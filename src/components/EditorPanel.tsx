@@ -1,23 +1,22 @@
 
-import React, { useState } from 'react';
-import { useEditor } from '@/context/EditorContext';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import TextEditor from './TextEditor';
-import ImageUploader from './ImageUploader';
-import VersionHistory from './VersionHistory';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
-import { 
-  Type, 
-  Image as ImageIcon, 
-  Video, 
-  Link, 
-  History,
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useEditor } from '@/context/EditorContext';
+import {
   FileVideo,
+  Image as ImageIcon,
+  Link,
+  Type,
+  Video
 } from 'lucide-react';
+import React, { useState } from 'react';
+import { toast } from 'sonner';
+import ImageUploader from './ImageUploader';
+import TextEditor from './TextEditor';
+import VersionHistory from './VersionHistory';
 
 const EditorPanel: React.FC = () => {
   const { addElement } = useEditor();
@@ -92,29 +91,29 @@ const EditorPanel: React.FC = () => {
           <TabsTrigger value="edit">Edit</TabsTrigger>
           <TabsTrigger value="history">History</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="elements" className="flex-1 overflow-auto">
           <div className="p-4 grid grid-cols-2 gap-2">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="h-24 flex flex-col items-center justify-center"
               onClick={handleAddText}
             >
               <Type size={24} className="mb-2" />
               <span>Text</span>
             </Button>
-            
-            <Button 
-              variant="outline" 
+
+            <Button
+              variant="outline"
               className="h-24 flex flex-col items-center justify-center"
               asChild
             >
               <label>
                 <ImageIcon size={24} className="mb-2" />
                 <span>Image</span>
-                <input 
-                  type="file" 
-                  className="hidden" 
+                <input
+                  type="file"
+                  className="hidden"
                   accept="image/*"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
@@ -140,11 +139,11 @@ const EditorPanel: React.FC = () => {
                 />
               </label>
             </Button>
-            
+
             <Dialog open={isVideoDialogOpen} onOpenChange={setIsVideoDialogOpen}>
               <DialogTrigger asChild>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="h-24 flex flex-col items-center justify-center"
                 >
                   <Video size={24} className="mb-2" />
@@ -165,7 +164,7 @@ const EditorPanel: React.FC = () => {
                       onChange={(e) => setVideoUrl(e.target.value)}
                     />
                   </div>
-                  <Button 
+                  <Button
                     onClick={handleAddVideo}
                     disabled={!videoUrl}
                     className="w-full"
@@ -176,11 +175,11 @@ const EditorPanel: React.FC = () => {
                 </div>
               </DialogContent>
             </Dialog>
-            
+
             <Dialog open={isLinkDialogOpen} onOpenChange={setIsLinkDialogOpen}>
               <DialogTrigger asChild>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="h-24 flex flex-col items-center justify-center"
                 >
                   <Link size={24} className="mb-2" />
@@ -210,7 +209,7 @@ const EditorPanel: React.FC = () => {
                       onChange={(e) => setLinkUrl(e.target.value)}
                     />
                   </div>
-                  <Button 
+                  <Button
                     onClick={handleAddLink}
                     disabled={!linkUrl}
                     className="w-full"
@@ -222,14 +221,14 @@ const EditorPanel: React.FC = () => {
               </DialogContent>
             </Dialog>
           </div>
-          
+
           <ImageUploader />
         </TabsContent>
-        
+
         <TabsContent value="edit" className="flex-1 overflow-auto">
           <TextEditor />
         </TabsContent>
-        
+
         <TabsContent value="history" className="flex-1 overflow-auto">
           <VersionHistory />
         </TabsContent>

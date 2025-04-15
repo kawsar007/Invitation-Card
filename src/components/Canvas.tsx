@@ -42,6 +42,20 @@ const Canvas: React.FC = () => {
     setDraggedElement(null);
   };
 
+  const handleTextDoubleClick = (e: React.MouseEvent, element: EditorElement) => {
+    e.stopPropagation();
+    const target = e.currentTarget as HTMLDivElement;
+    target.contentEditable = 'true';
+    target.focus();
+    // updateElement(element.id, { content: target.innerText });
+  };
+
+  const handleTextBlur = (e: React.FocusEvent, element: EditorElement) => {
+    const target = e.currentTarget as HTMLDivElement;
+    target.contentEditable = 'false';
+    updateElement(element.id, { content: target.textContent || '' });
+  };
+
   const renderElement = (element: EditorElement) => {
     const isSelected = state.selectedElement === element.id;
     const baseStyles = {
@@ -76,6 +90,9 @@ const Canvas: React.FC = () => {
             <div
               dangerouslySetInnerHTML={{ __html: element.content }}
               className="w-full h-full overflow-hidden"
+              onDoubleClick={(e) => handleTextDoubleClick(e, element)}
+              onBlur={(e) => handleTextBlur(e, element)}
+              suppressContentEditableWarning
             />
           </div>
         );
