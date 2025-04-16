@@ -5,14 +5,16 @@ import { useToast } from "@/hooks/use-toast";
 import { useRef, useState } from 'react';
 import { toast } from "sonner";
 
-const defaultContent = `
-<div style="text-align: center; padding: 40px;">
-  <h1 style="color: #a389f4; font-family: 'Georgia', serif; font-size: 32px; margin-bottom: 20px;">You're Invited</h1>
-  <p style="font-size: 18px; margin-bottom: 30px;">Please join us to celebrate</p>
-  <h2 style="font-family: 'Georgia', serif; font-size: 26px; margin-bottom: 20px;">Sarah & Michael's Wedding</h2>
-  <p style="font-size: 16px; margin-bottom: 10px;">Saturday, June 15th, 2025 at 4:00 PM</p>
-  <p style="font-size: 16px; margin-bottom: 30px;">The Grand Hotel, New York City</p>
-  <p style="font-style: italic; color: #666;">Dinner and dancing to follow</p>
+const defaultContent = (bgImage: string) => `
+<div style="text-align: center; min-height: 100vh; background-image: url('${bgImage}'); background-size: cover; background-position: center; background-repeat: no-repeat; display: flex; align-items: center; justify-content: center;">
+  <div style="padding: 40px; margin: 20px; width: 100%; max-width: 800px;">
+    <h1 style="color: #a389f4; font-family: 'Georgia', serif; font-size: 32px; margin-bottom: 20px;">You're Invited</h1>
+    <p style="font-size: 18px; margin-bottom: 30px;">Please join us to celebrate</p>
+    <h2 style="font-family: 'Georgia', serif; font-size: 26px; margin-bottom: 20px;">Sadia & Fahad's Wedding</h2>
+    <p style="font-size: 16px; margin-bottom: 10px;">Saturday, April 19th, 2025 at 8:00 PM</p>
+    <p style="font-size: 16px; margin-bottom: 30px;">The Grand Hotel, Gulshan Dhaka</p>
+    <p style="font-style: italic; color: #666;">Dinner and dancing to follow</p>
+  </div>
 </div>
 `;
 
@@ -23,20 +25,34 @@ interface CardVersion {
 }
 
 const Index = () => {
-  const [content, setContent] = useState<string>(defaultContent);
+  const [backgroundImage, setBackgroundImage] = useState<string>('/default-bg.jpg');
+  const [content, setContent] = useState<string>(defaultContent(backgroundImage));
   const [showGrid, setShowGrid] = useState<boolean>(false);
   const [versions, setVersions] = useState<CardVersion[]>([{
     id: 1,
-    content: defaultContent,
+    content: defaultContent(backgroundImage),
     timestamp: new Date()
   }]);
+
+  console.log("Versions", versions);
+
   const [currentVersionIndex, setCurrentVersionIndex] = useState<number>(0);
   const [canUndo, setCanUndo] = useState<boolean>(false);
   const [canRedo, setCanRedo] = useState<boolean>(false);
 
-  const historyRef = useRef<string[]>([defaultContent]);
+  const historyRef = useRef<string[]>([defaultContent(backgroundImage)]);
   const historyIndexRef = useRef<number>(0);
   const { toast: showToast } = useToast();
+
+  // Add this function to handle background changes
+  const handleBackgroundChange = (imageUrl: string) => {
+    setBackgroundImage(imageUrl);
+    const newContent = content.replace(
+      /background-image: url\([^)]+\)/,
+      `background-image: url('${imageUrl}')`
+    );
+    handleContentChange(newContent);
+  };
 
   // Handle content change and update history
   const handleContentChange = (newContent: string) => {
@@ -75,10 +91,12 @@ const Index = () => {
     }
   };
 
-  // Reset to default
+  // Update the reset handler
   const handleReset = () => {
-    setContent(defaultContent);
-    historyRef.current = [defaultContent];
+    const defaultBg = '/default-bg.jpg';
+    setBackgroundImage(defaultBg);
+    setContent(defaultContent(defaultBg));
+    historyRef.current = [defaultContent(defaultBg)];
     historyIndexRef.current = 0;
     setCanUndo(false);
     setCanRedo(false);
@@ -136,6 +154,7 @@ const Index = () => {
         currentVersion={currentVersionIndex + 1}
         versions={versions.length}
         onVersionChange={handleVersionChange}
+        onBackgroundChange={handleBackgroundChange}
       />
 
       <CardCanvas

@@ -9,6 +9,7 @@ import {
 import { Toggle } from "@/components/ui/toggle";
 import {
   Grid3X3,
+  Image,
   Redo,
   RotateCcw,
   Save,
@@ -28,6 +29,7 @@ interface EditorHeaderProps {
   currentVersion: number;
   versions: number;
   onVersionChange: (version: string) => void;
+  onBackgroundChange: (imageUrl: string) => void;
 }
 
 const EditorHeader: React.FC<EditorHeaderProps> = ({
@@ -41,15 +43,47 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
   onToggleGrid,
   currentVersion,
   versions,
-  onVersionChange
+  onVersionChange,
+  onBackgroundChange
 }) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const imageUrl = event.target?.result as string;
+        onBackgroundChange(imageUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
   return (
     <header className="bg-white border-b border-gray-200 p-4 flex flex-wrap justify-between items-center">
       <div className="flex items-center space-x-2">
         <h1 className="text-2xl font-bold text-primary">Card Editor</h1>
+
+
       </div>
 
       <div className="flex flex-wrap items-center space-x-2">
+
+        <input
+          type="file"
+          id="bg-upload"
+          accept="image/*"
+          className="hidden"
+          onChange={handleImageUpload}
+        />
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => document.getElementById('bg-upload')?.click()}
+          title="Change Background"
+        >
+          <Image className="h-4 w-4" />
+          {/* Change Background */}
+        </Button>
+
         <Button
           variant="outline"
           size="icon"
