@@ -1,230 +1,159 @@
-
-import React from 'react';
-import { useEditor } from '@/context/EditorContext';
 import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Slider } from '@/components/ui/slider';
-import { 
-  Type, 
-  Image, 
-  Video, 
-  Link, 
-  Grid, 
-  ZoomIn, 
-  ZoomOut, 
-  RotateCcw,
-  Undo, 
-  Redo 
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger
+} from '@/components/ui/tabs';
+import { useIsMobile } from '@/hooks/use-mobile';
+import {
+  Palette,
+  PanelLeft,
+  Type
 } from 'lucide-react';
+import React from 'react';
 
 interface ToolbarProps {
   onAddText: () => void;
-  onAddImage: () => void;
-  onAddVideo: () => void;
-  onAddLink: () => void;
+  onAddImage: (imageUrl: string) => void;
+  onAddVideo: (videoUrl: string) => void;
+  onAddLink: (linkData: { url: string; text: string }) => void;
+  sidebarOpen: boolean;
+  setSidebarOpen: (open: boolean) => void;
 }
 
-const Toolbar: React.FC<ToolbarProps> = ({ 
-  onAddText, 
-  onAddImage, 
-  onAddVideo, 
-  onAddLink 
+const Toolbar: React.FC<ToolbarProps> = ({
+  onAddText,
+  onAddImage,
+  onAddVideo,
+  onAddLink,
+  sidebarOpen,
+  setSidebarOpen
 }) => {
-  const { state, undo, redo, reset, toggleGrid, setScale } = useEditor();
-  
-  const handleZoomIn = () => {
-    if (state.scale < 2) {
-      setScale(state.scale + 0.1);
+  const [imageUrl, setImageUrl] = React.useState('');
+  const [videoUrl, setVideoUrl] = React.useState('');
+  const [linkUrl, setLinkUrl] = React.useState('');
+  const [linkText, setLinkText] = React.useState('');
+  const isMobile = useIsMobile();
+
+  const handleAddImage = () => {
+    if (imageUrl) {
+      onAddImage(imageUrl);
+      setImageUrl('');
     }
   };
 
-  const handleZoomOut = () => {
-    if (state.scale > 0.5) {
-      setScale(state.scale - 0.1);
+  const handleAddVideo = () => {
+    if (videoUrl) {
+      onAddVideo(videoUrl);
+      setVideoUrl('');
     }
   };
 
-  const handleScaleChange = (value: number[]) => {
-    setScale(value[0]);
+  const handleAddLink = () => {
+    if (linkUrl && linkText) {
+      onAddLink({ url: linkUrl, text: linkText });
+      setLinkUrl('');
+      setLinkText('');
+    }
   };
 
   return (
-    <div className="flex items-center p-2 bg-white border-b border-border">
-      <div className="flex items-center space-x-1 mr-4">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={onAddText}
-                className="toolbar-button"
-              >
-                <Type size={18} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Add Text</TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={onAddImage}
-                className="toolbar-button"
-              >
-                <Image size={18} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Add Image</TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={onAddVideo}
-                className="toolbar-button"
-              >
-                <Video size={18} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Add Video</TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={onAddLink}
-                className="toolbar-button"
-              >
-                <Link size={18} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Add Link</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+    <div className={`${sidebarOpen ? 'w-80' : 'w-0'} transition-all duration-300 overflow-hidden h-full bg-white border-r border-gray-200`}>
+      <div className="flex justify-between items-center p-4 border-b border-gray-200">
+        <h2 className="font-semibold text-gray-800">Toolbox</h2>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="md:hidden"
+        >
+          <PanelLeft className="h-4 w-4" />
+        </Button>
       </div>
 
-      <div className="h-6 w-px bg-border mx-2" />
+      <Tabs defaultValue="elements" className="p-4">
+        <TabsList className="w-full">
+          <TabsTrigger value="elements" className="flex-1">Elements</TabsTrigger>
+          <TabsTrigger value="design" className="flex-1">Design</TabsTrigger>
+        </TabsList>
 
-      <div className="flex items-center space-x-1 mr-4">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={undo}
-                disabled={state.history.past.length === 0}
-                className="toolbar-button"
-              >
-                <Undo size={18} />
+        <TabsContent value="elements">
+          <div className="space-y-4 mt-4">
+            <Button
+              variant="outline"
+              className="w-full justify-start"
+              onClick={onAddText}
+            >
+              <Type className="h-4 w-4 mr-2" />
+              Add Text
+            </Button>
+
+            <Separator />
+
+            <div className="space-y-2">
+              <Label htmlFor="image-url">Image URL</Label>
+              <div className="flex space-x-2">
+                <Input
+                  id="image-url"
+                  placeholder="https://example.com/image.jpg"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                />
+                <Button onClick={handleAddImage}>Add</Button>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-2">
+              <Label htmlFor="video-url">Video URL (YouTube/Vimeo)</Label>
+              <div className="flex space-x-2">
+                <Input
+                  id="video-url"
+                  placeholder="https://youtube.com/watch?v=..."
+                  value={videoUrl}
+                  onChange={(e) => setVideoUrl(e.target.value)}
+                />
+                <Button onClick={handleAddVideo}>Add</Button>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-2">
+              <Label htmlFor="link-url">Link</Label>
+              <Input
+                id="link-url"
+                placeholder="https://example.com"
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+                className="mb-2"
+              />
+              <Input
+                placeholder="Link text"
+                value={linkText}
+                onChange={(e) => setLinkText(e.target.value)}
+              />
+              <Button onClick={handleAddLink} className="w-full mt-2">
+                Add Link
               </Button>
-            </TooltipTrigger>
-            <TooltipContent>Undo</TooltipContent>
-          </Tooltip>
+            </div>
+          </div>
+        </TabsContent>
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={redo}
-                disabled={state.history.future.length === 0}
-                className="toolbar-button"
-              >
-                <Redo size={18} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Redo</TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={reset}
-                className="toolbar-button"
-              >
-                <RotateCcw size={18} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Reset</TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={toggleGrid}
-                className={`toolbar-button ${state.showGrid ? 'active' : ''}`}
-              >
-                <Grid size={18} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Toggle Grid</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
-
-      <div className="h-6 w-px bg-border mx-2" />
-
-      <div className="flex items-center space-x-2">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={handleZoomOut}
-                disabled={state.scale <= 0.5}
-                className="toolbar-button"
-              >
-                <ZoomOut size={18} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Zoom Out</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-
-        <div className="w-32">
-          <Slider
-            value={[state.scale]}
-            min={0.5}
-            max={2}
-            step={0.1}
-            onValueChange={handleScaleChange}
-          />
-        </div>
-
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={handleZoomIn}
-                disabled={state.scale >= 2}
-                className="toolbar-button"
-              >
-                <ZoomIn size={18} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Zoom In</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-
-        <span className="text-sm text-muted-foreground">
-          {Math.round(state.scale * 100)}%
-        </span>
-      </div>
+        <TabsContent value="design">
+          <div className="space-y-4 mt-4">
+            <div className="p-4 bg-gray-50 rounded-md text-center">
+              <Palette className="h-8 w-8 mx-auto text-primary mb-2" />
+              <p>Design options will be available here</p>
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

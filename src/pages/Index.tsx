@@ -1,125 +1,149 @@
 
-import React, { useState } from 'react';
-import { EditorProvider } from '@/context/EditorContext';
-import Canvas from '@/components/Canvas';
-import Toolbar from '@/components/Toolbar';
-import EditorPanel from '@/components/EditorPanel';
-import HistoryControls from '@/components/HistoryControls';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
+import CardCanvas from "@/components/CardCanvas";
+import EditorHeader from "@/components/EditorHeader";
+import { useToast } from "@/hooks/use-toast";
+import { useRef, useState } from 'react';
+import { toast } from "sonner";
+
+const defaultContent = `
+<div style="text-align: center; padding: 40px;">
+  <h1 style="color: #a389f4; font-family: 'Georgia', serif; font-size: 32px; margin-bottom: 20px;">You're Invited</h1>
+  <p style="font-size: 18px; margin-bottom: 30px;">Please join us to celebrate</p>
+  <h2 style="font-family: 'Georgia', serif; font-size: 26px; margin-bottom: 20px;">Sarah & Michael's Wedding</h2>
+  <p style="font-size: 16px; margin-bottom: 10px;">Saturday, June 15th, 2025 at 4:00 PM</p>
+  <p style="font-size: 16px; margin-bottom: 30px;">The Grand Hotel, New York City</p>
+  <p style="font-style: italic; color: #666;">Dinner and dancing to follow</p>
+</div>
+`;
+
+interface CardVersion {
+  id: number;
+  content: string;
+  timestamp: Date;
+}
 
 const Index = () => {
-  const [videoUrl, setVideoUrl] = useState('');
-  const [linkUrl, setLinkUrl] = useState('');
-  const [isVideoDialogOpen, setIsVideoDialogOpen] = useState(false);
-  const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
+  const [content, setContent] = useState<string>(defaultContent);
+  const [showGrid, setShowGrid] = useState<boolean>(false);
+  const [versions, setVersions] = useState<CardVersion[]>([{
+    id: 1,
+    content: defaultContent,
+    timestamp: new Date()
+  }]);
+  const [currentVersionIndex, setCurrentVersionIndex] = useState<number>(0);
+  const [canUndo, setCanUndo] = useState<boolean>(false);
+  const [canRedo, setCanRedo] = useState<boolean>(false);
 
-  const handleAddText = () => {
-    toast('Text element added to canvas');
+  const historyRef = useRef<string[]>([defaultContent]);
+  const historyIndexRef = useRef<number>(0);
+  const { toast: showToast } = useToast();
+
+  // Handle content change and update history
+  const handleContentChange = (newContent: string) => {
+    // Save current content to history if it's different
+    if (newContent !== content) {
+      const newHistory = historyRef.current.slice(0, historyIndexRef.current + 1);
+      newHistory.push(newContent);
+      historyRef.current = newHistory;
+      historyIndexRef.current = newHistory.length - 1;
+
+      // Update undo/redo buttons state
+      setCanUndo(historyIndexRef.current > 0);
+      setCanRedo(historyIndexRef.current < historyRef.current.length - 1);
+    }
+
+    setContent(newContent);
   };
 
-  const handleAddImage = () => {
-    toast('Please select an image file to upload');
+  // Undo action
+  const handleUndo = () => {
+    if (historyIndexRef.current > 0) {
+      historyIndexRef.current--;
+      setContent(historyRef.current[historyIndexRef.current]);
+      setCanUndo(historyIndexRef.current > 0);
+      setCanRedo(true);
+    }
   };
 
-  const handleAddVideo = () => {
-    setIsVideoDialogOpen(true);
+  // Redo action
+  const handleRedo = () => {
+    if (historyIndexRef.current < historyRef.current.length - 1) {
+      historyIndexRef.current++;
+      setContent(historyRef.current[historyIndexRef.current]);
+      setCanRedo(historyIndexRef.current < historyRef.current.length - 1);
+      setCanUndo(true);
+    }
   };
 
-  const handleAddLink = () => {
-    setIsLinkDialogOpen(true);
+  // Reset to default
+  const handleReset = () => {
+    setContent(defaultContent);
+    historyRef.current = [defaultContent];
+    historyIndexRef.current = 0;
+    setCanUndo(false);
+    setCanRedo(false);
+    toast.info("Card has been reset to default");
+  };
+
+  // Save card version
+  const handleSave = () => {
+    // Add new version
+    const newId = versions.length + 1;
+    const newVersion = {
+      id: newId,
+      content,
+      timestamp: new Date()
+    };
+
+    setVersions([...versions, newVersion]);
+    setCurrentVersionIndex(versions.length);
+    toast.success("Card saved successfully!");
+  };
+
+  // Toggle grid
+  const handleToggleGrid = () => {
+    setShowGrid(!showGrid);
+  };
+
+  // Load a specific version
+  const handleVersionChange = (version: string) => {
+    const versionIndex = parseInt(version) - 1;
+    if (versions[versionIndex]) {
+      setContent(versions[versionIndex].content);
+      setCurrentVersionIndex(versionIndex);
+
+      // Update history
+      historyRef.current = [...historyRef.current, versions[versionIndex].content];
+      historyIndexRef.current = historyRef.current.length - 1;
+      setCanUndo(true);
+      setCanRedo(false);
+
+      toast.info(`Loaded version ${version}`);
+    }
   };
 
   return (
-    <EditorProvider>
-      <div className="min-h-screen flex flex-col bg-editor-light-bg">
-        <header className="bg-white border-b border-border p-4">
-          <h1 className="text-2xl font-bold text-center text-editor-blue">Invitation Card Editor</h1>
-        </header>
-        
-        <div className="flex flex-1 overflow-hidden">
-          <main className="flex-1 flex flex-col overflow-hidden">
-            <Toolbar 
-              onAddText={handleAddText}
-              onAddImage={handleAddImage}
-              onAddVideo={handleAddVideo}
-              onAddLink={handleAddLink}
-            />
-            
-            <div className="flex-1 overflow-auto p-8 flex items-center justify-center">
-              <Canvas />
-            </div>
-            
-            <HistoryControls />
-          </main>
-          
-          <EditorPanel />
-        </div>
-      </div>
-      
-      <Dialog open={isVideoDialogOpen} onOpenChange={setIsVideoDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Video</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="video-url-main">Video URL</Label>
-              <Input
-                id="video-url-main"
-                placeholder="https://example.com/video.mp4"
-                value={videoUrl}
-                onChange={(e) => setVideoUrl(e.target.value)}
-              />
-            </div>
-            <Button 
-              onClick={() => {
-                toast.success('Video added to canvas');
-                setVideoUrl('');
-                setIsVideoDialogOpen(false);
-              }}
-              disabled={!videoUrl}
-              className="w-full"
-            >
-              Add Video
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-      
-      <Dialog open={isLinkDialogOpen} onOpenChange={setIsLinkDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Link</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="link-url-main">URL</Label>
-              <Input
-                id="link-url-main"
-                placeholder="https://example.com"
-                value={linkUrl}
-                onChange={(e) => setLinkUrl(e.target.value)}
-              />
-            </div>
-            <Button 
-              onClick={() => {
-                toast.success('Link added to canvas');
-                setLinkUrl('');
-                setIsLinkDialogOpen(false);
-              }}
-              disabled={!linkUrl}
-              className="w-full"
-            >
-              Add Link
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </EditorProvider>
+    <div className="flex flex-col h-screen overflow-hidden bg-gray-50">
+      <EditorHeader
+        canUndo={canUndo}
+        canRedo={canRedo}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
+        onReset={handleReset}
+        onSave={handleSave}
+        showGrid={showGrid}
+        onToggleGrid={handleToggleGrid}
+        currentVersion={currentVersionIndex + 1}
+        versions={versions.length}
+        onVersionChange={handleVersionChange}
+      />
+
+      <CardCanvas
+        content={content}
+        onChange={handleContentChange}
+        showGrid={showGrid}
+      />
+    </div>
   );
 };
 
