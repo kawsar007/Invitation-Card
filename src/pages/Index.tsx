@@ -37,6 +37,7 @@ const Index = () => {
   const [currentVersionIndex, setCurrentVersionIndex] = useState<number>(0);
   const [canUndo, setCanUndo] = useState<boolean>(false);
   const [canRedo, setCanRedo] = useState<boolean>(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
 
   const historyRef = useRef<string[]>([defaultContent(backgroundImage)]);
   const historyIndexRef = useRef<number>(0);
@@ -67,6 +68,7 @@ const Index = () => {
       // Update undo/redo buttons state
       setCanUndo(historyIndexRef.current > 0);
       setCanRedo(historyIndexRef.current < historyRef.current.length - 1);
+      setHasUnsavedChanges(true);
     }
 
     setContent(newContent);
@@ -106,6 +108,7 @@ const Index = () => {
 
   // Save card version
   const handleSave = () => {
+    if (!hasUnsavedChanges) return; // Don't save if no changes
     // Add new version
     const newId = versions.length + 1;
     const newVersion = {
@@ -116,6 +119,7 @@ const Index = () => {
 
     setVersions([...versions, newVersion]);
     setCurrentVersionIndex(versions.length);
+    setHasUnsavedChanges(false); // Reset after saving
     toast.success("Card saved successfully!");
   };
 
@@ -136,6 +140,7 @@ const Index = () => {
       historyIndexRef.current = historyRef.current.length - 1;
       setCanUndo(true);
       setCanRedo(false);
+      setHasUnsavedChanges(false); // Reset unsaved changes
 
       toast.info(`Loaded version ${version}`);
     }
@@ -150,6 +155,7 @@ const Index = () => {
         onRedo={handleRedo}
         onReset={handleReset}
         onSave={handleSave}
+        hasUnsavedChanges={hasUnsavedChanges}
         showGrid={showGrid}
         onToggleGrid={handleToggleGrid}
         currentVersion={currentVersionIndex + 1}

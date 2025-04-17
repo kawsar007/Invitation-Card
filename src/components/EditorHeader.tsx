@@ -24,6 +24,7 @@ interface EditorHeaderProps {
   onRedo: () => void;
   onReset: () => void;
   onSave: () => void;
+  hasUnsavedChanges: boolean;
   showGrid: boolean;
   onToggleGrid: () => void;
   currentVersion: number;
@@ -39,6 +40,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
   onRedo,
   onReset,
   onSave,
+  hasUnsavedChanges,
   showGrid,
   onToggleGrid,
   currentVersion,
@@ -139,6 +141,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
 
         <Button
           onClick={onSave}
+          disabled={!hasUnsavedChanges}
           className="bg-primary hover:bg-primary/90"
         >
           <Save className="h-4 w-4 mr-2" />
