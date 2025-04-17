@@ -10,7 +10,6 @@ import {
 } from '@/components/ui/tabs';
 import { useIsMobile } from '@/hooks/use-mobile';
 import {
-  Palette,
   PanelLeft,
   Type
 } from 'lucide-react';
@@ -23,6 +22,7 @@ interface ToolbarProps {
   onAddLink: (linkData: { url: string; text: string }) => void;
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
+  onBackgroundChange: (imageUrl: string) => void;
 }
 
 const Toolbar: React.FC<ToolbarProps> = ({
@@ -31,13 +31,17 @@ const Toolbar: React.FC<ToolbarProps> = ({
   onAddVideo,
   onAddLink,
   sidebarOpen,
-  setSidebarOpen
+  setSidebarOpen,
+  onBackgroundChange
 }) => {
   const [imageUrl, setImageUrl] = React.useState('');
   const [videoUrl, setVideoUrl] = React.useState('');
   const [linkUrl, setLinkUrl] = React.useState('');
   const [linkText, setLinkText] = React.useState('');
   const isMobile = useIsMobile();
+
+  console.log("Link Url", linkUrl);
+  console.log("Link Text", linkText);
 
   const handleAddImage = () => {
     if (imageUrl) {
@@ -60,6 +64,16 @@ const Toolbar: React.FC<ToolbarProps> = ({
       setLinkText('');
     }
   };
+
+  const backgroundImages = [
+    '/default-bg.jpg',
+    '/card-bg-1.jpg',
+    '/card-bg-2.jpg',
+    '/card-bg-3.jpg',
+    '/card-bg-4.jpg',
+    '/card-bg-5.jpg',
+    // Add more background images as needed
+  ];
 
   return (
     <div className={`${sidebarOpen ? 'w-80' : 'w-0'} transition-all duration-300 overflow-hidden h-full bg-white border-r border-gray-200`}>
@@ -147,9 +161,23 @@ const Toolbar: React.FC<ToolbarProps> = ({
 
         <TabsContent value="design">
           <div className="space-y-4 mt-4">
-            <div className="p-4 bg-gray-50 rounded-md text-center">
-              <Palette className="h-8 w-8 mx-auto text-primary mb-2" />
-              <p>Design options will be available here</p>
+            <h3 className="font-medium text-sm">Background Images</h3>
+            <div className="h-[calc(100vh-280px)] overflow-y-auto pr-2">
+              <div className="grid grid-cols-2 gap-2">
+                {backgroundImages.map((image, index) => (
+                  <div
+                    key={index}
+                    className="relative aspect-[3/4] cursor-pointer overflow-hidden rounded-lg border-2 hover:border-primary transition-all"
+                    onClick={() => onBackgroundChange(image)}
+                  >
+                    <img
+                      src={image}
+                      alt={`Background ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </TabsContent>

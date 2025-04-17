@@ -10,7 +10,7 @@ const defaultContent = (bgImage: string) => `
   <div style="padding: 40px; margin: 20px; width: 100%; max-width: 800px;">
     <h1 style="color: #a389f4; font-family: 'Georgia', serif; font-size: 32px; margin-bottom: 20px;">You're Invited</h1>
     <p style="font-size: 18px; margin-bottom: 30px;">Please join us to celebrate</p>
-    <h2 style="font-family: 'Georgia', serif; font-size: 26px; margin-bottom: 20px;">Sadia & Fahad's Wedding</h2>
+    <h2 style="font-family: 'Georgia', serif; font-size: 26px; margin-bottom: 20px;">Jerry & Jayson's Wedding</h2>
     <p style="font-size: 16px; margin-bottom: 10px;">Saturday, April 19th, 2025 at 8:00 PM</p>
     <p style="font-size: 16px; margin-bottom: 30px;">The Grand Hotel, Gulshan Dhaka</p>
     <p style="font-style: italic; color: #666;">Dinner and dancing to follow</p>
@@ -34,8 +34,6 @@ const Index = () => {
     timestamp: new Date()
   }]);
 
-  console.log("Versions", versions);
-
   const [currentVersionIndex, setCurrentVersionIndex] = useState<number>(0);
   const [canUndo, setCanUndo] = useState<boolean>(false);
   const [canRedo, setCanRedo] = useState<boolean>(false);
@@ -43,6 +41,9 @@ const Index = () => {
   const historyRef = useRef<string[]>([defaultContent(backgroundImage)]);
   const historyIndexRef = useRef<number>(0);
   const { toast: showToast } = useToast();
+
+  console.log("History Ref ---> ", historyRef);
+
 
   // Add this function to handle background changes
   const handleBackgroundChange = (imageUrl: string) => {
@@ -161,6 +162,7 @@ const Index = () => {
         content={content}
         onChange={handleContentChange}
         showGrid={showGrid}
+        onBackgroundChange={handleBackgroundChange}
       />
     </div>
   );

@@ -9,12 +9,14 @@ interface CardCanvasProps {
   content: string;
   onChange: (content: string) => void;
   showGrid: boolean;
+  onBackgroundChange: (imageUrl: string) => void;
 }
 
 const CardCanvas: React.FC<CardCanvasProps> = ({
   content,
   onChange,
-  showGrid
+  showGrid,
+  onBackgroundChange
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const editorRef = useRef<any>(null);
@@ -82,6 +84,7 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
         onAddLink={handleAddLink}
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
+        onBackgroundChange={onBackgroundChange}
       />
 
       {/* Main canvas area */}
