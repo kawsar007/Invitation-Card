@@ -65,13 +65,39 @@ const CardEditor: React.FC<CardEditorProps> = ({
           plugins: [
             'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
             'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-            'insertdatetime', 'media', 'table', 'code', 'help', 'emoticons'
+            'insertdatetime', 'media', 'table', 'code', 'help', 'emoticons', 'fontsize', 'fontfamily'
           ],
-          toolbar: 'undo redo | blocks | ' + 'image media | ' +
+          toolbar: 'undo redo | blocks | fontfamily | fontsizeinput | ' + 'image media | ' +
             'bold italic forecolor | alignleft aligncenter ' +
             'alignright alignjustify | bullist numlist outdent indent | ' +
-
             'removeformat | help',
+          font_family_formats: 'Arial=arial,helvetica,sans-serif;' +
+            'Arial Black=arial black,avant garde;' +
+            'Book Antiqua=book antiqua,palatino;' +
+            'Comic Sans MS=comic sans ms,sans-serif;' +
+            'Courier New=courier new,courier;' +
+            'Georgia=georgia,palatino;' +
+            'Helvetica=helvetica;' +
+            'Impact=impact,chicago;' +
+            'Tahoma=tahoma,arial,helvetica,sans-serif;' +
+            'Terminal=terminal,monaco;' +
+            'Times New Roman=times new roman,times;' +
+            'Trebuchet MS=trebuchet ms,geneva;' +
+            'Dancing Script=Dancing Script,cursive;' +
+            'Pacifico=Pacifico,cursive;' +
+            'Great Vibes=Great Vibes,cursive;' +
+            'Satisfy=Satisfy,cursive;' +
+            'Tangerine=Tangerine,cursive;' +
+            'Kalam=Kalam,cursive;' +
+            'Caveat=Caveat,cursive;' +
+            'Sacramento=Sacramento,cursive;' +
+            'Courgette=Courgette,cursive;' +
+            'Marck Script=Marck Script,cursive;' +
+            'Yellowtail=Yellowtail,cursive;' +
+            'Italianno=Italianno,cursive;' +
+            'Rouge Script=Rouge Script,cursive;' +
+            'Times New Roman=times new roman,times',
+          fontsize_formats: '8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt 48pt',
           image_advtab: true,  // Enables advanced image options
           file_picker_types: 'image',  // Only allow image uploads
           content_style: `
@@ -84,6 +110,7 @@ const CardEditor: React.FC<CardEditorProps> = ({
               box-sizing: border-box;
             }
             img { max-width: 100%; height: auto; }
+             @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Pacifico&family=Great+Vibes&family=Satisfy&family=Tangerine:wght@400;700&family=Kalam:wght@300;400;700&family=Caveat:wght@400;700&family=Sacramento&family=Courgette&family=Marck+Script&family=Yellowtail&family=Italianno&family=Rouge+Script&display=swap');
           `,
           images_upload_handler: (blobInfo, progress) => {
             return new Promise((resolve, reject) => {
