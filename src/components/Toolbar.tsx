@@ -40,9 +40,6 @@ const Toolbar: React.FC<ToolbarProps> = ({
   const [linkText, setLinkText] = React.useState('');
   const isMobile = useIsMobile();
 
-  console.log("Link Url", linkUrl);
-  console.log("Link Text", linkText);
-
   const handleAddImage = () => {
     if (imageUrl) {
       onAddImage(imageUrl);

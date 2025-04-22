@@ -10,6 +10,7 @@ import { Toggle } from "@/components/ui/toggle";
 import {
   Grid3X3,
   Image,
+  ListTree,
   Redo,
   RotateCcw,
   Save,
@@ -31,6 +32,8 @@ interface EditorHeaderProps {
   versions: number;
   onVersionChange: (version: string) => void;
   onBackgroundChange: (imageUrl: string) => void;
+  showModifiedBlocks?: boolean;
+  onToggleModifiedBlocks?: () => void;
 }
 
 const EditorHeader: React.FC<EditorHeaderProps> = ({
@@ -46,7 +49,9 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
   currentVersion,
   versions,
   onVersionChange,
-  onBackgroundChange
+  onBackgroundChange,
+  showModifiedBlocks = false,
+  onToggleModifiedBlocks = () => { }
 }) => {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -112,6 +117,14 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
           title="Toggle Grid"
         >
           <Grid3X3 className="h-4 w-4" />
+        </Toggle>
+
+        <Toggle
+          pressed={showModifiedBlocks}
+          onPressedChange={onToggleModifiedBlocks}
+          title="Track Content Changes"
+        >
+          <ListTree className="h-4 w-4" />
         </Toggle>
 
         <Select
