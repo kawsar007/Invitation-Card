@@ -1,58 +1,29 @@
-
-import CardCanvas from "@/components/CardCanvas";
-import EditorHeader from "@/components/EditorHeader";
 import ModifiedBlocksPanel from "@/components/ModifiedBlocks";
-import { useToast } from "@/hooks/use-toast";
+import TemplateSelector from "@/components/TemplateSelector";
+import CardCanvas from "@/pages/CardCanvas";
+import EditorHeader from "@/pages/EditorHeader";
+import { CardTemplate, CardVersion, ContentBlock, ModifiedBlock } from "@/types/types";
+import { extractContentBlocks } from "@/utils/contentParser";
+import { cardTemplates } from "@/utils/templates";
 import { useEffect, useRef, useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { toast } from "sonner";
 
-const defaultContent = (bgImage: string) => `
-<div style="text-align: center; min-height: 100vh; background-image: url('${bgImage}'); background-size: cover; background-position: center; background-repeat: no-repeat; display: flex; align-items: center; justify-content: center;">
-  <div style="padding: 40px; margin: 20px; width: 100%; max-width: 800px;">
-    <h1 id="block-h1-0" style="color: #a389f4; font-family: 'Georgia', serif; font-size: 32px; margin-bottom: 20px;">You're Invited</h1>
-    <p id="block-p-0" style="font-size: 18px; margin-bottom: 30px;">Please join us to celebrate</p>
-    <h2 id="block-h2-0" style="font-family: 'Georgia', serif; font-size: 26px; margin-bottom: 20px;">Jerry & Jayson's Wedding</h2>
-    <p id="block-p-1" style="font-size: 16px; margin-bottom: 10px;">Saturday, April 19th, 2025 at 8:00 PM</p>
-    <p id="block-p-2" style="font-size: 16px; margin-bottom: 30px;">The Grand Hotel, Gulshan Dhaka</p>
-    <p id="block-p-3" style="font-style: italic; color: #666;">Dinner and dancing to follow</p>
-  </div>
-</div>
-`;
-
-// Define interfaces for tracking content blocks
-interface ModifiedBlock {
-  id: string;
-  type: string;
-  originalContent: string;
-  newContent: string;
-  timestamp: Date;
-}
-interface CardVersion {
-  id: number;
-  content: string;
-  timestamp: Date;
-  modifiedBlocks: ModifiedBlock[];
-}
-
-interface ContentBlock {
-  id: string;
-  type: string;
-  content: string;
-  html: string; // Complete HTML including styles
-}
-
-
 const Index = () => {
-  const [backgroundImage, setBackgroundImage] = useState<string>('/default-bg.jpg');
-  const [content, setContent] = useState<string>(defaultContent(backgroundImage));
+  // Add template selection state
+  const [showTemplateSelector, setShowTemplateSelector] = useState<boolean>(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<CardTemplate>(cardTemplates[0]);
+
+  const [backgroundImage, setBackgroundImage] = useState<string>(selectedTemplate.backgroundImage);
+  const [content, setContent] = useState<string>(selectedTemplate.content);
   const [showGrid, setShowGrid] = useState<boolean>(false);
   const [versions, setVersions] = useState<CardVersion[]>([{
     id: 1,
-    content: defaultContent(backgroundImage),
+    content: selectedTemplate.content,
     timestamp: new Date(),
     modifiedBlocks: []
   }]);
+
 
   const [currentVersionIndex, setCurrentVersionIndex] = useState<number>(0);
   const [canUndo, setCanUndo] = useState<boolean>(false);
@@ -67,47 +38,54 @@ const Index = () => {
   const [contentBlocks, setContentBlocks] = useState<ContentBlock[]>([]);
   const [showBlockEditor, setShowBlockEditor] = useState<boolean>(false);
 
-  const historyRef = useRef<string[]>([defaultContent(backgroundImage)]);
+  const historyRef = useRef<string[]>([selectedTemplate.content]);
   const historyIndexRef = useRef<number>(0);
-  const { toast: showToast } = useToast();
 
   // Store original content for comparing changes
   const originalContentRef = useRef<Record<string, string>>({});
-  const containerRef = useRef<HTMLDivElement | null>(null);
 
-  // Extract content blocks from HTML
-  const extractContentBlocks = (htmlContent: string) => {
-    // Create a temporary DOM element to parse the HTML
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlContent, 'text/html');
+  // Handle template selection
+  const handleTemplateSelect = (templateId: string) => {
+    const template = cardTemplates.find(t => t.id === templateId);
+    if (template) {
+      setSelectedTemplate(template);
+      setBackgroundImage(template.backgroundImage);
+      setContent(template.content);
 
-    const blocks: Record<string, string> = {};
-    const extractedBlocks: ContentBlock[] = [];
+      // Reset history with the new template
+      historyRef.current = [template.content];
+      historyIndexRef.current = 0;
+      setCanUndo(false);
+      setCanRedo(false);
 
-    // Get the container div
-    const container = doc.querySelector('div > div');
-    if (!container) return { blocks, extractedBlocks };
+      // Reset modified blocks
+      setModifiedBlocks([]);
 
-    // Extract all direct children (content blocks)
-    Array.from(container.children).forEach((element, index) => {
-      const tagName = element.tagName.toLowerCase();
+      // Extract blocks from new template
+      const { blocks, extractedBlocks } = extractContentBlocks(template.content);
+      originalContentRef.current = blocks;
+      setContentBlocks(extractedBlocks);
 
-      // Create an ID if the element doesn't have one
-      const id = element.id || `block-${tagName}-${index}`;
-      if (!element.id) {
-        element.id = id;
-      }
+      // Reset versions
+      setVersions([{
+        id: 1,
+        content: template.content,
+        timestamp: new Date(),
+        modifiedBlocks: []
+      }]);
+      setCurrentVersionIndex(0);
+      setHasUnsavedChanges(false);
 
-      blocks[id] = element.innerHTML.trim();
+      // Close template selector
+      setShowTemplateSelector(false);
 
-      extractedBlocks.push({
-        id,
-        type: tagName,
-        content: element.innerHTML.trim(),
-        html: element.outerHTML
-      });
-    });
-    return { blocks, extractedBlocks };
+      toast.success(`Template "${template.name}" loaded successfully!`);
+    }
+  };
+
+  // Toggle template selector
+  const handleToggleTemplateSelector = () => {
+    setShowTemplateSelector(!showTemplateSelector);
   };
 
   // Initialize content blocks on mount and when content changes
@@ -307,19 +285,18 @@ const Index = () => {
     }
   };
 
-  // Update the reset handler
+  // Update the reset handler to use the current template
   const handleReset = () => {
-    const defaultBg = '/default-bg.jpg';
-    setBackgroundImage(defaultBg);
-    setContent(defaultContent(defaultBg));
-    historyRef.current = [defaultContent(defaultBg)];
+    setBackgroundImage(selectedTemplate.backgroundImage);
+    setContent(selectedTemplate.content);
+    historyRef.current = [selectedTemplate.content];
     historyIndexRef.current = 0;
     setCanUndo(false);
     setCanRedo(false);
     setModifiedBlocks([]); // Reset Modified Blocks
-    const { blocks } = extractContentBlocks(defaultContent(defaultBg));
+    const { blocks } = extractContentBlocks(selectedTemplate.content);
     originalContentRef.current = blocks;
-    toast.info("Card has been reset to default");
+    toast.info("Card has been reset to the selected template");
   };
 
   // Save card version
@@ -405,7 +382,19 @@ const Index = () => {
         onToggleModifiedBlocks={handleToggleModifiedBlocks}
         showBlockEditor={showBlockEditor}
         onToggleBlockEditor={handleToggleBlockEditor}
+        onToggleTemplateSelector={handleToggleTemplateSelector} // New prop
+        currentTemplate={selectedTemplate.name} // New prop
       />
+
+      {/* Template Selector Modal */}
+      {showTemplateSelector && (
+        <TemplateSelector
+          templates={cardTemplates}
+          onSelect={handleTemplateSelect}
+          onClose={() => setShowTemplateSelector(false)}
+          currentTemplateId={selectedTemplate.id}
+        />
+      )}
 
       <div className="flex flex-1 overflow-hidden">
         <div className={`flex-1 ${showModifiedBlocks ? 'w-3/4' : 'w-full'}`}>
@@ -428,6 +417,12 @@ const Index = () => {
                   className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded hover:bg-blue-100"
                 >
                   Add H1
+                </button>
+                <button
+                  onClick={() => addContentBlock('h2')}
+                  className="px-2 py-1 bg-purple-50 text-purple-600 text-xs rounded hover:bg-purple-100"
+                >
+                  Add H2
                 </button>
                 <button
                   onClick={() => addContentBlock('p')}

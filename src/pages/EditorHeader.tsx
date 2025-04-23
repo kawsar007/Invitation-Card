@@ -37,6 +37,9 @@ interface EditorHeaderProps {
   onToggleModifiedBlocks?: () => void;
   showBlockEditor?: boolean;
   onToggleBlockEditor?: () => void;
+
+  onToggleTemplateSelector: () => void; // New prop
+  currentTemplate: string; // New prop
 }
 
 const EditorHeader: React.FC<EditorHeaderProps> = ({
@@ -56,7 +59,9 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
   showModifiedBlocks = false,
   onToggleModifiedBlocks = () => { },
   showBlockEditor = false,
-  onToggleBlockEditor = () => { }
+  onToggleBlockEditor = () => { },
+  onToggleTemplateSelector,
+  currentTemplate
 }) => {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -69,6 +74,16 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
       reader.readAsDataURL(file);
     }
   };
+
+  // Generate version options
+  const versionOptions = [];
+  for (let i = 1; i <= versions; i++) {
+    versionOptions.push(
+      <option key={i} value={i}>
+        Version {i} {i === currentVersion ? '(current)' : ''}
+      </option>
+    );
+  }
   return (
     <header className="bg-white border-b border-gray-200 p-4 flex flex-wrap justify-between items-center">
       <div className="flex items-center space-x-2">
@@ -137,6 +152,31 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
         >
           <GripVertical className="h-4 w-4" />
         </Toggle>
+
+        <div className="flex items-center">
+          <span className="text-sm text-gray-500 mr-2">Current Template:</span>
+          <button
+            onClick={onToggleTemplateSelector}
+            className="inline-flex items-center px-3 py-1.5 bg-indigo-50 border border-indigo-200 rounded-md text-sm font-medium text-indigo-700 hover:bg-indigo-100"
+          >
+            {currentTemplate} <span className="ml-1">▼</span>
+          </button>
+        </div>
+
+        {/* Version Selector */}
+        {/* <div className="flex items-center">
+          <label htmlFor="version-select" className="text-sm text-gray-500 mr-2">
+            Version:
+          </label>
+          <select
+            id="version-select"
+            value={currentVersion}
+            onChange={(e) => onVersionChange(e.target.value)}
+            className="text-sm border border-gray-200 rounded px-2 py-1"
+          >
+            {versionOptions}
+          </select>
+        </div> */}
 
         <Select
           value={currentVersion.toString()}
