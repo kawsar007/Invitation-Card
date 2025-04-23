@@ -9,6 +9,7 @@ import {
 import { Toggle } from "@/components/ui/toggle";
 import {
   Grid3X3,
+  GripVertical,
   Image,
   ListTree,
   Redo,
@@ -34,6 +35,8 @@ interface EditorHeaderProps {
   onBackgroundChange: (imageUrl: string) => void;
   showModifiedBlocks?: boolean;
   onToggleModifiedBlocks?: () => void;
+  showBlockEditor?: boolean;
+  onToggleBlockEditor?: () => void;
 }
 
 const EditorHeader: React.FC<EditorHeaderProps> = ({
@@ -51,7 +54,9 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
   onVersionChange,
   onBackgroundChange,
   showModifiedBlocks = false,
-  onToggleModifiedBlocks = () => { }
+  onToggleModifiedBlocks = () => { },
+  showBlockEditor = false,
+  onToggleBlockEditor = () => { }
 }) => {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -68,12 +73,9 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
     <header className="bg-white border-b border-gray-200 p-4 flex flex-wrap justify-between items-center">
       <div className="flex items-center space-x-2">
         <h1 className="text-2xl font-bold text-primary">Card Editor</h1>
-
-
       </div>
 
       <div className="flex flex-wrap items-center space-x-2">
-
         <input
           type="file"
           id="bg-upload"
@@ -88,7 +90,6 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
           title="Change Background"
         >
           <Image className="h-4 w-4" />
-          {/* Change Background */}
         </Button>
 
         <Button
@@ -119,12 +120,22 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
           <Grid3X3 className="h-4 w-4" />
         </Toggle>
 
+        {/* Toggle for Modified Blocks */}
         <Toggle
           pressed={showModifiedBlocks}
           onPressedChange={onToggleModifiedBlocks}
           title="Track Content Changes"
         >
           <ListTree className="h-4 w-4" />
+        </Toggle>
+
+        {/* New Toggle for Block Editor */}
+        <Toggle
+          pressed={showBlockEditor}
+          onPressedChange={onToggleBlockEditor}
+          title="Drag & Drop Block Editor"
+        >
+          <GripVertical className="h-4 w-4" />
         </Toggle>
 
         <Select
