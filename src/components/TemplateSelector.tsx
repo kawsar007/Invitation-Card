@@ -1,15 +1,6 @@
 // components/TemplateSelector.tsx (continued)
+import { CardTemplate } from '@/types/types';
 import React from 'react';
-
-interface CardTemplate {
-  id: string;
-  name: string;
-  thumbnail: string;
-  backgroundImage: string;
-  content: string;
-  description: string;
-  category: string;
-}
 
 interface TemplateSelectorProps {
   templates: CardTemplate[];
@@ -24,6 +15,8 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
   onClose,
   currentTemplateId
 }) => {
+  console.log("Templates --->", templates);
+
   // Group templates by category
   const templatesByCategory: Record<string, CardTemplate[]> = {};
   templates.forEach(template => {
@@ -32,6 +25,8 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
     }
     templatesByCategory[template.category].push(template);
   });
+
+  console.log("templatesByCategory", templatesByCategory);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
