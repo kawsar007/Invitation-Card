@@ -1,3 +1,22 @@
+/**
+ * useBlockEditor Hook
+ * 
+ * This hook manages the block-based editing functionality of the card editor.
+ * It handles operations such as drag-and-drop reordering of blocks, updating block content,
+ * adding new blocks, and removing existing blocks.
+ * 
+ * Features:
+ * - Content block state management
+ * - Drag and drop reordering of blocks
+ * - Block content updating
+ * - Block addition and removal
+ * - Synchronizing block changes with the overall card content
+ * 
+ * @param content - Current card content
+ * @param onContentChange - Function to call when content changes
+ * @returns Object containing block editor state and functions
+ */
+
 import { ContentBlock } from "@/types/types";
 import { useState } from 'react';
 import { DropResult } from "react-beautiful-dnd";

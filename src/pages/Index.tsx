@@ -1,15 +1,36 @@
+/**
+ * Card Editor
+ * 
+ * This is the main component for the card editor application. It integrates
+ * multiple custom hooks to provide a complete card editing experience with
+ * features like template selection, version history, block editing, and
+ * background customization.
+ * 
+ * The component is structured to separate concerns:
+ * - Card state management via useCardEditor
+ * - Template handling via useTemplateManagement
+ * - Version control via useVersionHistory
+ * - UI panel visibility via useEditorPanels
+ * 
+ * The editor layout consists of a header with controls, an optional template
+ * selector, and the main workspace area which can display the card canvas
+ * along with optional panels for block editing or modified block viewing.
+ */
+
+
 import BlockEditor from "@/components/BlockEditor";
 import ModifiedBlocksPanel from "@/components/ModifiedBlocks";
 import TemplateSelector from "@/components/TemplateSelector";
 import { useBlockEditor } from "@/hooks/useBlockEditor";
 import { useCardEditor } from "@/hooks/useCardEditor";
+import { useEditorPanels } from "@/hooks/useEditorPanels";
 import { useTemplateManagement } from "@/hooks/useTemplateManagement";
 import { useVersionHistory } from "@/hooks/useVersionHistory";
 import CardCanvas from "@/pages/CardCanvas";
 import EditorHeader from "@/pages/EditorHeader";
 import { extractContentBlocks } from "@/utils/contentParser";
 import { cardTemplates } from "@/utils/templates";
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 const Index = () => {
   // Initialize editor with the first template
@@ -41,11 +62,6 @@ const Index = () => {
     originalContentRef
   });
 
-  const [showGrid, setShowGrid] = useState<boolean>(false);
-
-  const [showModifiedBlocks, setShowModifiedBlocks] = useState<boolean>(false);
-  const [showBlockEditor, setShowBlockEditor] = useState<boolean>(false);
-
   // Version control
   const {
     versions,
@@ -70,6 +86,16 @@ const Index = () => {
     trackContentBlockChange
   });
 
+  // UI panel states
+  const {
+    showGrid,
+    showModifiedBlocks,
+    showBlockEditor,
+    handleToggleGrid,
+    handleToggleModifiedBlocks,
+    handleToggleBlockEditor
+  } = useEditorPanels();
+
   // Add this function to handle background changes
   const handleBackgroundChange = (imageUrl: string) => {
     setBackgroundImage(imageUrl);
@@ -80,23 +106,6 @@ const Index = () => {
     // Track background change as a content block modification
     trackContentBlockChange('background', 'image', backgroundImage, imageUrl);
     handleContentChange(newContent);
-  };
-
-  // Toggle grid
-  const handleToggleGrid = () => {
-    setShowGrid(!showGrid);
-  };
-
-  // Toggle modified blocks panel
-  const handleToggleModifiedBlocks = () => {
-    setShowModifiedBlocks(!showModifiedBlocks);
-    setShowBlockEditor(false);
-  };
-
-  // Toggle block editor
-  const handleToggleBlockEditor = () => {
-    setShowBlockEditor(!showBlockEditor);
-    setShowModifiedBlocks(false);
   };
 
   // Block editor functionality

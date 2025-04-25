@@ -1,3 +1,27 @@
+/**
+ * useTemplateManagement Hook
+ * 
+ * This hook manages template selection and loading in the card editor.
+ * It handles the template selector modal visibility, template switching,
+ * and resetting the editor state when a new template is selected.
+ * 
+ * Features:
+ * - Template selector modal visibility control
+ * - Template selection and loading
+ * - Content reset when switching templates
+ * - History reset when switching templates
+ * - Notification feedback on template changes
+ * 
+ * @param selectedTemplate - Currently selected template
+ * @param setSelectedTemplate - Function to update selected template
+ * @param setContent - Function to update content
+ * @param setBackgroundImage - Function to update background image
+ * @param setModifiedBlocks - Function to update modified blocks
+ * @param originalContentRef - Reference to original content blocks
+ * @returns Object containing template selector state and functions
+ */
+
+
 import { CardTemplate, ModifiedBlock } from "@/types/types";
 import { extractContentBlocks } from "@/utils/contentParser";
 import { cardTemplates } from "@/utils/templates";

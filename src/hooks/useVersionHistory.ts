@@ -1,3 +1,27 @@
+/**
+ * useVersionHistory Hook
+ * 
+ * This hook manages version history for card content, enabling undo/redo functionality
+ * and version management. It tracks content changes, maintains a history stack,
+ * and provides functions to save versions, navigate between them, and reset content.
+ * 
+ * Features:
+ * - Undo/redo functionality with state tracking
+ * - Version saving and restoration
+ * - Content history management
+ * - Change detection for unsaved work
+ * - Content block change tracking
+ * 
+ * @param content - Current card content
+ * @param setContent - Function to update content
+ * @param selectedTemplate - Currently selected template
+ * @param setBackgroundImage - Function to update background image
+ * @param modifiedBlocks - Array of blocks that have been modified
+ * @param setModifiedBlocks - Function to update modified blocks
+ * @param originalContentRef - Reference to original content blocks
+ * @param trackContentBlockChange - Function to track changes to content blocks
+ */
+
 import { CardTemplate, CardVersion, ModifiedBlock } from "@/types/types";
 import { extractContentBlocks } from "@/utils/contentParser";
 import { MutableRefObject, useRef, useState } from 'react';

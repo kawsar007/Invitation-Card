@@ -1,3 +1,22 @@
+/**
+ * useCardEditor Hook
+ * 
+ * This is the primary hook that powers the card editor functionality.
+ * It manages the overall card state, including content, template, background,
+ * and tracked modifications. This hook serves as the central state manager
+ * for the card editor.
+ * 
+ * Features:
+ * - Template state management
+ * - Content state management
+ * - Background image management
+ * - Modified blocks tracking
+ * - Content block change tracking
+ * 
+ * @param initialTemplate - Template to initialize the editor with
+ * @returns Object containing card editor state and functions
+ */
+
 import { CardTemplate, ModifiedBlock } from "@/types/types";
 import { useRef, useState } from 'react';
 
