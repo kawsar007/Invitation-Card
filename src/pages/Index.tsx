@@ -1,22 +1,36 @@
 import BlockEditor from "@/components/BlockEditor";
 import ModifiedBlocksPanel from "@/components/ModifiedBlocks";
 import TemplateSelector from "@/components/TemplateSelector";
+import { useBlockEditor } from "@/hooks/useBlockEditor";
+import { useCardEditor } from "@/hooks/useCardEditor";
 import CardCanvas from "@/pages/CardCanvas";
 import EditorHeader from "@/pages/EditorHeader";
-import { CardTemplate, CardVersion, ContentBlock, ModifiedBlock } from "@/types/types";
+import { CardVersion } from "@/types/types";
 import { extractContentBlocks } from "@/utils/contentParser";
 import { cardTemplates } from "@/utils/templates";
 import { useEffect, useRef, useState } from 'react';
-import { DropResult } from "react-beautiful-dnd";
 import { toast } from "sonner";
 
 const Index = () => {
+  // Initialize editor with the first template
+  const {
+    selectedTemplate,
+    setSelectedTemplate,
+    content,
+    setContent,
+    backgroundImage,
+    setBackgroundImage,
+    modifiedBlocks,
+    setModifiedBlocks,
+    trackContentBlockChange,
+    originalContentRef
+  } = useCardEditor(cardTemplates[0]);
+
+
+
   // Add template selection state
   const [showTemplateSelector, setShowTemplateSelector] = useState<boolean>(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<CardTemplate>(cardTemplates[0]);
 
-  const [backgroundImage, setBackgroundImage] = useState<string>(selectedTemplate.backgroundImage);
-  const [content, setContent] = useState<string>(selectedTemplate.content);
   const [showGrid, setShowGrid] = useState<boolean>(false);
   const [versions, setVersions] = useState<CardVersion[]>([{
     id: 1,
@@ -25,26 +39,15 @@ const Index = () => {
     modifiedBlocks: []
   }]);
 
-
   const [currentVersionIndex, setCurrentVersionIndex] = useState<number>(0);
   const [canUndo, setCanUndo] = useState<boolean>(false);
   const [canRedo, setCanRedo] = useState<boolean>(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
-
-  // states for block tracking
-  const [modifiedBlocks, setModifiedBlocks] = useState<ModifiedBlock[]>([]);
   const [showModifiedBlocks, setShowModifiedBlocks] = useState<boolean>(false);
-
-  // state for content blocks (for drag and drop)
-  const [contentBlocks, setContentBlocks] = useState<ContentBlock[]>([]);
   const [showBlockEditor, setShowBlockEditor] = useState<boolean>(false);
 
   const historyRef = useRef<string[]>([selectedTemplate.content]);
   const historyIndexRef = useRef<number>(0);
-
-  // Store original content for comparing changes
-  const originalContentRef = useRef<Record<string, string>>({});
-
   // Handle template selection
   const handleTemplateSelect = (templateId: string) => {
     const template = cardTemplates.find(t => t.id === templateId);
@@ -89,104 +92,8 @@ const Index = () => {
     setShowTemplateSelector(!showTemplateSelector);
   };
 
-  // Initialize content blocks on mount and when content changes
-  useEffect(() => {
-    const { blocks, extractedBlocks } = extractContentBlocks(content);
-    originalContentRef.current = blocks;
-    setContentBlocks(extractedBlocks);
-  }, [content]);
 
-  // Handle drag end event
-  const handleDragEnd = (result: DropResult) => {
-    if (!result.destination) return;
 
-    const items = Array.from(contentBlocks);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-
-    setContentBlocks(items);
-
-    // Rebuild HTML content from reordered blocks
-    updateHtmlFromBlocks(items);
-  }
-
-  // Update HTML content from rearranged blocks
-  const updateHtmlFromBlocks = (blocks: ContentBlock[]) => {
-    // Create a temporary DOM element to parse the HTML
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(content, 'text/html');
-
-    // Get the container div
-    const container = doc.querySelector('div > div');
-    if (!container) return;
-
-    // Clear the container
-    container.innerHTML = '';
-
-    // Add blocks in new order
-    blocks.forEach(block => {
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = block.html;
-      const element = tempDiv.firstChild;
-      if (element) {
-        container.appendChild(element);
-      }
-    });
-
-    // Update content state
-    const newContent = doc.documentElement.outerHTML;
-    handleContentChange(newContent);
-  }
-
-  // Handle block content update
-  const handleBlockUpdate = (id: string, newHtml: string) => {
-    const updatedBlocks = contentBlocks.map(block => {
-      if (block.id === id) {
-        // Parse the new HTML to extract content
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = newHtml;
-        const element = tempDiv.firstChild as HTMLElement;
-
-        return {
-          ...block,
-          content: element.innerHTML || block.content,
-          html: newHtml
-        };
-      }
-      return block;
-    });
-    setContentBlocks(updatedBlocks);
-    updateHtmlFromBlocks(updatedBlocks);
-  }
-
-  // Add a new content block
-  const addContentBlock = (type: string) => {
-    const id = `block-${type}-${contentBlocks.length}`;
-    const defaultContent = type === 'h1' ? 'New Heading' :
-      type === 'h2' ? 'New Subheading' : 'New paragraph text';
-
-    const style = type === 'h1' ? "color: #a389f4; font-family: 'Georgia', serif; font-size: 32px; margin-bottom: 20px;" :
-      type === 'h2' ? "font-family: 'Georgia', serif; font-size: 26px; margin-bottom: 20px;" :
-        "font-size: 16px; margin-bottom: 10px;";
-
-    const newBlock = {
-      id,
-      type,
-      content: defaultContent,
-      html: `<${type} id="${id}" style="${style}">${defaultContent}</${type}>`
-    };
-
-    const updatedBlocks = [...contentBlocks, newBlock];
-    setContentBlocks(updatedBlocks);
-    updateHtmlFromBlocks(updatedBlocks);
-  };
-
-  // Remove a content block
-  const removeContentBlock = (id: string) => {
-    const updatedBlocks = contentBlocks.filter(block => block.id !== id);
-    setContentBlocks(updatedBlocks);
-    updateHtmlFromBlocks(updatedBlocks);
-  };
 
   // Add this function to handle background changes
   const handleBackgroundChange = (imageUrl: string) => {
@@ -199,36 +106,6 @@ const Index = () => {
     trackContentBlockChange('background', 'image', backgroundImage, imageUrl);
     handleContentChange(newContent);
   };
-
-  // Track content block changes
-  const trackContentBlockChange = (id: string, type: string, originalContent: string, newContent: string) => {
-    // Don't track if content is the same
-    if (originalContent === newContent) return;
-    const existingBlockIndex = modifiedBlocks.findIndex(block => block.id === id);
-
-    if (existingBlockIndex >= 0) {
-      // Update existing block
-      const updatedBlocks = [...modifiedBlocks];
-      updatedBlocks[existingBlockIndex] = {
-        ...updatedBlocks[existingBlockIndex],
-        newContent,
-        timestamp: new Date()
-      };
-      setModifiedBlocks(updatedBlocks);
-    } else {
-      // Add new block to tracking
-      setModifiedBlocks([
-        ...modifiedBlocks,
-        {
-          id,
-          type,
-          originalContent,
-          newContent,
-          timestamp: new Date()
-        }
-      ])
-    }
-  }
 
   // Handle content change and update history
   const handleContentChange = (newContent: string) => {
@@ -357,11 +234,26 @@ const Index = () => {
 
       // Load modified blocks from this version
       setModifiedBlocks(versions[versionIndex].modifiedBlocks);
-
       toast.info(`Loaded version ${version}`);
     }
   };
 
+  // Block editor functionality
+  const {
+    contentBlocks,
+    setContentBlocks,
+    handleDragEnd,
+    handleBlockUpdate,
+    addContentBlock,
+    removeContentBlock
+  } = useBlockEditor(content, handleContentChange);
+
+  // Initialize content blocks on mount and when content changes
+  useEffect(() => {
+    const { blocks, extractedBlocks } = extractContentBlocks(content);
+    originalContentRef.current = blocks;
+    setContentBlocks(extractedBlocks);
+  }, [content, originalContentRef, setContentBlocks]);
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-gray-50">
