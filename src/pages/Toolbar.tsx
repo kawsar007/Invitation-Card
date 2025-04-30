@@ -80,7 +80,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
           variant="ghost"
           size="icon"
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="md:hidden"
+        // className="md:hidden"
         >
           <PanelLeft className="h-4 w-4" />
         </Button>
