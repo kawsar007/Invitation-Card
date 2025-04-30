@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Editor } from '@tinymce/tinymce-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from "sonner";
+import Toolbar from "./Toolbar";
 
 interface CardEditorProps {
   content: string;
@@ -14,6 +15,14 @@ interface CardEditorProps {
   cardSize: { width: number; height: number };
   toolbarTheme?: 'light' | 'dark';
   toolbarSize?: 'sm' | 'md' | 'lg';
+
+  onAddText: () => void;
+  onAddImage: (imageUrl: string) => void;
+  onAddVideo: (videoUrl: string) => void;
+  onAddLink: (linkData: { url: string; text: string }) => void;
+  sidebarOpen: boolean;
+  setSidebarOpen: (open: boolean) => void;
+  onBackgroundChange: (imageUrl: string) => void;
 }
 
 const CardEditor: React.FC<CardEditorProps> = ({
@@ -23,7 +32,15 @@ const CardEditor: React.FC<CardEditorProps> = ({
   editorRef,
   cardSize,
   toolbarTheme = 'light',
-  toolbarSize = 'md'
+  toolbarSize = 'md',
+
+  onAddText,
+  onAddImage,
+  onAddVideo,
+  onAddLink,
+  sidebarOpen,
+  setSidebarOpen,
+  onBackgroundChange
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [editorHeight, setEditorHeight] = useState<string>("80vh");
@@ -56,6 +73,7 @@ const CardEditor: React.FC<CardEditorProps> = ({
   return (
     <div className="flex flex-col w-full">
       {/* Custom toolbar with theme support */}
+
       <div className="w-full mb-4">
         <CustomEditorToolbar
           editor={editorInstance}
@@ -67,10 +85,20 @@ const CardEditor: React.FC<CardEditorProps> = ({
 
       {/* Main content area with side-by-side layout */}
       <div className="flex flex-row gap-4 w-full">
-        {showFormatting && (
+        {showFormatting ? (
           <div className="w-72 flex-shrink-0 transition-all duration-300 ease-in-out">
             <TextFormattingControls editor={editorInstance} theme={toolbarTheme} size={toolbarSize} />
           </div>
+        ) : (
+          <Toolbar
+            onAddText={onAddText}
+            onAddImage={onAddImage}
+            onAddVideo={onAddVideo}
+            onAddLink={onAddLink}
+            sidebarOpen={sidebarOpen}
+            setSidebarOpen={setSidebarOpen}
+            onBackgroundChange={onBackgroundChange}
+          />
         )}
 
         {/* Right side editor container */}

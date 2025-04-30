@@ -33,7 +33,7 @@ const CustomEditorToolbar: React.FC<CustomToolbarProps> = ({
     } ${size === 'sm' ? 'text-xs' : size === 'lg' ? 'text-lg px-4 py-2' : 'text-base'
     }`;
 
-  const containerClass = `w-full border-b py-2 mb-4 flex justify-between flex-wrap items-center ${theme === 'light' ? 'bg-white border-gray-200' : 'bg-gray-800 border-gray-700'
+  const containerClass = `w-full border-b py-2 flex justify-between flex-wrap items-center ${theme === 'light' ? 'bg-white border-gray-200' : 'bg-gray-800 border-gray-700'
     }`;
 
   const sectionClass = `flex items-center mr-4 border-r pr-4 ${theme === 'light' ? 'border-gray-200' : 'border-gray-700'

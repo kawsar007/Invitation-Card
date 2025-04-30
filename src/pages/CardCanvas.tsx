@@ -1,9 +1,6 @@
-import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { PanelLeft } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import CardEditor from './CardEditor';
-import Toolbar from './Toolbar';
 
 interface CardCanvasProps {
   content: string;
@@ -77,7 +74,7 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
   return (
     <div className="flex flex-1 h-full overflow-hidden">
       {/* Toolbar */}
-      <Toolbar
+      {/* <Toolbar
         onAddText={handleAddText}
         onAddImage={handleAddImage}
         onAddVideo={handleAddVideo}
@@ -85,21 +82,12 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
         onBackgroundChange={onBackgroundChange}
-      />
+      /> */}
 
       {/* Main canvas area */}
       <div className="flex-1 overflow-auto p-4 bg-gray-50">
         <div className="flex items-center justify-between mb-4">
-          {!sidebarOpen && (
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setSidebarOpen(true)}
-              className="mr-2"
-            >
-              <PanelLeft className="h-4 w-4" />
-            </Button>
-          )}
+
           <h2 className="text-lg font-semibold text-gray-700">Card Canvas</h2>
         </div>
 
@@ -110,6 +98,14 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
             showGrid={showGrid}
             editorRef={editorRef}
             cardSize={cardSize}
+
+            onAddText={handleAddText}
+            onAddImage={handleAddImage}
+            onAddVideo={handleAddVideo}
+            onAddLink={handleAddLink}
+            sidebarOpen={sidebarOpen}
+            setSidebarOpen={setSidebarOpen}
+            onBackgroundChange={onBackgroundChange}
           />
         </div>
       </div>
