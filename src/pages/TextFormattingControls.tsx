@@ -1,5 +1,6 @@
 import { Color, Font } from '@/types/types';
 import { COLOR_PALETTE, FONT_FAMILIES, FONT_SIZES, SIZES, THEMES } from '@/utils/constant';
+import { AlignCenter, AlignLeft, AlignRight } from 'lucide-react';
 import React, { useState } from 'react';
 
 
@@ -59,64 +60,68 @@ const TextFormattingControls: React.FC<TextFormattingControlsProps> = ({
     <div className="w-72">
       <div className={styleConfig.cardClass}>
         <FormattingSection
-          title="Basic Formatting"
+          title="Text Style & Formatting"
           isActive={activeSections.basic}
           onToggle={() => toggleSection('basic')}
           styleConfig={styleConfig}
         >
-          <div className="flex p-3 space-x-1">
-            <button
-              className={`${styleConfig.buttonClass} flex-1`}
-              onClick={() => executeCommand('Bold')}
-              title="Bold"
-            >
-              <strong>B</strong>
-            </button>
-            <button
-              className={`${styleConfig.buttonClass} flex-1`}
-              onClick={() => executeCommand('Italic')}
-              title="Italic"
-            >
-              <em>I</em>
-            </button>
-            <button
-              className={`${styleConfig.buttonClass} flex-1`}
-              onClick={() => executeCommand('Underline')}
-              title="Underline"
-            >
-              <u>U</u>
-            </button>
-          </div>
-        </FormattingSection>
+          <div className="flex flex-col p-3 space-y-3">
+            {/* Basic Formatting */}
+            <div className="flex space-x-1">
+              <button
+                className={`${styleConfig.buttonClass} flex-1`}
+                onClick={() => executeCommand('Bold')}
+                title="Bold"
+              >
+                <strong>B</strong>
+              </button>
+              <button
+                className={`${styleConfig.buttonClass} flex-1`}
+                onClick={() => executeCommand('Italic')}
+                title="Italic"
+              >
+                <em>I</em>
+              </button>
+              <button
+                className={`${styleConfig.buttonClass} flex-1`}
+                onClick={() => executeCommand('Underline')}
+                title="Underline"
+              >
+                <u>U</u>
+              </button>
+            </div>
 
-        <FormattingSection
-          title="Text Alignment"
-          isActive={activeSections.alignment}
-          onToggle={() => toggleSection('alignment')}
-          styleConfig={styleConfig}
-        >
-          <div className="flex p-3 space-x-1">
-            <button
-              className={`${styleConfig.buttonClass} flex-1`}
-              onClick={() => executeCommand('JustifyLeft')}
-              title="Align Left"
-            >
-              Left
-            </button>
-            <button
-              className={`${styleConfig.buttonClass} flex-1`}
-              onClick={() => executeCommand('JustifyCenter')}
-              title="Align Center"
-            >
-              Center
-            </button>
-            <button
-              className={`${styleConfig.buttonClass} flex-1`}
-              onClick={() => executeCommand('JustifyRight')}
-              title="Align Right"
-            >
-              Right
-            </button>
+            {/* Alignment Controls */}
+            <div className="flex space-x-1">
+              <button
+                className={`${styleConfig.buttonClass} flex-1`}
+                onClick={() => executeCommand('JustifyLeft')}
+                title="Align Left"
+              >
+                <span className='flex justify-center'>
+                  <AlignLeft className='h-5 w-5' />
+                </span>
+
+              </button>
+              <button
+                className={`${styleConfig.buttonClass} flex-1`}
+                onClick={() => executeCommand('JustifyCenter')}
+                title="Align Center"
+              >
+                <span className='flex justify-center'>
+                  <AlignCenter className='h-5 w-5' />
+                </span>
+              </button>
+              <button
+                className={`${styleConfig.buttonClass} flex-1`}
+                onClick={() => executeCommand('JustifyRight')}
+                title="Align Right"
+              >
+                <span className='flex justify-center'>
+                  <AlignRight className='h-5 w-5' />
+                </span>
+              </button>
+            </div>
           </div>
         </FormattingSection>
 

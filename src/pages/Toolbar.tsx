@@ -85,7 +85,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
         </Button>
       )}
 
-      <div className={`${sidebarOpen ? 'w-80' : 'w-0'} transition-all duration-300 overflow-hidden h-full bg-white border-r border-gray-200`}>
+      <div className={`${sidebarOpen ? 'w-72' : 'w-0'} transition-all duration-300 overflow-hidden h-full bg-white border-r border-gray-200`}>
 
 
         <div className="flex justify-between items-center p-2 border-b border-gray-200">

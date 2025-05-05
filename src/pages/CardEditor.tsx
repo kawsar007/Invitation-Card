@@ -1,6 +1,4 @@
 import CustomEditorToolbar from "@/components/CustomEditorToolbar";
-// import TextFormattingControls from "@/components/TestFormitingControls";
-// import TextFormattingControls from "@/components/TextFormitingControls";
 import { cn } from "@/lib/utils";
 import { Editor } from '@tinymce/tinymce-react';
 import React, { useEffect, useRef, useState } from 'react';
@@ -44,15 +42,60 @@ const CardEditor: React.FC<CardEditorProps> = ({
   onBackgroundChange
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const formattingControlsRef = useRef<HTMLDivElement>(null);
   const [editorHeight, setEditorHeight] = useState<string>("80vh");
   const [editorInstance, setEditorInstance] = useState<any>(null);
   const [showFormatting, setShowFormatting] = useState(false);
+
+  // Handle showing the formatting controls when the editor is clicked
+  useEffect(() => {
+    if (editorInstance) {
+      // Add click event listener to the editor
+      const editorElement = editorInstance.getContainer();
+
+      editorElement.addEventListener('click', () => {
+        setShowFormatting(true);
+      });
+
+      // Add focus event listener to the editor
+      editorInstance.on('focus', () => {
+        setShowFormatting(true);
+      });
+
+      return () => {
+        // Clean up event listeners when component unmounts
+        editorElement.removeEventListener('click', () => {
+          setShowFormatting(true);
+        });
+        editorInstance.off('focus');
+      };
+    }
+  }, [editorInstance]);
+
+  // Handle clicking outside to hide formatting controls
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      // If formatting is shown and click is outside editor and outside formatting controls
+      if (showFormatting &&
+        editorInstance &&
+        !editorInstance.getContainer().contains(event.target) &&
+        formattingControlsRef.current &&
+        !formattingControlsRef.current.contains(event.target as Node)) {
+        setShowFormatting(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showFormatting, editorInstance]);
 
   // Update handleAddText function
   const handleAddText = () => {
     if (editorInstance) {
       editorInstance.focus();
-      setShowFormatting(!showFormatting); // Toggle formatting controls
+      setShowFormatting(true); // Always show formatting controls when adding text
     }
   };
 
@@ -70,11 +113,9 @@ const CardEditor: React.FC<CardEditorProps> = ({
     return () => window.removeEventListener('resize', updateSize);
   }, [cardSize]);
 
-
   return (
     <div className="flex flex-col w-full">
       {/* Custom toolbar with theme support */}
-
       <div className="w-full mb-4">
         <CustomEditorToolbar
           editor={editorInstance}
@@ -87,7 +128,10 @@ const CardEditor: React.FC<CardEditorProps> = ({
       {/* Main content area with side-by-side layout */}
       <div className="flex flex-row gap-4 w-full">
         {showFormatting ? (
-          <div className="w-72 flex-shrink-0 transition-all duration-300 ease-in-out">
+          <div
+            ref={formattingControlsRef}
+            className="w-72 flex-shrink-0 transition-all duration-300 ease-in-out"
+          >
             <TextFormattingControls editor={editorInstance} theme={toolbarTheme} size={toolbarSize} />
           </div>
         ) : (
@@ -196,9 +240,6 @@ const CardEditor: React.FC<CardEditorProps> = ({
           </div>
         </div>
       </div>
-
-
-
     </div>
   );
 };
