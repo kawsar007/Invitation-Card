@@ -1,10 +1,11 @@
 import CustomEditorToolbar from "@/components/CustomEditorToolbar";
-import TextFormattingControls from "@/components/TestFormitingControls";
+// import TextFormattingControls from "@/components/TestFormitingControls";
 // import TextFormattingControls from "@/components/TextFormitingControls";
 import { cn } from "@/lib/utils";
 import { Editor } from '@tinymce/tinymce-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from "sonner";
+import TextFormattingControls from "./TextFormattingControls";
 import Toolbar from "./Toolbar";
 
 interface CardEditorProps {

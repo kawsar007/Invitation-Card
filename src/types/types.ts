@@ -30,3 +30,19 @@ export interface CardTemplate {
   description: string;
   category: string; // e.g., "wedding", "birthday", "professional"
 }
+
+// Types
+export interface Font {
+  value: string;
+  label: string;
+}
+
+export interface Color {
+  value: string;
+  label: string;
+}
+
+export interface FontSize {
+  value: string;
+  label: string;
+}
