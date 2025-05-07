@@ -15,10 +15,6 @@ interface CardEditorProps {
   toolbarTheme?: 'light' | 'dark';
   toolbarSize?: 'sm' | 'md' | 'lg';
 
-  onAddText: () => void;
-  onAddImage: (imageUrl: string) => void;
-  onAddVideo: (videoUrl: string) => void;
-  onAddLink: (linkData: { url: string; text: string }) => void;
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
   onBackgroundChange: (imageUrl: string) => void;
@@ -33,10 +29,6 @@ const CardEditor: React.FC<CardEditorProps> = ({
   toolbarTheme = 'light',
   toolbarSize = 'md',
 
-  onAddText,
-  onAddImage,
-  onAddVideo,
-  onAddLink,
   sidebarOpen,
   setSidebarOpen,
   onBackgroundChange
@@ -136,10 +128,6 @@ const CardEditor: React.FC<CardEditorProps> = ({
           </div>
         ) : (
           <Toolbar
-            onAddText={onAddText}
-            onAddImage={onAddImage}
-            onAddVideo={onAddVideo}
-            onAddLink={onAddLink}
             sidebarOpen={sidebarOpen}
             setSidebarOpen={setSidebarOpen}
             onBackgroundChange={onBackgroundChange}
