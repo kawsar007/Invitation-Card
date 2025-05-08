@@ -1,4 +1,5 @@
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Component, Edit, Mail } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import CardEditor from './CardEditor';
 
@@ -16,6 +17,7 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
   onBackgroundChange
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [activeTab, setActiveTab] = useState<'editor' | 'card' | 'envelope'>('editor');
   const editorRef = useRef<any>(null);
   const isMobile = useIsMobile();
 
@@ -27,19 +29,11 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
   // Standard invitation card size ratio (5x7 inches)
   const cardSize = { width: 700, height: 900 };
 
-  return (
-    <div className="flex flex-1 h-full overflow-hidden">
-
-      {/* Main canvas area */}
-      <div className="flex-1 overflow-auto p-4 bg-gray-50">
-        <div className="flex items-center justify-start gap-8 mb-4">
-
-          <h2 className="text-lg font-semibold text-gray-700">Editor</h2>
-          <h2 className="text-lg font-semibold text-gray-700">Edit Card</h2>
-          <h2 className="text-lg font-semibold text-gray-700">Edit Envelope</h2>
-        </div>
-
-        <div className="flex justify-center">
+  // Render tab content based on active tab
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'editor':
+        return (
           <CardEditor
             content={content}
             onChange={onChange}
@@ -50,6 +44,89 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
             setSidebarOpen={setSidebarOpen}
             onBackgroundChange={onBackgroundChange}
           />
+        );
+      case 'card':
+        return (
+          <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-3xl mx-auto">
+            <h3 className="text-xl font-semibold mb-4">Edit Card Content</h3>
+            <p className="mb-4">Here you can customize the appearance and content of your card.</p>
+            <div className="mb-4">
+              <h4 className="text-lg font-medium mb-2">Card Options</h4>
+              <ul className="list-disc pl-5 space-y-2">
+                <li>Choose card size and orientation</li>
+                <li>Select paper type and quality</li>
+                <li>Add custom borders and patterns</li>
+                <li>Set font styles and typography</li>
+              </ul>
+            </div>
+            <div className="p-4 bg-gray-100 rounded">
+              <p className="italic text-gray-600">This is dummy text for the Edit Card tab. In a real implementation, this would contain actual card editing tools and options.</p>
+            </div>
+          </div>
+        );
+
+      case 'envelope':
+        return (
+          <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-3xl mx-auto">
+            <h3 className="text-xl font-semibold mb-4">Edit Envelope Design</h3>
+            <p className="mb-4">Customize your envelope to match your card design.</p>
+            <div className="mb-4">
+              <h4 className="text-lg font-medium mb-2">Envelope Options</h4>
+              <ul className="list-disc pl-5 space-y-2">
+                <li>Choose envelope size and style</li>
+                <li>Add custom liners and patterns</li>
+                <li>Include return address printing</li>
+                <li>Select envelope color and material</li>
+              </ul>
+            </div>
+            <div className="p-4 bg-gray-100 rounded">
+              <p className="italic text-gray-600">This is dummy text for the Edit Envelope tab. In a real implementation, this would contain actual envelope customization tools.</p>
+            </div>
+          </div>
+        );
+      default:
+        return null;
+    }
+  }
+
+  return (
+    <div className="flex flex-1 h-full overflow-hidden">
+
+      {/* Main canvas area */}
+      <div className="flex-1 overflow-auto p-4 bg-gray-50">
+        <div className="flex items-center justify-start gap-8 mb-4 border-b border-gray-200">
+
+          <button
+            className={`flex justify-center items-center py-2 px-1 text-sm font-semibold ${activeTab === 'editor'
+              ? 'text-blue-600 border-b-2 border-blue-600'
+              : 'text-gray-700 hover:text-blue-500'
+              }`}
+            onClick={() => setActiveTab('editor')}
+          >
+            <Component className="h-4 w-4 mr-2" /> Editor
+          </button>
+          <button
+            className={`flex justify-center items-center py-2 px-1 text-sm font-semibold ${activeTab === 'card'
+              ? 'text-blue-600 border-b-2 border-blue-600'
+              : 'text-gray-700 hover:text-blue-500'
+              }`}
+            onClick={() => setActiveTab('card')}
+          >
+            <Edit className="h-4 w-4 mr-2" />  Edit Card
+          </button>
+          <button
+            className={`flex justify-center items-center py-2 px-1 text-sm font-semibold ${activeTab === 'envelope'
+              ? 'text-blue-600 border-b-2 border-blue-600'
+              : 'text-gray-700 hover:text-blue-500'
+              }`}
+            onClick={() => setActiveTab('envelope')}
+          >
+            <Mail className="h-4 w-4 mr-2" />  Edit Envelope
+          </button>
+        </div>
+
+        <div className="flex justify-center">
+          {renderTabContent()}
         </div>
       </div>
     </div>
