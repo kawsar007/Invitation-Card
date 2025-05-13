@@ -50,12 +50,12 @@ export const cardTemplates: CardTemplate[] = [
     category: "wedding",
     content: `
       <div style="display: flex; align-items: center; justify-content: center; text-align: center; min-height: 100vh; width: 100%; background-image: url('/public/widding/widding.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; box-sizing: border-box;">
-        <div style="padding: min(40px, 5vw); margin: min(20px, 3vw); width: 100%; max-width: 100%; background-color: rgba(0, 0, 0, 0.8); border-radius: 12px; box-sizing: border-box;">
-          <h1 id="block-h1-0" style="color: #ffffff; font-family: 'Montserrat', sans-serif; font-size: clamp(26px, 5vw, 36px); margin-bottom: max(10px, 2vh);">Save the Date</h1>
-          <p id="block-p-0" style="font-size: clamp(14px, 3vw, 18px); margin-bottom: max(15px, 3vh); color: #ddd;">You are cordially invited to the wedding of</p>
-          <h2 id="block-h2-0" style="font-family: 'Montserrat', sans-serif; font-size: clamp(22px, 4.5vw, 30px); margin-bottom: max(10px, 2vh); color: #ffffff;">Alice & Bob</h2>
-          <p id="block-p-1" style="font-size: clamp(12px, 2.5vw, 16px); margin-bottom: max(5px, 1vh); color: #ddd;">Saturday, June 21st, 2025 at 6:00 PM</p>
-          <p id="block-p-2" style="font-size: clamp(12px, 2.5vw, 16px); margin-bottom: max(15px, 3vh); color: #ddd;">The Modern Loft, Dhanmondi</p>
+        <div style="padding: min(40px, 5vw); margin: min(20px, 3vw); width: 100%; max-width: 100%; border-radius: 12px; box-sizing: border-box;">
+          <h1 id="block-h1-0" style="color: #111111; font-family: 'Montserrat', sans-serif; font-size: clamp(26px, 5vw, 36px); margin-bottom: max(10px, 2vh);">Save the Date</h1>
+          <p id="block-p-0" style="font-size: clamp(14px, 3vw, 18px); margin-bottom: max(15px, 3vh); color: #111;">You are cordially invited to the wedding of</p>
+          <h2 id="block-h2-0" style="font-family: 'Montserrat', sans-serif; font-size: clamp(22px, 4.5vw, 30px); margin-bottom: max(10px, 2vh); color: #111111;">Alice & Bob</h2>
+          <p id="block-p-1" style="font-size: clamp(12px, 2.5vw, 16px); margin-bottom: max(5px, 1vh); color: #111;">Saturday, June 21st, 2025 at 6:00 PM</p>
+          <p id="block-p-2" style="font-size: clamp(12px, 2.5vw, 16px); margin-bottom: max(15px, 3vh); color: #111;">The Modern Loft, Dhanmondi</p>
           <p id="block-p-3" style="font-style: italic; color: #aaa; font-size: clamp(12px, 2.5vw, 16px);">Formal attire requested</p>
         </div>
       </div>

@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, Moon, Search, Sun, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 interface NavbarProps {
   theme: string;
@@ -38,10 +39,10 @@ export default function Navbar({ theme, toggleTheme }: NavbarProps) {
 
   // Navigation items - can be expanded as needed
   const navItems = [
-    { name: 'Features', href: '#features' },
-    { name: 'Docs', href: '#docs' },
-    { name: 'Pricing', href: '#pricing' },
-    { name: 'Templates', href: '#templates' },
+    { name: 'Features', href: '/home/features' },
+    { name: 'Docs', href: '/home/docs' },
+    { name: 'Pricing', href: '/home/pricing' },
+    { name: 'Templates', href: '/home/templates' },
     // { name: 'Integrations', href: '#integrations' },
     // { name: 'Support', href: '#support' },
   ];
@@ -61,13 +62,13 @@ export default function Navbar({ theme, toggleTheme }: NavbarProps) {
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-6">
           {navItems.map((item) => (
-            <a
+            <Link
               key={item.name}
-              href={item.href}
+              to={item.href}
               className={`text-sm font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'} hover:text-lime-500 transition-colors`}
             >
               {item.name}
-            </a>
+            </Link>
           ))}
 
           <button className={`rounded-full p-2 ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'} hover:bg-gray-200 dark:hover:bg-gray-700`}>
@@ -113,14 +114,14 @@ export default function Navbar({ theme, toggleTheme }: NavbarProps) {
 
                 <div className="flex-1 flex flex-col space-y-4">
                   {navItems.map((item) => (
-                    <a
+                    <Link
                       key={item.name}
-                      href={item.href}
+                      to={item.href}
                       className={`py-3 px-4 rounded-lg text-lg font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'} hover:bg-gray-100 dark:hover:bg-gray-700`}
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       {item.name}
-                    </a>
+                    </Link>
                   ))}
                 </div>
 

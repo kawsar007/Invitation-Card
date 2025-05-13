@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import DesignTemplate from './DesignTemplate';
 import FeaturesSection from './Features';
 import FeedbackButton from './FeedbackButton';
@@ -6,19 +5,12 @@ import HeroSection from './HeroSection';
 import Navbar from './Navbar';
 import VideoSection from './VideoSection';
 
-export default function LandingPage() {
-  const [theme, setTheme] = useState('light');
+interface LandingPageProps {
+  theme: string;
+  toggleTheme: () => void;
+}
 
-  // Toggle between light and dark theme
-  const toggleTheme = () => {
-    setTheme(theme === 'light' ? 'dark' : 'light');
-  };
-
-  // Apply theme class to document when theme changes
-  useEffect(() => {
-    document.documentElement.classList.remove('light', 'dark');
-    document.documentElement.classList.add(theme);
-  }, [theme]);
+export default function LandingPage({ theme, toggleTheme }: LandingPageProps) {
 
   return (
     <div className={`min-h-screen ${theme === 'light' ? 'bg-green-50' : 'bg-gray-900'} transition-colors duration-300`}>
