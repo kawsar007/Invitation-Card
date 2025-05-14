@@ -39,13 +39,59 @@ export default function Navbar({ theme, toggleTheme }: NavbarProps) {
 
   // Navigation items - can be expanded as needed
   const navItems = [
-    { name: 'Features', href: '/home/features' },
-    { name: 'Docs', href: '/home/docs' },
-    { name: 'Pricing', href: '/home/pricing' },
-    { name: 'Templates', href: '/home/templates' },
+    { name: 'Features', href: '/features' },
+    { name: 'Docs', href: '/docs' },
+    { name: 'Pricing', href: '/pricing' },
+    { name: 'Templates', href: '/templates' },
     // { name: 'Integrations', href: '#integrations' },
     // { name: 'Support', href: '#support' },
   ];
+
+  const handleNavigation = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href === '/features') {
+      e.preventDefault();
+      const element = document.getElementById('features');
+      if (element) {
+        const offset = 80;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+      setIsMobileMenuOpen(false);
+    } else if (href === '/templates') {
+      e.preventDefault();
+      const element = document.getElementById('templates');
+      if (element) {
+        const offset = 80;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+      setIsMobileMenuOpen(false);
+    } else if (href === '/pricing') {
+      e.preventDefault();
+      const element = document.getElementById('pricing');
+      if (element) {
+        const offset = 80;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+      setIsMobileMenuOpen(false);
+    }
+  };
 
   return (
     <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'py-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md' : 'py-4 bg-transparent'}`}>
@@ -65,6 +111,7 @@ export default function Navbar({ theme, toggleTheme }: NavbarProps) {
             <Link
               key={item.name}
               to={item.href}
+              onClick={(e) => handleNavigation(e, item.href)}
               className={`text-sm font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'} hover:text-lime-500 transition-colors`}
             >
               {item.name}
@@ -118,7 +165,10 @@ export default function Navbar({ theme, toggleTheme }: NavbarProps) {
                       key={item.name}
                       to={item.href}
                       className={`py-3 px-4 rounded-lg text-lg font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'} hover:bg-gray-100 dark:hover:bg-gray-700`}
-                      onClick={() => setIsMobileMenuOpen(false)}
+                      // onClick={() => setIsMobileMenuOpen(false)}
+                      onClick={(e) => {
+                        handleNavigation(e, item.href);
+                      }}
                     >
                       {item.name}
                     </Link>

@@ -5,7 +5,7 @@ export default function PricingSection({ theme }) {
   const [billingCycle, setBillingCycle] = useState('annually');
 
   return (
-    <div className={`py-20 ${theme === 'light' ? 'bg-green-50' : 'bg-gray-900'} transition-colors duration-300`}>
+    <div id="pricing" className={`py-20 ${theme === 'light' ? 'bg-green-50' : 'bg-gray-900'} transition-colors duration-300`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
