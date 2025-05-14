@@ -5,6 +5,7 @@ import HeroSection from './HeroSection';
 import HowItWorksSection from './HowItWorks';
 import Navbar from './Navbar';
 import PricingSection from './Pricing';
+import TestimonialsSection from './Testimonial';
 import VideoSection from './VideoSection';
 
 interface LandingPageProps {
@@ -43,6 +44,7 @@ export default function LandingPage({ theme, toggleTheme }: LandingPageProps) {
         <DesignTemplate theme={theme} />
 
         <HowItWorksSection theme={theme} />
+        <TestimonialsSection theme={theme} />
         <PricingSection theme={theme} />
         <FeedbackButton theme={theme} />
       </div>

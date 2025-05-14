@@ -56,7 +56,7 @@ export default function Navbar({ theme, toggleTheme }: NavbarProps) {
             <path d="M12 6a4 4 0 0 0-4 4v8h8v-8a4 4 0 0 0-4-4z" fill={theme === 'light' ? '#84cc16' : '#a3e635'} />
             <path d="M12 4c0.6 0 1 0.4 1 1v1h-2V5c0-0.6 0.4-1 1-1z" fill={theme === 'light' ? '#84cc16' : '#a3e635'} />
           </svg>
-          <span className={`text-xl font-bold ${theme === 'light' ? 'text-lime-500' : 'text-lime-400'}`}>Invitation Card</span>
+          <span className={`text-xl font-bold ${theme === 'light' ? 'text-lime-500' : 'text-lime-400'}`}>InviteLoop</span>
         </div>
 
         {/* Desktop Navigation */}
@@ -105,7 +105,7 @@ export default function Navbar({ theme, toggleTheme }: NavbarProps) {
                       <path d="M12 6a4 4 0 0 0-4 4v8h8v-8a4 4 0 0 0-4-4z" fill={theme === 'light' ? '#84cc16' : '#a3e635'} />
                       <path d="M12 4c0.6 0 1 0.4 1 1v1h-2V5c0-0.6 0.4-1 1-1z" fill={theme === 'light' ? '#84cc16' : '#a3e635'} />
                     </svg>
-                    <span className={`text-xl font-bold ${theme === 'light' ? 'text-lime-500' : 'text-lime-400'}`}>Invitation Card</span>
+                    <span className={`text-xl font-bold ${theme === 'light' ? 'text-lime-500' : 'text-lime-400'}`}>InviteLoop</span>
                   </div>
                   <button onClick={() => setIsMobileMenuOpen(false)}>
                     <X size={24} className={theme === 'light' ? 'text-gray-700' : 'text-gray-300'} />
@@ -127,7 +127,7 @@ export default function Navbar({ theme, toggleTheme }: NavbarProps) {
 
                 <div className="pt-6 pb-4">
                   <Button className="w-full bg-lime-200 hover:bg-lime-300 text-gray-800 text-lg font-medium py-6 h-auto rounded-md shadow-md">
-                    Try Envelope for free
+                    Try InviteLoop for free
                   </Button>
                 </div>
               </div>
