@@ -2,7 +2,9 @@ import DesignTemplate from './DesignTemplate';
 import FeaturesSection from './Features';
 import FeedbackButton from './FeedbackButton';
 import HeroSection from './HeroSection';
+import HowItWorksSection from './HowItWorks';
 import Navbar from './Navbar';
+import PricingSection from './Pricing';
 import VideoSection from './VideoSection';
 
 interface LandingPageProps {
@@ -39,6 +41,9 @@ export default function LandingPage({ theme, toggleTheme }: LandingPageProps) {
       <div>
         <FeaturesSection theme={theme} />
         <DesignTemplate theme={theme} />
+
+        <HowItWorksSection theme={theme} />
+        <PricingSection theme={theme} />
         <FeedbackButton theme={theme} />
       </div>
     </div>
