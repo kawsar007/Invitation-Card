@@ -1,10 +1,9 @@
 import DesignTemplate from './DesignTemplate';
 import FeaturesSection from './Features';
-import FeedbackButton from './FeedbackButton';
 import HeroSection from './HeroSection';
 import HowItWorksSection from './HowItWorks';
-import Navbar from './Navbar';
 import PricingSection from './Pricing';
+import ScrollToTop from './ScrollToTop';
 import TestimonialsSection from './Testimonial';
 import VideoSection from './VideoSection';
 
@@ -32,7 +31,7 @@ export default function LandingPage({ theme, toggleTheme }: LandingPageProps) {
 
         {/* Content that should have background */}
         <div className="relative">
-          <Navbar theme={theme} toggleTheme={toggleTheme} />
+          {/* <Navbar theme={theme} toggleTheme={toggleTheme} /> */}
           <HeroSection theme={theme} />
           <VideoSection theme={theme} />
         </div>
@@ -46,7 +45,7 @@ export default function LandingPage({ theme, toggleTheme }: LandingPageProps) {
         <HowItWorksSection theme={theme} />
         <TestimonialsSection theme={theme} />
         <PricingSection theme={theme} />
-        <FeedbackButton theme={theme} />
+        <ScrollToTop theme={theme} />
       </div>
     </div>
   );

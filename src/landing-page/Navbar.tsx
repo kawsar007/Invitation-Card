@@ -40,10 +40,10 @@ export default function Navbar({ theme, toggleTheme }: NavbarProps) {
   // Navigation items - can be expanded as needed
   const navItems = [
     { name: 'Features', href: '/features' },
-    { name: 'Docs', href: '/docs' },
+    // { name: 'Docs', href: '/docs' },
     { name: 'Pricing', href: '/pricing' },
     { name: 'Templates', href: '/templates' },
-    // { name: 'Integrations', href: '#integrations' },
+    { name: 'Login', href: '/sign-in' },
     // { name: 'Support', href: '#support' },
   ];
 
