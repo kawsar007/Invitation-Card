@@ -35,10 +35,10 @@ export default function HowItWorksSection({ theme }: HowItWorksProps) {
 
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className={`text-4xl font-bold mb-4 ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+          <h2 className={`heading-primary mb-6 ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
             How It Works
           </h2>
-          <p className={`text-xl max-w-3xl mx-auto ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>
+          <p className={`font-opensans text-xl max-w-3xl mx-auto ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>
             Create and send beautiful digital invitations in just a few simple steps.
           </p>
         </div>

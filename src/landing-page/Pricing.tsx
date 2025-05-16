@@ -9,11 +9,11 @@ export default function PricingSection({ theme }) {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
-          <h2 className={`text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 ${theme === 'light' ? 'text-gray-900' : 'text-white'
+          <h2 className={`heading-primary mb-6 ${theme === 'light' ? 'text-gray-900' : 'text-white'
             }`}>
             Affordable Plans for Every Gardener
           </h2>
-          <p className={`text-lg sm:text-xl max-w-3xl mx-auto ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'
+          <p className={`font-opensans text-lg sm:text-xl max-w-3xl mx-auto ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'
             }`}>
             Choose the plan that works best for your event needs.
           </p>

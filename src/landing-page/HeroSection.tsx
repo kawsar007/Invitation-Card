@@ -7,7 +7,7 @@ interface HeroSectionProps {
 export default function HeroSection({ theme }: HeroSectionProps) {
   return (
     <div className="container mx-auto px-4 py-12 sm:py-16 md:py-24 lg:py-32 text-center">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Cactus Icon */}
         <div className="my-8 sm:mb-12 flex justify-center">
           <div className="relative w-16 h-16 sm:w-20 sm:h-20">
@@ -25,14 +25,14 @@ export default function HeroSection({ theme }: HeroSectionProps) {
         </div>
 
         {/* Hero Text */}
-        <h1 className={`text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6 ${theme === 'light' ? 'text-gray-900' : 'text-white'
+        <h1 className={`hero-heading mb-6 ${theme === 'light' ? 'text-gray-900' : 'text-white'
           }`}>
           Beautiful Digital Invitations
           <br className="hidden sm:block" />
           <span className="inline sm:inline-block">Designs in Minutes</span>
         </h1>
 
-        <p className={`text-base sm:text-lg lg:text-xl mb-8 sm:mb-12 max-w-2xl mx-auto ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'
+        <p className={`subheading-primary ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'
           }`}>
           Create stunning, personalized digital invitation cards for any occasion.
           Elegant, eco-friendly, and effortlessly delivered.

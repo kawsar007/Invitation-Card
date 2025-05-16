@@ -62,10 +62,10 @@ export default function TestimonialsSection({ theme }: TestimonialSectionProps) 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className={`text-4xl sm:text-5xl font-bold mb-4 ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+          <h2 className={`heading-primary mb-6 ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
             Gardeners Love Inviteloop
           </h2>
-          <p className={`text-lg max-w-3xl mx-auto ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'}`}>
+          <p className={`font-opensans text-lg max-w-3xl mx-auto ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'}`}>
             See what our community of 120k gardeners have to say about Inviteloop.
           </p>
         </div>
@@ -98,7 +98,7 @@ function TestimonialCard({ testimonial, theme }: TestimonialCardProps) {
         : 'bg-gray-800 border border-gray-700'
         }`}
     >
-      <p className={`mb-6 text-lg ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'}`}>
+      <p className={`font-opensans mb-6 text-md ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'}`}>
         "{testimonial.quote}"
       </p>
 
