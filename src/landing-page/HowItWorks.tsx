@@ -57,7 +57,7 @@ export default function HowItWorksSection({ theme }: HowItWorksProps) {
             {steps.map((step) => (
               <div key={step.number} className="flex-1 flex flex-col items-center text-center px-4">
                 {/* Step Number Circle */}
-                <div className={`flex items-center justify-center w-16 h-16 rounded-full mb-6 ${theme === 'light' ? 'bg-lime-200 text-gray-800' : 'bg-lime-700 text-white'
+                <div className={`flex items-center justify-center w-16 h-16 rounded-full mb-6 ${theme === 'light' ? 'bg-teal-400 text-gray-800' : 'bg-teal-700 text-white'
                   } text-2xl font-bold z-10`}>
                   {step.number}
                 </div>

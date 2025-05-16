@@ -63,7 +63,7 @@ export default function FeaturesSection({ theme }: FeatureSectionProps) {
                 : 'bg-gray-800 hover:bg-gray-750'
                 }`}
             >
-              <div className={`mb-6 ${theme === 'light' ? 'text-lime-600' : 'text-lime-400'
+              <div className={`mb-6 ${theme === 'light' ? 'text-teal-600' : 'text-teal-400'
                 }`}>
                 {feature.icon}
               </div>

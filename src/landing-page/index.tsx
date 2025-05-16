@@ -1,5 +1,7 @@
 import DesignTemplate from './DesignTemplate';
+import FAQSection from './FAQ';
 import FeaturesSection from './Features';
+import Footer from './Footer';
 import HeroSection from './HeroSection';
 import HowItWorksSection from './HowItWorks';
 import PricingSection from './Pricing';
@@ -45,6 +47,8 @@ export default function LandingPage({ theme, toggleTheme }: LandingPageProps) {
         <HowItWorksSection theme={theme} />
         <TestimonialsSection theme={theme} />
         <PricingSection theme={theme} />
+        <FAQSection theme={theme} />
+        <Footer theme={theme} />
         <ScrollToTop theme={theme} />
       </div>
     </div>

@@ -43,6 +43,7 @@ export default function Navbar({ theme, toggleTheme }: NavbarProps) {
     // { name: 'Docs', href: '/docs' },
     { name: 'Pricing', href: '/pricing' },
     { name: 'Templates', href: '/templates' },
+    { name: 'FAQ', href: '/faq' },
     { name: 'Login', href: '/sign-in' },
     // { name: 'Support', href: '#support' },
   ];
@@ -90,6 +91,20 @@ export default function Navbar({ theme, toggleTheme }: NavbarProps) {
         });
       }
       setIsMobileMenuOpen(false);
+    } else if (href === '/faq') {
+      e.preventDefault();
+      const element = document.getElementById('faq');
+      if (element) {
+        const offset = 80;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+      setIsMobileMenuOpen(false);
     }
   };
 
@@ -98,11 +113,11 @@ export default function Navbar({ theme, toggleTheme }: NavbarProps) {
       <div className="container mx-auto px-4 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center">
-          <svg className="w-8 h-8 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 6a4 4 0 0 0-4 4v8h8v-8a4 4 0 0 0-4-4z" fill={theme === 'light' ? '#84cc16' : '#a3e635'} />
-            <path d="M12 4c0.6 0 1 0.4 1 1v1h-2V5c0-0.6 0.4-1 1-1z" fill={theme === 'light' ? '#84cc16' : '#a3e635'} />
-          </svg>
-          <span className={`text-xl font-bold ${theme === 'light' ? 'text-lime-500' : 'text-lime-400'}`}>InviteLoop</span>
+          {/* <svg className="w-8 h-8 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 6a4 4 0 0 0-4 4v8h8v-8a4 4 0 0 0-4-4z" fill={theme === 'light' ? '#197875' : '#a3e635'} />
+            <path d="M12 4c0.6 0 1 0.4 1 1v1h-2V5c0-0.6 0.4-1 1-1z" fill={theme === 'light' ? '#197875' : '#a3e635'} />
+          </svg> */}
+          <span className={`text-xl font-bold ${theme === 'light' ? 'text-teal-500' : 'text-teal-400'}`}>InviteLoop</span>
         </div>
 
         {/* Desktop Navigation */}
@@ -112,7 +127,7 @@ export default function Navbar({ theme, toggleTheme }: NavbarProps) {
               key={item.name}
               to={item.href}
               onClick={(e) => handleNavigation(e, item.href)}
-              className={`text-sm font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'} hover:text-lime-500 transition-colors`}
+              className={`text-sm font-medium ${theme === 'light' ? 'text-teal-600' : 'text-gray-300'} hover:text-lime-500 transition-colors`}
             >
               {item.name}
             </Link>

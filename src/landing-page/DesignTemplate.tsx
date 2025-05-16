@@ -106,8 +106,8 @@ export default function DesignTemplate({ theme }: DesignTemplateProps) {
         <div className="text-center mt-12">
           <button
             className={`px-8 py-4 rounded-lg inline-flex items-center font-medium transition-all duration-300 ${theme === 'light'
-              ? 'bg-lime-200 text-gray-800 hover:bg-lime-300'
-              : 'bg-lime-700 text-white hover:bg-lime-600'
+              ? 'bg-teal-500 text-gray-800 hover:bg-teal-400'
+              : 'bg-teal-700 text-white hover:bg-teal-600'
               }`}
           >
             View All Designs
