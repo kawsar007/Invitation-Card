@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -82,18 +81,21 @@
   .editor-shadow {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 16px rgba(0, 0, 0, 0.1);
   }
-  
+
   .canvas-grid {
     background-size: 20px 20px;
-    background-image: 
-      linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    background-image: linear-gradient(
+        to right,
+        rgba(0, 0, 0, 0.05) 1px,
+        transparent 1px
+      ),
       linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
   }
-  
+
   .toolbar-button {
     @apply flex items-center justify-center h-9 w-9 rounded-md hover:bg-secondary text-foreground border border-transparent hover:border-border transition-colors;
   }
-  
+
   .toolbar-button.active {
     @apply bg-secondary border-border;
   }

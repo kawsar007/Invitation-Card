@@ -1,9 +1,7 @@
-import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { PanelLeft } from 'lucide-react';
+import { Component, Edit, Mail } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import CardEditor from './CardEditor';
-import Toolbar from './Toolbar';
 
 interface CardCanvasProps {
   content: string;
@@ -19,6 +17,7 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
   onBackgroundChange
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [activeTab, setActiveTab] = useState<'editor' | 'card' | 'envelope'>('editor');
   const editorRef = useRef<any>(null);
   const isMobile = useIsMobile();
 
@@ -30,87 +29,104 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
   // Standard invitation card size ratio (5x7 inches)
   const cardSize = { width: 700, height: 900 };
 
-  const handleAddText = () => {
-    if (editorRef.current) {
-      editorRef.current.insertContent('<p>Edit this text</p>');
-    }
-  };
-
-  const handleAddImage = (imageUrl: string) => {
-    if (editorRef.current && imageUrl) {
-      editorRef.current.insertContent(`<img src="${imageUrl}" alt="Added image" style="max-width: 100%" />`);
-    }
-  };
-
-  const handleAddVideo = (videoUrl: string) => {
-    if (editorRef.current && videoUrl) {
-      let embedCode = '';
-
-      if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
-        // Extract YouTube video ID
-        const youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
-        const match = videoUrl.match(youtubeRegex);
-        if (match && match[1]) {
-          embedCode = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${match[1]}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-        }
-      } else if (videoUrl.includes('vimeo.com')) {
-        // Extract Vimeo video ID
-        const vimeoRegex = /vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|)(\d+)(?:[?].*)?$/;
-        const match = videoUrl.match(vimeoRegex);
-        if (match && match[1]) {
-          embedCode = `<iframe src="https://player.vimeo.com/video/${match[1]}" width="100%" height="315" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
-        }
-      }
-
-      if (embedCode) {
-        editorRef.current.insertContent(`<div class="video-container">${embedCode}</div>`);
-      }
-    }
-  };
-
-  const handleAddLink = (linkData: { url: string; text: string }) => {
-    if (editorRef.current && linkData.url && linkData.text) {
-      editorRef.current.insertContent(`<a href="${linkData.url}" target="_blank">${linkData.text}</a>`);
-    }
-  };
-
-  return (
-    <div className="flex flex-1 h-full overflow-hidden">
-      {/* Toolbar */}
-      <Toolbar
-        onAddText={handleAddText}
-        onAddImage={handleAddImage}
-        onAddVideo={handleAddVideo}
-        onAddLink={handleAddLink}
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
-        onBackgroundChange={onBackgroundChange}
-      />
-
-      {/* Main canvas area */}
-      <div className="flex-1 overflow-auto p-4 bg-gray-50">
-        <div className="flex items-center justify-between mb-4">
-          {!sidebarOpen && (
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setSidebarOpen(true)}
-              className="mr-2"
-            >
-              <PanelLeft className="h-4 w-4" />
-            </Button>
-          )}
-          <h2 className="text-lg font-semibold text-gray-700">Card Canvas</h2>
-        </div>
-
-        <div className="flex justify-center">
+  // Render tab content based on active tab
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'editor':
+        return (
           <CardEditor
             content={content}
             onChange={onChange}
             showGrid={showGrid}
             editorRef={editorRef}
             cardSize={cardSize}
+            sidebarOpen={sidebarOpen}
+            setSidebarOpen={setSidebarOpen}
+            onBackgroundChange={onBackgroundChange}
           />
+        );
+      case 'card':
+        return (
+          <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-3xl mx-auto">
+            <h3 className="text-xl font-semibold mb-4">Edit Card Content</h3>
+            <p className="mb-4">Here you can customize the appearance and content of your card.</p>
+            <div className="mb-4">
+              <h4 className="text-lg font-medium mb-2">Card Options</h4>
+              <ul className="list-disc pl-5 space-y-2">
+                <li>Choose card size and orientation</li>
+                <li>Select paper type and quality</li>
+                <li>Add custom borders and patterns</li>
+                <li>Set font styles and typography</li>
+              </ul>
+            </div>
+            <div className="p-4 bg-gray-100 rounded">
+              <p className="italic text-gray-600">This is dummy text for the Edit Card tab. In a real implementation, this would contain actual card editing tools and options.</p>
+            </div>
+          </div>
+        );
+
+      case 'envelope':
+        return (
+          <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-3xl mx-auto">
+            <h3 className="text-xl font-semibold mb-4">Edit Envelope Design</h3>
+            <p className="mb-4">Customize your envelope to match your card design.</p>
+            <div className="mb-4">
+              <h4 className="text-lg font-medium mb-2">Envelope Options</h4>
+              <ul className="list-disc pl-5 space-y-2">
+                <li>Choose envelope size and style</li>
+                <li>Add custom liners and patterns</li>
+                <li>Include return address printing</li>
+                <li>Select envelope color and material</li>
+              </ul>
+            </div>
+            <div className="p-4 bg-gray-100 rounded">
+              <p className="italic text-gray-600">This is dummy text for the Edit Envelope tab. In a real implementation, this would contain actual envelope customization tools.</p>
+            </div>
+          </div>
+        );
+      default:
+        return null;
+    }
+  }
+
+  return (
+    <div className="flex flex-1 h-full overflow-hidden">
+
+      {/* Main canvas area */}
+      <div className="flex-1 overflow-auto p-4 bg-gray-50">
+        <div className="flex items-center justify-start gap-8 mb-4 border-b border-gray-200">
+
+          <button
+            className={`flex justify-center items-center py-2 px-1 text-sm font-semibold ${activeTab === 'editor'
+              ? 'text-blue-600 border-b-2 border-blue-600'
+              : 'text-gray-700 hover:text-blue-500'
+              }`}
+            onClick={() => setActiveTab('editor')}
+          >
+            <Component className="h-4 w-4 mr-2" /> Editor
+          </button>
+          <button
+            className={`flex justify-center items-center py-2 px-1 text-sm font-semibold ${activeTab === 'card'
+              ? 'text-blue-600 border-b-2 border-blue-600'
+              : 'text-gray-700 hover:text-blue-500'
+              }`}
+            onClick={() => setActiveTab('card')}
+          >
+            <Edit className="h-4 w-4 mr-2" />  Edit Card
+          </button>
+          <button
+            className={`flex justify-center items-center py-2 px-1 text-sm font-semibold ${activeTab === 'envelope'
+              ? 'text-blue-600 border-b-2 border-blue-600'
+              : 'text-gray-700 hover:text-blue-500'
+              }`}
+            onClick={() => setActiveTab('envelope')}
+          >
+            <Mail className="h-4 w-4 mr-2" />  Edit Envelope
+          </button>
+        </div>
+
+        <div className="flex justify-center">
+          {renderTabContent()}
         </div>
       </div>
     </div>

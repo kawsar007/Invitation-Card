@@ -1,5 +1,6 @@
+import { useTemplateCategories, useTemplatePreview } from '@/hooks/useTemplateData';
 import { CardTemplate } from '@/types/types';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 interface TemplateSelectorProps {
   templates: CardTemplate[];
@@ -14,68 +15,18 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
   onClose,
   currentTemplateId
 }) => {
-  // Store templates grouped by category
-  const [templatesByCategory, setTemplatesByCategory] = useState<Record<string, CardTemplate[]>>({});
-  const [previewContent, setPreviewContent] = useState<string>('');
-  const [showPreview, setShowPreview] = useState<boolean>(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<CardTemplate | null>(
-    templates.find(t => t.id === currentTemplateId) || null
-  );
+  // Use custom hooks
+  const templatesByCategory = useTemplateCategories(templates);
+  const {
+    previewContent,
+    showPreview,
+    handleTemplateSelect,
+    handleTemplateHover
+  } = useTemplatePreview(templates, currentTemplateId);
 
-  // Group templates by category on component mount
-  useEffect(() => {
-    const grouped: Record<string, CardTemplate[]> = {};
-    templates.forEach(template => {
-      if (!grouped[template.category]) {
-        grouped[template.category] = [];
-      }
-      grouped[template.category].push(template);
-    });
-    setTemplatesByCategory(grouped);
-
-    // Set initial preview if there's a current template
-    if (currentTemplateId) {
-      const current = templates.find(t => t.id === currentTemplateId);
-      if (current) {
-        setPreviewContent(makeResponsive(current.content));
-        setShowPreview(true);
-      }
-    }
-  }, [templates, currentTemplateId]);
-
-  // Function to make template content responsive
-  const makeResponsive = (content: string): string => {
-    // Replace fixed dimensions with responsive ones
-    const responsiveContent = content
-      // Make container responsive with min-height
-      .replace(/min-height: 100vh;/g, 'min-height: 100%;')
-      // Ensure max-width is responsive
-      .replace(/max-width: 800px;/g, 'max-width: 100%;')
-      // Add viewport meta tag for proper scaling in preview
-      .replace(/<div style="/g, '<div style="box-sizing: border-box; ')
-      // Make text sizes more responsive
-      .replace(/font-size: (\d+)px;/g, (match, size) => {
-        const newSize = Math.max(parseInt(size) * 0.8, 12); // Scale down but not below 12px
-        return `font-size: clamp(${newSize * 0.7}px, ${newSize * 0.02}vw + ${newSize * 0.5}px, ${newSize}px);`;
-      })
-      // Make padding responsive
-      .replace(/padding: (\d+)px;/g, (match, padding) => {
-        return `padding: clamp(15px, ${parseInt(padding) * 0.5}px + 2vw, ${padding}px);`;
-      });
-
-    return responsiveContent;
-  };
-
-  const handleTemplateSelect = (template: CardTemplate) => {
-    onSelect(template.id);
-    setSelectedTemplate(template);
-    setPreviewContent(makeResponsive(template.content));
-    setShowPreview(true);
-  };
-
-  const handleTemplateHover = (template: CardTemplate) => {
-    setPreviewContent(makeResponsive(template.content));
-    setShowPreview(true);
+  const handleSelectAndNotify = (template: CardTemplate) => {
+    const templateId = handleTemplateSelect(template);
+    onSelect(templateId);
   };
 
   return (
@@ -108,7 +59,7 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
                         ? 'border-blue-500 ring-2 ring-blue-300'
                         : 'border-gray-200 hover:border-blue-300'
                         }`}
-                      onClick={() => handleTemplateSelect(template)}
+                      onClick={() => handleSelectAndNotify(template)}
                       onMouseEnter={() => handleTemplateHover(template)}
                     >
                       <div className="h-32 sm:h-40 bg-gray-100 overflow-hidden">
@@ -166,13 +117,6 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
                 </div>
               )}
             </div>
-
-            {/* {selectedTemplate && showPreview && (
-              <div className="mt-4">
-                <h4 className="font-medium text-gray-800">{selectedTemplate.name}</h4>
-                <p className="text-sm text-gray-600 mt-1">{selectedTemplate.description}</p>
-              </div>
-            )} */}
           </div>
         </div>
 
