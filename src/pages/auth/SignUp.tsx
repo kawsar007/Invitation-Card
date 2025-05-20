@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from "sonner";
 import { z } from 'zod';
 
 // Define our validation schema using Zod
@@ -10,11 +11,11 @@ const signupSchema = z.object({
   lastName: z.string().min(1, 'Last name is required'),
   email: z.string().email('Please enter a valid email address'),
   password: z.string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number')
-    .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
+    .min(8, 'Password must be at least 8 characters'),
+  // .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+  // .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+  // .regex(/[0-9]/, 'Password must contain at least one number')
+  // .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
   confirmPassword: z.string().min(1, 'Please confirm your password'),
   termsAccepted: z.literal(true, {
     errorMap: () => ({ message: 'You must accept the terms and conditions' }),
@@ -30,6 +31,9 @@ type SignupFormInputs = z.infer<typeof signupSchema>;
 const SignUp: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const {
     register,
@@ -48,14 +52,42 @@ const SignUp: React.FC = () => {
   });
 
   const onSubmit: SubmitHandler<SignupFormInputs> = async (data) => {
-    // Simulate API call
-    console.log('Form submitted', data);
+    try {
+      setIsLoading(true);
+      setErrorMessage(null);
 
-    // Add your registration logic here
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+      const regsiterData = {
+        first_name: data.firstName,
+        last_name: data.lastName,
+        email: data.email,
+        password: data.password
+      }
 
-    // Handle successful signup
-    // e.g., redirect to login, show success message, etc.
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(regsiterData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Registration failed');
+      }
+
+      // Handle successful registration
+      console.log('Registration successful console', result);
+
+      toast.success(result?.message);
+      navigate('/sign-in', { state: { registrationSuccess: true } });
+    } catch (error) {
+      console.error('Registration error:', error);
+      setErrorMessage(error instanceof Error ? error.message : 'An unknown error occurred');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

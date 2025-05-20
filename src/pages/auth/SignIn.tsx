@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { FaEye, FaEyeSlash, FaFacebookF, FaLinkedinIn } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from "sonner";
 import { z } from 'zod';
 
 // Define our validation schema using Zod
@@ -18,6 +19,9 @@ type LoginFormInputs = z.infer<typeof loginSchema>;
 
 const SignIn: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -32,6 +36,55 @@ const SignIn: React.FC = () => {
   });
 
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
+
+    try {
+      setLoginError(null);
+      const response = await fetch('http://localhost:8000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+        }),
+      });
+
+      const responseData = await response.json();
+      if (!response.ok) {
+        throw new Error(responseData.message || 'Login failed');
+      }
+      // Handle successful login
+      console.log('Login successful:', responseData);
+      toast.success(responseData?.message || 'Login successful');
+      navigate('/editor');
+
+      // Store token in localStorage or secure cookie
+      if (responseData?.data?.token) {
+        localStorage.setItem('authToken', responseData.data?.token);
+
+        // Store user data if needed
+        if (responseData?.data?.user) {
+          localStorage.setItem('user', JSON.stringify(responseData?.data.user));
+        }
+
+        // Save in session or localStorage based on rememberMe
+        // if (data.rememberMe) {
+        //   localStorage.setItem('rememberMe', 'true');
+        // } else {
+        //   sessionStorage.setItem('authToken', responseData?.data?.token);
+        //   localStorage.removeItem('rememberMe');
+        // }
+
+      }
+
+      // Redirect to dashboard or home page
+
+    } catch (error) {
+      console.error('Login error:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to login. Please try again.')
+      // setLoginError(error instanceof Error ? error.message : 'Failed to login. Please try again.');
+    }
     // Simulate API call
     console.log('Form submitted', data);
 

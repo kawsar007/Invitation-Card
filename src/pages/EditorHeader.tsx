@@ -1,3 +1,4 @@
+import { DropdownMenuDemo } from "@/components/DropDownMenu";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -7,6 +8,7 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import { Toggle } from "@/components/ui/toggle";
+import { logoutUser } from "@/utils/auth";
 import {
   Grid3X3,
   GripVertical,
@@ -18,6 +20,7 @@ import {
   Undo
 } from 'lucide-react';
 import React from 'react';
+import { useNavigate } from "react-router-dom";
 
 interface EditorHeaderProps {
   canUndo: boolean;
@@ -63,6 +66,13 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
   onToggleTemplateSelector,
   currentTemplate
 }) => {
+  const navigate = useNavigate();
+
+  const logout = () => {
+    logoutUser();
+    navigate('/sign-in')
+  }
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -163,21 +173,6 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
           </button>
         </div>
 
-        {/* Version Selector */}
-        {/* <div className="flex items-center">
-          <label htmlFor="version-select" className="text-sm text-gray-500 mr-2">
-            Version:
-          </label>
-          <select
-            id="version-select"
-            value={currentVersion}
-            onChange={(e) => onVersionChange(e.target.value)}
-            className="text-sm border border-gray-200 rounded px-2 py-1"
-          >
-            {versionOptions}
-          </select>
-        </div> */}
-
         <Select
           value={currentVersion.toString()}
           onValueChange={onVersionChange}
@@ -211,6 +206,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
           <Save className="h-4 w-4 mr-2" />
           Save
         </Button>
+        <DropdownMenuDemo logout={logout} />
       </div>
     </header>
   );

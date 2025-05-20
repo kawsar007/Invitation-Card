@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
 import LandingPage from "./landing-page";
 import Navbar from "./landing-page/Navbar";
 import Index from "./pages/Index";
@@ -38,7 +39,15 @@ const AppContent = () => {
       <Toaster />
       <Sonner />
       <Routes>
-        <Route path="/editor" element={<Index />} />
+        <Route
+          path="/editor"
+          element={
+            <ProtectedRoute>
+              <Index />
+            </ProtectedRoute>
+          }
+        />
+        {/* <Route path="/editor" element={<Index />} /> */}
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/" element={<LandingPage theme={theme} toggleTheme={toggleTheme} />} />
@@ -51,11 +60,13 @@ const AppContent = () => {
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
+      {/* <AuthProvider> */}
       <TooltipProvider>
         <BrowserRouter>
           <AppContent />
         </BrowserRouter>
       </TooltipProvider>
+      {/* </AuthProvider> */}
     </QueryClientProvider>
   );
 }
