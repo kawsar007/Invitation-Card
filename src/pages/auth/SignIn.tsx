@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { FaEye, FaEyeSlash, FaFacebookF, FaLinkedinIn } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
@@ -22,9 +22,12 @@ const SignIn: React.FC = () => {
   const [loginError, setLoginError] = useState<string | null>(null);
   const navigate = useNavigate();
 
+
+
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
@@ -35,11 +38,23 @@ const SignIn: React.FC = () => {
     },
   });
 
+  // Check for saved email on component mount
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('savedEmail');
+    const savedPassword = localStorage.getItem('savedPassword');
+    if (savedEmail) {
+      // Pre-fill the email field if we have a saved email
+      setValue('email', savedEmail);
+      setValue('password', savedPassword);
+      setValue('rememberMe', true);
+    }
+  }, [setValue]);
+
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
 
     try {
       setLoginError(null);
-      const response = await fetch('http://localhost:8000/api/auth/login', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -57,7 +72,23 @@ const SignIn: React.FC = () => {
       // Handle successful login
       console.log('Login successful:', responseData);
       toast.success(responseData?.message || 'Login successful');
-      navigate('/editor');
+
+      // Handle "Remember Me" functionality
+      if (data.rememberMe) {
+        localStorage.setItem('savedEmail', data.email);
+        localStorage.setItem('savedPassword', data.password);
+
+        // Set long expiration for token (e.g., 30 days)
+        const expirationDate = new Date();
+        expirationDate.setDate(expirationDate.getDate() + 30);
+        localStorage.setItem('tokenExpiration', expirationDate.toISOString());
+      } else {
+        localStorage.removeItem('savedEmail');
+        localStorage.removeItem('savedPassword');
+        const expirationDate = new Date();
+        expirationDate.setDate(expirationDate.getDate() + 1);
+        localStorage.setItem('tokenExpiration', expirationDate.toISOString());
+      }
 
       // Store token in localStorage or secure cookie
       if (responseData?.data?.token) {
@@ -67,19 +98,10 @@ const SignIn: React.FC = () => {
         if (responseData?.data?.user) {
           localStorage.setItem('user', JSON.stringify(responseData?.data.user));
         }
-
-        // Save in session or localStorage based on rememberMe
-        // if (data.rememberMe) {
-        //   localStorage.setItem('rememberMe', 'true');
-        // } else {
-        //   sessionStorage.setItem('authToken', responseData?.data?.token);
-        //   localStorage.removeItem('rememberMe');
-        // }
-
       }
 
       // Redirect to dashboard or home page
-
+      navigate('/editor');
     } catch (error) {
       console.error('Login error:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to login. Please try again.')

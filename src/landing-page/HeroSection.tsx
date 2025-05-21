@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 interface HeroSectionProps {
   theme: string;
@@ -40,14 +40,14 @@ export default function HeroSection({ theme }: HeroSectionProps) {
 
         {/* CTA Button */}
         <div className="flex flex-col items-center space-y-4">
-          <Button
+          <Link to="/editor"
             className="w-full sm:w-auto bg-teal-500 hover:bg-teal-400 active:bg-teal-600 
             text-white text-base sm:text-lg font-medium px-6 sm:px-8 py-4 sm:py-6 
             h-auto rounded-md shadow-md transition-all duration-200 
             hover:shadow-lg hover:scale-105 active:scale-100"
           >
             Try Envelope for free
-          </Button>
+          </Link>
           <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 font-medium">
             No credit card required
           </p>
