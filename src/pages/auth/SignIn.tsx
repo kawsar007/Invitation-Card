@@ -214,9 +214,9 @@ const SignIn: React.FC = () => {
               </label>
             </div>
             <div className="text-sm">
-              <a href="#" className="font-medium text-indigo-500 hover:text-indigo-600">
+              <Link to="/trouble-signing-in" className="font-medium text-indigo-500 hover:text-indigo-600">
                 Forgot your password?
-              </a>
+              </Link>
             </div>
           </div>
 

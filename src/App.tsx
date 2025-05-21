@@ -11,6 +11,7 @@ import LandingPage from "./landing-page";
 import Navbar from "./landing-page/Navbar";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import ForgotPassword from "./pages/auth/ForgotPassword";
 import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
 
@@ -21,7 +22,7 @@ const AppContent = () => {
   const [theme, setTheme] = useState('light');
 
   // Define routes where navbar should be hidden
-  const hideNavbarRoutes = ['/editor', '/sign-in', '/sign-up'];
+  const hideNavbarRoutes = ['/editor', '/sign-in', '/sign-up', '/trouble-signing-in'];
   const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname);
 
   const toggleTheme = () => {
@@ -50,6 +51,7 @@ const AppContent = () => {
         {/* <Route path="/editor" element={<Index />} /> */}
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
+        <Route path="/trouble-signing-in" element={<ForgotPassword />} />
         <Route path="/" element={<LandingPage theme={theme} toggleTheme={toggleTheme} />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
