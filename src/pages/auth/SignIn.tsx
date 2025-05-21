@@ -1,3 +1,4 @@
+import { useUser } from '@/context/UserContext';
 import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -18,11 +19,16 @@ const loginSchema = z.object({
 type LoginFormInputs = z.infer<typeof loginSchema>;
 
 const SignIn: React.FC = () => {
+  const { login, logout } = useUser();
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-
+  // Clear any previous user data when mounting the login page
+  React.useEffect(() => {
+    // Always logout when visiting the login page to ensure clean state
+    logout();
+  }, [logout]);
 
   const {
     register,
@@ -66,11 +72,12 @@ const SignIn: React.FC = () => {
       });
 
       const responseData = await response.json();
+
+      login(responseData?.data?.user, responseData?.data?.token);
       if (!response.ok) {
         throw new Error(responseData.message || 'Login failed');
       }
       // Handle successful login
-      console.log('Login successful:', responseData);
       toast.success(responseData?.message || 'Login successful');
 
       // Handle "Remember Me" functionality
@@ -107,14 +114,6 @@ const SignIn: React.FC = () => {
       toast.error(error instanceof Error ? error.message : 'Failed to login. Please try again.')
       // setLoginError(error instanceof Error ? error.message : 'Failed to login. Please try again.');
     }
-    // Simulate API call
-    console.log('Form submitted', data);
-
-    // Add your authentication logic here
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Handle successful login
-    // e.g., redirect to dashboard, store token, etc.
   };
 
   return (

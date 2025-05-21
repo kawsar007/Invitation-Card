@@ -1,176 +1,126 @@
-import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { logoutUser } from '../utils/auth'; // Adjust import path as needed
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
-// Define types for user and context
-interface User {
-  id?: string | number;
-  name?: string;
-  email: string;
-  role?: string;
-  // Add any other user properties your application uses
-}
+// Create the context
+const UserContext = createContext(null);
 
-interface AuthContextType {
-  user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  login: (token: string, userData: User) => void;
-  logout: () => Promise<void>;
-  updateUser: (userData: Partial<User>) => void;
-}
-
-// Create the context with a default value
-const AuthContext = createContext<AuthContextType>({
-  user: null,
+// Default user state
+const defaultUserState = {
   isAuthenticated: false,
-  isLoading: true,
-  login: () => { },
-  logout: async () => { },
-  updateUser: () => { },
-});
+  user: null,
+  token: null
+};
 
-// Custom hook for using the auth context
-export const useAuth = () => useContext(AuthContext);
+// Create a provider component
+export const UserProvider = ({ children }) => {
+  const [userData, setUserData] = useState(defaultUserState);
+  const [loading, setLoading] = useState(true);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Initialize auth state from storage on component mount
+  // Load user data from localStorage on mount
   useEffect(() => {
-    const initializeAuth = () => {
+    const loadUserFromStorage = () => {
       try {
-        // Check for token
-        const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        const storedUser = localStorage.getItem('user');
+        const storedToken = localStorage.getItem('authToken');
 
-        if (!token) {
-          setIsLoading(false);
-          return;
-        }
+        if (storedUser && storedToken) {
+          const parsedUser = JSON.parse(storedUser)
 
-        // Get user data if token exists
-        const userDataString = localStorage.getItem('user');
-
-        if (userDataString) {
-          const userData = JSON.parse(userDataString);
-          setUser(userData);
+          setUserData({
+            isAuthenticated: true,
+            user: parsedUser,
+            token: storedToken
+          });
+        } else {
+          // Make sure we reset to default if no data in storage
+          setUserData(defaultUserState);
         }
       } catch (error) {
-        console.error('Error initializing auth state:', error);
+        console.error('Error loading user data from localStorage:', error);
+        // Clear potentially corrupt data
+        localStorage.removeItem('user');
+        localStorage.removeItem('authToken');
+
+        setUserData(defaultUserState);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
-    initializeAuth();
+    loadUserFromStorage();
+  }, [refreshTrigger]);
 
-    // Listen for storage events (for multi-tab support)
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === 'authToken' && !event.newValue) {
-        // Token was removed in another tab
-        setUser(null);
-      } else if (event.key === 'user') {
-        if (event.newValue) {
-          setUser(JSON.parse(event.newValue));
-        } else {
-          setUser(null);
-        }
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
+  // Force a refresh of user data from localStorage
+  const refreshUserData = useCallback(() => {
+    setRefreshTrigger(prev => prev + 1);
   }, []);
 
   // Login function
-  const login = (token: string, userData: User) => {
-    // Store token
-    const rememberMe = localStorage.getItem('rememberMe') === 'true';
+  const login = useCallback((user, token) => {
+    // Clear any existing data first
+    localStorage.removeItem('user');
+    localStorage.removeItem('authToken');
 
-    if (rememberMe) {
-      localStorage.setItem('authToken', token);
-    } else {
-      sessionStorage.setItem('authToken', token);
-    }
+    // Store in localStorage
+    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem('authToken', token);
 
-    // Store user data
-    localStorage.setItem('user', JSON.stringify(userData));
-
-    // Update state
-    setUser(userData);
-  };
+    // Store in state
+    setUserData({
+      isAuthenticated: true,
+      user,
+      token
+    });
+  }, []);
 
   // Logout function
-  const logout = async () => {
-    try {
-      // Get the auth token for the API call
-      // const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+  const logout = useCallback(() => {    // Clear state
+    setUserData(defaultUserState);
+    // Clear localStorage
+    localStorage.removeItem('user');
+    localStorage.removeItem('authToken');
+  }, []);
 
-      // Call logout API if available
-      // if (token) {
-      //   try {
-      //     await fetch('http://localhost:8000/api/auth/logout', {
-      //       method: 'POST',
-      //       headers: {
-      //         'Content-Type': 'application/json',
-      //         'Authorization': `Bearer ${token}`
-      //       }
-      //     });
-      //   } catch (error) {
-      //     console.warn('Error calling logout API:', error);
-      //     // Continue with local logout
-      //   }
-      // }
+  // Update user function
+  const updateUser = useCallback((updatedUser) => {
 
-      // Clear all auth data
-      logoutUser();
+    setUserData(prev => {
+      // Create the updated user object
+      const newUserData = {
+        ...prev,
+        user: { ...prev.user, ...updatedUser }
+      };
 
-      // Update state
-      setUser(null);
+      // Update localStorage with the complete new user object
+      localStorage.setItem('user', JSON.stringify(newUserData.user));
 
-      // Dispatch storage event for other tabs
-      window.dispatchEvent(new Event('storage'));
-    } catch (error) {
-      console.error('Logout error:', error);
-      // Ensure we still clear local data
-      logoutUser();
-      setUser(null);
-    }
-  };
+      return newUserData;
+    });
+  }, []);
 
-  // Update user information
-  const updateUser = (userData: Partial<User>) => {
-    if (!user) return;
-
-    const updatedUser = { ...user, ...userData };
-
-    // Update in storage
-    localStorage.setItem('user', JSON.stringify(updatedUser));
-
-    // Update state
-    setUser(updatedUser);
-  };
-
-  // Context value
-  const value = {
-    user,
-    isAuthenticated: !!user,
-    isLoading,
+  const contextValue = {
+    ...userData,
     login,
     logout,
     updateUser,
+    refreshUserData,
+    loading
   };
 
   return (
-    <AuthContext.Provider value={value}>
+    <UserContext.Provider value={contextValue}>
       {children}
-    </AuthContext.Provider>
+    </UserContext.Provider>
   );
 };
+
+// Custom hook to use the user context
+export const useUser = () => {
+  const context = useContext(UserContext);
+  if (context === undefined) {
+    throw new Error('useUser must be used within a UserProvider');
+  }
+  return context;
+};
+
+export default UserContext;

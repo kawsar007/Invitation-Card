@@ -2,7 +2,7 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from "@/components/ui/avatar"
+} from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,16 +16,28 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
+import { useUser } from "@/context/UserContext";
 
 export function DropdownMenuDemo({ logout }) {
+  const { user, isAuthenticated } = useUser();
+  console.log("User", user);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         {/* <Button variant="outline">Profile</Button> */}
         <Avatar className="cursor-pointer">
-          <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-          <AvatarFallback>CN</AvatarFallback>
+          {user?.profile_photo ? (
+            <AvatarImage src={user.profile_photo} alt={user?.first_name || '@user'} />
+          ) : (
+            <AvatarImage src="" alt={user?.first_name || '@user'} />
+          )}
+          <AvatarFallback>
+            {user?.first_name && user?.last_name
+              ? `${user.first_name[0]}${user.last_name[0]}`.toUpperCase()
+              : 'U'}
+          </AvatarFallback>
         </Avatar>
 
       </DropdownMenuTrigger>
