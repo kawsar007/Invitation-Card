@@ -24,12 +24,13 @@ const Toolbar: React.FC<ToolbarProps> = ({
 
 
   const backgroundImages = [
-    '/default-bg.jpg',
-    '/card-bg-1.jpg',
-    '/card-bg-2.jpg',
-    '/card-bg-3.jpg',
-    '/card-bg-4.jpg',
-    '/card-bg-5.jpg',
+    'https://inviteloop.s3.ap-southeast-1.amazonaws.com/cards/4bbc84d4-3e1e-4f43-a7a5-764931a24843-default-bg.jpg',
+    'https://inviteloop.s3.ap-southeast-1.amazonaws.com/cards/03ed4b7c-96e6-41b0-97e1-4116baf1b9cf-card-bg-1.jpg',
+    'https://inviteloop.s3.ap-southeast-1.amazonaws.com/cards/1f232c79-f2d7-4751-bb30-08310fefeb03-card-bg-2.jpg',
+    'https://inviteloop.s3.ap-southeast-1.amazonaws.com/cards/f261dbec-0ce1-4f5c-a894-0f21ce55ae05-card-bg-3.jpg',
+    'https://inviteloop.s3.ap-southeast-1.amazonaws.com/cards/928d1f6a-2ccc-465a-a824-4fc1f2bb4ddd-card-bg-4.jpg',
+    'https://inviteloop.s3.ap-southeast-1.amazonaws.com/cards/ceb4ec99-32c6-4a97-af06-9ec9118e6638-card-bg-5.jpg',
+    'https://inviteloop.s3.ap-southeast-1.amazonaws.com/cards/42642bcb-d94f-440d-889f-87fb3935bd63-card-bg-6.jpg',
     // Add more background images as needed
   ];
 
