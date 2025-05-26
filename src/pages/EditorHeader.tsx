@@ -68,6 +68,8 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
 }) => {
   const navigate = useNavigate();
 
+  console.log("Versions: ", versions);
+
   const logout = () => {
     logoutUser();
     navigate('/sign-in')
@@ -94,6 +96,9 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
       </option>
     );
   }
+
+  console.log("Version Options: ", versionOptions);
+
   return (
     <header className="bg-white border-b border-gray-200 p-4 flex flex-wrap justify-between items-center">
       <div className="flex items-center space-x-2">

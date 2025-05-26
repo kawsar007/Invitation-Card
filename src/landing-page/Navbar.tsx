@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { isAuthenticated } from '@/utils/auth';
 import { Menu, Moon, Search, Sun, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -12,6 +13,10 @@ interface NavbarProps {
 export default function Navbar({ theme, toggleTheme }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const auth = isAuthenticated();
+  console.log("Auth:", auth);
+
 
   // Track scroll position for navbar effect
   useEffect(() => {
@@ -37,16 +42,18 @@ export default function Navbar({ theme, toggleTheme }: NavbarProps) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Navigation items - can be expanded as needed
-  const navItems = [
+  // Base navigation items
+  const baseNavItems = [
     { name: 'Features', href: '/features' },
-    // { name: 'Docs', href: '/docs' },
     { name: 'Pricing', href: '/pricing' },
     { name: 'Templates', href: '/templates' },
     { name: 'FAQ', href: '/faq' },
-    { name: 'Login', href: '/sign-in' },
-    // { name: 'Support', href: '#support' },
   ];
+
+  // Conditionally add Login based on auth status
+  const navItems = auth
+    ? baseNavItems // If authenticated, don't show Login
+    : [...baseNavItems, { name: 'Login', href: '/sign-in' }]; // If not authenticated, show Login
 
   const handleNavigation = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (href === '/features') {
@@ -113,10 +120,6 @@ export default function Navbar({ theme, toggleTheme }: NavbarProps) {
       <div className="container mx-auto px-4 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center">
-          {/* <svg className="w-8 h-8 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 6a4 4 0 0 0-4 4v8h8v-8a4 4 0 0 0-4-4z" fill={theme === 'light' ? '#197875' : '#a3e635'} />
-            <path d="M12 4c0.6 0 1 0.4 1 1v1h-2V5c0-0.6 0.4-1 1-1z" fill={theme === 'light' ? '#197875' : '#a3e635'} />
-          </svg> */}
           <span className={`text-xl font-bold ${theme === 'light' ? 'text-teal-500' : 'text-teal-400'}`}>InviteLoop</span>
         </div>
 

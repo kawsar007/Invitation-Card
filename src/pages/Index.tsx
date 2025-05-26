@@ -47,9 +47,6 @@ const Index = () => {
     originalContentRef
   } = useCardEditor(cardTemplates[0]);
 
-  console.log("Content:", JSON.stringify(content));
-
-
   // Template management 
   const {
     showTemplateSelector,
