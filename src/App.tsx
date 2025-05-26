@@ -7,10 +7,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { UserProvider } from "./context/UserContext";
 import LandingPage from "./landing-page";
 import Navbar from "./landing-page/Navbar";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import ForgotPassword from "./pages/auth/ForgotPassword";
 import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
 
@@ -21,7 +23,7 @@ const AppContent = () => {
   const [theme, setTheme] = useState('light');
 
   // Define routes where navbar should be hidden
-  const hideNavbarRoutes = ['/editor', '/sign-in', '/sign-up'];
+  const hideNavbarRoutes = ['/editor', '/sign-in', '/sign-up', '/trouble-signing-in'];
   const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname);
 
   const toggleTheme = () => {
@@ -50,6 +52,7 @@ const AppContent = () => {
         {/* <Route path="/editor" element={<Index />} /> */}
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
+        <Route path="/trouble-signing-in" element={<ForgotPassword />} />
         <Route path="/" element={<LandingPage theme={theme} toggleTheme={toggleTheme} />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -62,9 +65,11 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       {/* <AuthProvider> */}
       <TooltipProvider>
-        <BrowserRouter>
-          <AppContent />
-        </BrowserRouter>
+        <UserProvider>
+          <BrowserRouter>
+            <AppContent />
+          </BrowserRouter>
+        </UserProvider>
       </TooltipProvider>
       {/* </AuthProvider> */}
     </QueryClientProvider>

@@ -39,6 +39,9 @@ const CardEditor: React.FC<CardEditorProps> = ({
   const [editorInstance, setEditorInstance] = useState<any>(null);
   const [showFormatting, setShowFormatting] = useState(false);
 
+  console.log("Editor Content:", content);
+
+
   // Handle showing the formatting controls when the editor is clicked
   useEffect(() => {
     if (editorInstance) {
