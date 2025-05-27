@@ -1,12 +1,15 @@
 import { useTemplateCategories } from "@/hooks/useTemplateData";
+import { isAuthenticated } from "@/utils/auth";
 import { cardTemplates } from "@/utils/templates";
 import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface DesignTemplateProps {
   theme: string;
 }
 
 export default function DesignTemplate({ theme }: DesignTemplateProps) {
+  const auth = isAuthenticated();
   const templatesByCategory = useTemplateCategories(cardTemplates);
 
   // Get all templates from all categories and flatten them into a single array
@@ -87,7 +90,7 @@ export default function DesignTemplate({ theme }: DesignTemplateProps) {
 
                 {/* Template Information */}
                 <div className="p-6">
-                  <button
+                  <Link to={auth ? `/editor/${template.id}` : '/sign-in'}
                     className={`inline-flex items-center ${theme === 'light'
                       ? 'text-lime-600 hover:text-lime-700'
                       : 'text-lime-400 hover:text-lime-300'
@@ -95,7 +98,7 @@ export default function DesignTemplate({ theme }: DesignTemplateProps) {
                   >
                     Customize this design
                     <ArrowRight className="w-4 h-4 ml-1" />
-                  </button>
+                  </Link>
                 </div>
               </div>
             ))}
@@ -104,7 +107,7 @@ export default function DesignTemplate({ theme }: DesignTemplateProps) {
 
         {/* View All Button */}
         <div className="text-center mt-12">
-          <button
+          <Link to="/templates"
             className={`px-8 py-4 rounded-lg inline-flex items-center font-medium transition-all duration-300 ${theme === 'light'
               ? 'bg-teal-500 text-gray-800 hover:bg-teal-400'
               : 'bg-teal-700 text-white hover:bg-teal-600'
@@ -112,7 +115,7 @@ export default function DesignTemplate({ theme }: DesignTemplateProps) {
           >
             View All Designs
             <ArrowRight className="w-5 h-5 ml-2" />
-          </button>
+          </Link>
         </div>
       </div>
     </div>

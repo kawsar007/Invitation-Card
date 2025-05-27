@@ -31,8 +31,12 @@ import EditorHeader from "@/pages/EditorHeader";
 import { extractContentBlocks } from "@/utils/contentParser";
 import { cardTemplates } from "@/utils/templates";
 import { useEffect } from 'react';
+import { useParams } from "react-router-dom";
 
 const Index = () => {
+  const { templateId } = useParams();
+
+  const initialTemplate = templateId ? cardTemplates.find(t => t.id === templateId) || cardTemplates[0] : cardTemplates[0];
   // Initialize editor with the first template
   const {
     selectedTemplate,
@@ -45,7 +49,7 @@ const Index = () => {
     setModifiedBlocks,
     trackContentBlockChange,
     originalContentRef
-  } = useCardEditor(cardTemplates[0]);
+  } = useCardEditor(initialTemplate);
 
   // Template management 
   const {

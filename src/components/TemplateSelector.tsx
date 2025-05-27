@@ -1,6 +1,7 @@
 import { useTemplateCategories, useTemplatePreview } from '@/hooks/useTemplateData';
 import { CardTemplate } from '@/types/types';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface TemplateSelectorProps {
   templates: CardTemplate[];
@@ -15,6 +16,7 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
   onClose,
   currentTemplateId
 }) => {
+  const navigate = useNavigate();
   // Use custom hooks
   const templatesByCategory = useTemplateCategories(templates);
   const {
@@ -27,6 +29,7 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
   const handleSelectAndNotify = (template: CardTemplate) => {
     const templateId = handleTemplateSelect(template);
     onSelect(templateId);
+    navigate(`/editor/${templateId}`);
   };
 
   return (

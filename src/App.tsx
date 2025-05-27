@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
+import TemplatesPage from "./pages/templates";
 
 const queryClient = new QueryClient();
 
@@ -24,7 +25,8 @@ const AppContent = () => {
 
   // Define routes where navbar should be hidden
   const hideNavbarRoutes = ['/editor', '/sign-in', '/sign-up', '/trouble-signing-in'];
-  const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname);
+  // const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname);
+  const shouldShowNavbar = !location.pathname.startsWith('/editor') && !hideNavbarRoutes.includes(location.pathname);
 
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
@@ -42,7 +44,7 @@ const AppContent = () => {
       <Sonner />
       <Routes>
         <Route
-          path="/editor"
+          path="/editor/:templateId?"
           element={
             <ProtectedRoute>
               <Index />
@@ -53,6 +55,7 @@ const AppContent = () => {
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/trouble-signing-in" element={<ForgotPassword />} />
+        <Route path="/templates" element={<TemplatesPage theme={theme} />} />
         <Route path="/" element={<LandingPage theme={theme} toggleTheme={toggleTheme} />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
