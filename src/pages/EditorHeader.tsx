@@ -68,8 +68,6 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  console.log("Versions: ", versions);
-
   const logout = () => {
     logoutUser();
     navigate('/sign-in')

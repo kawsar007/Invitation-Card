@@ -25,7 +25,7 @@ export default function FAQSection({ theme }: FAQSectionProps) {
     },
     {
       question: "Can I send in multiple batches?",
-      answer: "Greenvelope allows you to resend invitations or send invitations to new contacts at any time.",
+      answer: "InviteLoop allows you to resend invitations or send invitations to new contacts at any time.",
       isOpen: false
     },
     {
@@ -35,17 +35,17 @@ export default function FAQSection({ theme }: FAQSectionProps) {
     },
     {
       question: "Do you offer RSVP tracking?",
-      answer: "Yes! Greenvelope’s robust RSVP tracking makes planning effortless. You can collect RSVPs, track plus ones, gather meal selections, send RSVP reminders, set up seating charts, and more.",
+      answer: "Yes! InviteLoop robust RSVP tracking makes planning effortless. You can collect RSVPs, track plus ones, gather meal selections, send RSVP reminders, set up seating charts, and more.",
       isOpen: false
     },
     {
       question: "Can I also send my invitations via text message?",
-      answer: "In addition to email, you can send your Greenvelope invitations and cards via SMS text message, WhatsApp, Facebook messenger, or a sharable link.",
+      answer: "In addition to email, you can send your InviteLoop invitations and cards via SMS text message, WhatsApp, Facebook messenger, or a sharable link.",
       isOpen: false
     },
     {
       question: "Do you offer digital thank you notes or save the dates?",
-      answer: "Yes, in addition to our digital invitations and RSVP tracking, Greenvelope offers both save the dates and thank you notes. Each mailing type provides easy-to-use features, such as address collection on save the dates and individual customization for thank you notes.",
+      answer: "Yes, in addition to our digital invitations and RSVP tracking, InviteLoop offers both save the dates and thank you notes. Each mailing type provides easy-to-use features, such as address collection on save the dates and individual customization for thank you notes.",
       isOpen: false
     },
     {
@@ -60,7 +60,7 @@ export default function FAQSection({ theme }: FAQSectionProps) {
     },
     {
       question: "What if I need help?",
-      answer: "Our Help Center is always available to help guide you through the process and answer common questions. If you have additional questions, our in-house customer support team is available 7:30am - 5pm PST Monday through Friday via support@greenvelope.com or 888-505-2588.",
+      answer: "Our Help Center is always available to help guide you through the process and answer common questions. If you have additional questions, our in-house customer support team is available 7:30am - 5pm PST Monday through Friday via support@inviteloop.com or 888-505-2588.",
       isOpen: false
     }
   ]);

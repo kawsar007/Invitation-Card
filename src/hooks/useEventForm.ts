@@ -27,14 +27,11 @@ export const useEventForm = (templateId: string, onSuccess?: EventModalProps["on
   console.log("Auth User: ", user);
 
   const sender_name = `${user?.first_name} ${user?.last_name}`;
-  console.log("Sender Name: ", sender_name);
 
 
   const [formData, setFormData] = useState<EventFormData>(INITIAL_FORM_DATA);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<(string | null)>(null);
-
-  console.log("Form Data:---> ", formData);
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

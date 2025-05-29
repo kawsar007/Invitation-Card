@@ -1,9 +1,10 @@
+import { DropdownMenuDemo } from '@/components/DropDownMenu';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { isAuthenticated } from '@/utils/auth';
+import { isAuthenticated, logoutUser } from '@/utils/auth';
 import { Menu, Moon, Search, Sun, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface NavbarProps {
   theme: string;
@@ -13,10 +14,8 @@ interface NavbarProps {
 export default function Navbar({ theme, toggleTheme }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-
+  const navigate = useNavigate();
   const auth = isAuthenticated();
-  console.log("Auth:", auth);
-
 
   // Track scroll position for navbar effect
   useEffect(() => {
@@ -115,6 +114,11 @@ export default function Navbar({ theme, toggleTheme }: NavbarProps) {
     }
   };
 
+  const logout = () => {
+    logoutUser();
+    navigate('/sign-in')
+  }
+
   return (
     <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'py-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md' : 'py-4 bg-transparent'}`}>
       <div className="container mx-auto px-4 flex items-center justify-between">
@@ -134,17 +138,22 @@ export default function Navbar({ theme, toggleTheme }: NavbarProps) {
             >
               {item.name}
             </Link>
+
           ))}
 
-          <button className={`rounded-full p-2 ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'} hover:bg-gray-200 dark:hover:bg-gray-700`}>
+
+
+          <button className={`rounded-full p-2 ${theme === 'light' ? 'text-teal-600' : 'text-gray-300'} hover:bg-gray-200 dark:hover:bg-gray-700`}>
             <Search size={20} />
           </button>
           <button
             onClick={toggleTheme}
-            className={`rounded-full p-2 ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'} hover:bg-gray-200 dark:hover:bg-gray-700`}
+            className={`rounded-full p-2 ${theme === 'light' ? 'text-teal-600' : 'text-gray-300'} hover:bg-gray-200 dark:hover:bg-gray-700`}
           >
             {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
           </button>
+
+          {auth && <DropdownMenuDemo logout={logout} />}
         </div>
 
         {/* Mobile Navigation */}

@@ -5,7 +5,6 @@ import { useTemplateCategories } from "@/hooks/useTemplateData";
 import { isAuthenticated } from "@/utils/auth";
 import { cardTemplates } from "@/utils/templates";
 import { ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
 import { EventModalTrigger } from "./EventModalTrigger";
 
 // ==================== TYPES ====================
@@ -126,19 +125,6 @@ const TemplateCard = ({
   );
 };
 
-const ViewAllButton = ({ theme }: { theme: string }) => {
-  const styles = getThemeStyles(theme);
-
-  return (
-    <div className="text-center mt-12">
-      <Link to="/templates" className={styles.viewAllButton}>
-        View All Designs
-        <ArrowRight className="w-5 h-5 ml-2" />
-      </Link>
-    </div>
-  );
-};
-
 // ==================== MAIN COMPONENT ====================
 export default function DesignTemplate({ theme }: DesignTemplateProps) {
   const auth = isAuthenticated();
@@ -165,8 +151,6 @@ export default function DesignTemplate({ theme }: DesignTemplateProps) {
             ))}
           </div>
         </div>
-
-        <ViewAllButton theme={theme} />
       </div>
     </div>
   );
