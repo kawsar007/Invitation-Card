@@ -1,4 +1,4 @@
-import { EventFormData, EventModalProps } from "@/pages/templates/CreateEventModal";
+import { EventFormData, EventModalProps } from "@/components/design-templates/CreateEventModal";
 import { getAuthToken, getUserData } from "@/utils/auth";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";

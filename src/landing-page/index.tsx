@@ -1,4 +1,3 @@
-import DesignTemplate from './DesignTemplate';
 import FAQSection from './FAQ';
 import FeaturesSection from './Features';
 import Footer from './Footer';
@@ -6,6 +5,7 @@ import HeroSection from './HeroSection';
 import HowItWorksSection from './HowItWorks';
 import PricingSection from './Pricing';
 import ScrollToTop from './ScrollToTop';
+import Template from './Template';
 import TestimonialsSection from './Testimonial';
 import VideoSection from './VideoSection';
 
@@ -42,7 +42,7 @@ export default function LandingPage({ theme, toggleTheme }: LandingPageProps) {
       {/* Rest of the content without background image */}
       <div>
         <FeaturesSection theme={theme} />
-        <DesignTemplate theme={theme} />
+        <Template theme={theme} />
 
         <HowItWorksSection theme={theme} />
         <TestimonialsSection theme={theme} />

@@ -46,3 +46,9 @@ export interface FontSize {
   value: string;
   label: string;
 }
+
+export interface Template {
+  id: string;
+  name: string;
+  content: string;
+}
