@@ -110,9 +110,6 @@ export default function CreateEventModal({
 }: EventModalProps) {
   const form = useEventForm(templateId, onSuccess);
 
-  console.log("Form Data:", form);
-
-
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       form.resetForm();

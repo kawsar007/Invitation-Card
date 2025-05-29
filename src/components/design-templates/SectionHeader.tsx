@@ -1,4 +1,4 @@
-import { getThemeStyles } from "./TemplateStyles";
+import { getThemeStyles } from "../../styles/TemplateStyles";
 
 const SectionHeader = ({
   theme,

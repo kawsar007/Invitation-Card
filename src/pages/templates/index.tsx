@@ -1,10 +1,10 @@
 import Template from '@/components/design-templates'
 
-const Templates = () => {
+const Templates = ({ theme }) => {
   return (
     <div>
       <Template
-        theme="light"
+        theme={theme}
         variant="full"
         // maxTemplates={999}
         showHeader={true}

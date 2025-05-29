@@ -1,8 +1,8 @@
 import { Template } from "@/types/types";
 import { ArrowRight } from "lucide-react";
+import { getThemeStyles } from "../../styles/TemplateStyles";
 import { EventModalTrigger } from "./EventModalTrigger";
 import TemplatePreview from "./TemplatePreview";
-import { getThemeStyles } from "./TemplateStyles";
 
 const TemplateCard = ({
   template,

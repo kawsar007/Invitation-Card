@@ -1,6 +1,6 @@
 import { Template } from "@/types/types";
+import { getThemeStyles } from "../../styles/TemplateStyles";
 import { createTemplateIframe } from "./TemplateIframe";
-import { getThemeStyles } from "./TemplateStyles";
 
 const TemplatePreview = ({ template, theme }: { template: Template; theme: string }) => {
   const styles = getThemeStyles(theme);

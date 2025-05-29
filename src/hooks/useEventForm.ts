@@ -24,7 +24,6 @@ export const useEventForm = (templateId: string, onSuccess?: EventModalProps["on
   const navigate = useNavigate();
   const token = getAuthToken();
   const user = getUserData();
-  console.log("Auth User: ", user);
 
   const sender_name = `${user?.first_name} ${user?.last_name}`;
 

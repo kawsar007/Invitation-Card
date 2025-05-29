@@ -2,9 +2,9 @@ import { useTemplateCategories } from "@/hooks/useTemplateData";
 import { isAuthenticated } from "@/utils/auth";
 import { cardTemplates } from "@/utils/templates";
 import { ArrowRight } from "lucide-react";
+import { getThemeStyles } from "../../styles/TemplateStyles";
 import SectionHeader from "./SectionHeader";
 import TemplateCard from "./TemplateCard";
-import { getThemeStyles } from "./TemplateStyles";
 
 // ==================== TYPES ====================
 interface DesignTemplateProps {

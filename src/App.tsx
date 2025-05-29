@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
+import EventsPage from "./pages/events";
 import TemplatesPage from "./pages/templates";
 
 const queryClient = new QueryClient();
@@ -56,6 +57,14 @@ const AppContent = () => {
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/trouble-signing-in" element={<ForgotPassword />} />
         <Route path="/templates" element={<TemplatesPage theme={theme} />} />
+        <Route
+          path="/events"
+          element={
+            <ProtectedRoute>
+              <EventsPage theme={theme} />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/" element={<LandingPage theme={theme} toggleTheme={toggleTheme} />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -18,10 +18,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useUser } from "@/context/UserContext";
+import { useNavigate } from "react-router-dom";
 
 export function DropdownMenuDemo({ logout }) {
   const { user, isAuthenticated } = useUser();
-  console.log("User", user);
+  const navigate = useNavigate();
 
   return (
     <DropdownMenu>
@@ -47,6 +48,10 @@ export function DropdownMenuDemo({ logout }) {
         <DropdownMenuGroup>
           <DropdownMenuItem className="cursor-pointer">
             Profile
+            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer" onClick={() => navigate('/events')}>
+            Events
             <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem>
