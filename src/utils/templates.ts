@@ -9,16 +9,40 @@ export const cardTemplates: CardTemplate[] = [
     description: "A sophisticated, elegant wedding invitation with classic typography",
     category: "wedding",
     content: `
-      <div style="display: flex; align-items: center; justify-content: center; text-align: center; min-height: 100vh; width: 100%; background-image: url('https://inviteloop.s3.ap-southeast-1.amazonaws.com/cards/42d69d3c-5f34-4386-9412-68e6416ecc1f-widding-elegant-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; box-sizing: border-box;">
+      <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elegant Wedding Invitation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Georgia:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            color: #333;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div style="display: flex; align-items: center; justify-content: center; text-align: center; min-height: 100vh; width: 100%; background-image: url('https://inviteloop.s3.ap-southeast-1.amazonaws.com/cards/42d69d3c-5f34-4386-9412-68e6416ecc1f-widding-elegant-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; box-sizing: border-box;">
         <div style="padding: min(40px, 5vw); margin: min(20px, 3vw); width: 100%; max-width: 100%; box-sizing: border-box;">
-          <h1 id="block-h1-0" style="color: #a389f4; font-family: 'Georgia', serif; font-size: clamp(24px, 5vw, 32px); margin-bottom: max(10px, 2vh);">You're Invited</h1>
-          <p id="block-p-0" style="font-size: clamp(14px, 3vw, 18px); margin-bottom: max(15px, 3vh);">Please join us to celebrate</p>
-          <h2 id="block-h2-0" style="font-family: 'Georgia', serif; font-size: clamp(20px, 4vw, 26px); margin-bottom: max(10px, 2vh);">Jerry & Jayson's Wedding</h2>
-          <p id="block-p-1" style="font-size: clamp(12px, 2.5vw, 16px); margin-bottom: max(5px, 1vh);">Saturday, April 19th, 2025 at 8:00 PM</p>
-          <p id="block-p-2" style="font-size: clamp(12px, 2.5vw, 16px); margin-bottom: max(15px, 3vh);">The Grand Hotel, Gulshan Dhaka</p>
-          <p id="block-p-3" style="font-style: italic; color: #666; font-size: clamp(12px, 2.5vw, 16px);">Dinner and dancing to follow</p>
+            <h1 id="block-h1-0" style="color: #a389f4; font-family: 'Georgia', serif; font-size: clamp(24px, 5vw, 32px); margin-bottom: max(10px, 2vh);">You're Invited Kawsar</h1>
+            <p id="block-p-0" style="font-size: clamp(14px, 3vw, 18px); margin-bottom: max(15px, 3vh);">Please join us to celebrate</p>
+            <h2 id="block-h2-0" style="font-family: 'Georgia', serif; font-size: clamp(20px, 4vw, 26px); margin-bottom: max(10px, 2vh);">Jerry & Jayson's Wedding</h2>
+            <p id="block-p-1" style="font-size: clamp(12px, 2.5vw, 16px); margin-bottom: max(5px, 1vh);">Saturday, April 19th, 2025 at 8:00 PM</p>
+            <p id="block-p-2" style="font-size: clamp(12px, 2.5vw, 16px); margin-bottom: max(15px, 3vh);">The Grand Hotel, Gulshan Dhaka</p>
+            <p id="block-p-3" style="font-style: italic; color: #666; font-size: clamp(12px, 2.5vw, 16px);">Dinner and dancing to follow</p>
         </div>
-      </div>
+    </div>
+</body>
+</html>
     `
   },
   {

@@ -1,5 +1,6 @@
 import CustomEditorToolbar from "@/components/CustomEditorToolbar";
 import { cn } from "@/lib/utils";
+import { formatHtmlContent } from "@/utils/formatters";
 import { Editor } from '@tinymce/tinymce-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from "sonner";
@@ -40,6 +41,7 @@ const CardEditor: React.FC<CardEditorProps> = ({
   const [showFormatting, setShowFormatting] = useState(false);
 
   console.log("Editor Content:", content);
+  console.log("Editor Content HTML String:", formatHtmlContent(content));
 
 
   // Handle showing the formatting controls when the editor is clicked
