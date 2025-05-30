@@ -1,4 +1,4 @@
-import { Template } from "@/types/types";
+import { CardTemplate } from "@/types/types";
 import { ArrowRight } from "lucide-react";
 import { getThemeStyles } from "../../styles/TemplateStyles";
 import { EventModalTrigger } from "./EventModalTrigger";
@@ -9,7 +9,7 @@ const TemplateCard = ({
   theme,
   isAuthenticated
 }: {
-  template: Template;
+  template: CardTemplate;
   theme: string;
   isAuthenticated: boolean;
 }) => {
@@ -20,7 +20,7 @@ const TemplateCard = ({
       <TemplatePreview template={template} theme={theme} />
       <div className="p-6">
         <EventModalTrigger
-          templateId={template.id}
+          template={template}
           isAuthenticated={isAuthenticated}
           className={styles.customizeButton}
         >

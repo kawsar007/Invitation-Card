@@ -1,10 +1,11 @@
+import { CardTemplate } from "@/types/types";
 import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CreateEventModal from "./CreateEventModal";
 
 interface EventModalTriggerProps {
-  templateId: string;
+  template: CardTemplate;
   isAuthenticated: boolean;
   className?: string;
   children?: React.ReactNode;
@@ -12,7 +13,7 @@ interface EventModalTriggerProps {
 }
 
 export function EventModalTrigger({
-  templateId,
+  template,
   isAuthenticated,
   className = "",
   children,
@@ -48,7 +49,7 @@ export function EventModalTrigger({
         <CreateEventModal
           isOpen={isOpen}
           onOpenChange={setIsOpen}
-          templateId={templateId}
+          template={template}
           onSuccess={onSuccess}
         />
       )}

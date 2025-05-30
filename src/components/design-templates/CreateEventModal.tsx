@@ -7,6 +7,7 @@ import {
 
 import { ErrorMessage, FormActions, FormField } from "@/components/common/FormField";
 import { useEventForm } from "@/hooks/useEventForm";
+import { CardTemplate } from "@/types/types";
 
 // ==================== TYPES ====================
 export interface EventFormData {
@@ -22,7 +23,7 @@ export interface EventFormData {
 export interface EventModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  templateId: string;
+  template: CardTemplate;
   onSuccess?: (templateId: string, customizationId?: string) => void;
 }
 
@@ -105,10 +106,10 @@ export const FORM_FIELDS = [
 export default function CreateEventModal({
   isOpen,
   onOpenChange,
-  templateId,
+  template,
   onSuccess
 }: EventModalProps) {
-  const form = useEventForm(templateId, onSuccess);
+  const form = useEventForm(template, onSuccess);
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
