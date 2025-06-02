@@ -34,7 +34,10 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
     previewLoading,
     error,
     lastCraftedInvitation,
-    previewData
+    previewData,
+    generateImage,
+    imageGenerating,
+    craftPreviewAndGenerate
   } = useCraftApi();
 
   // Get the latest invitation to get the version number
@@ -46,9 +49,10 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
       // Craft the invitation when moving from editor to details
       try {
         const successCraft = await craftInvitation(eventId, content);
-        const successPreview = await previewInvitation(eventId, version);
+        const successGenerateImage = await generateImage(eventId, version);
+        // const successPreview = await previewInvitation(eventId, version);
 
-        if (successCraft && successPreview) {
+        if (successCraft && successGenerateImage) {
           setActiveTab('details');
         }
         // If craftInvitation fails, stay on editor tab and let the toast show the error
@@ -89,7 +93,7 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
   const getNextButtonText = () => {
     if (activeTab === 'editor' && loading) return 'Crafting...';
     if (activeTab === 'details' && previewLoading) return 'Generating Preview...';
-    if (activeTab === 'editor') return 'Craft & Continue';
+    if (activeTab === 'editor') return 'Next';
     if (activeTab === 'details') return 'Generate Preview';
     return 'Next';
   };
