@@ -37,6 +37,9 @@ const Index = () => {
   const { templateId } = useParams();
 
   const initialTemplate = templateId ? cardTemplates.find(t => t.id === templateId) || cardTemplates[0] : cardTemplates[0];
+
+  console.log("Initial Template: ", initialTemplate);
+
   // Initialize editor with the first template
   const {
     selectedTemplate,

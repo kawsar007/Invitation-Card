@@ -21,6 +21,9 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
   const editorRef = useRef<any>(null);
   const isMobile = useIsMobile();
 
+  console.log("Content from CardCanvas:", content);
+
+
   // Default to closed sidebar on mobile
   useEffect(() => {
     setSidebarOpen(!isMobile);
@@ -94,34 +97,46 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
 
       {/* Main canvas area */}
       <div className="flex-1 overflow-auto p-4 bg-gray-50">
-        <div className="flex items-center justify-start gap-8 mb-4 border-b border-gray-200">
-
+        <div className="flex items-center justify-between gap-8 mb-4 border-b border-gray-200">
+          <div className="flex gap-8">
+            <button
+              className={`flex justify-center items-center py-2 px-1 text-sm font-semibold ${activeTab === 'editor'
+                ? 'text-blue-600 border-b-2 border-blue-600'
+                : 'text-gray-700 hover:text-blue-500'
+                }`}
+              onClick={() => setActiveTab('editor')}
+            >
+              <Component className="h-4 w-4 mr-2" /> Editor
+            </button>
+            <button
+              className={`flex justify-center items-center py-2 px-1 text-sm font-semibold ${activeTab === 'card'
+                ? 'text-blue-600 border-b-2 border-blue-600'
+                : 'text-gray-700 hover:text-blue-500'
+                }`}
+              onClick={() => setActiveTab('card')}
+            >
+              <Edit className="h-4 w-4 mr-2" />  Edit Card
+            </button>
+            <button
+              className={`flex justify-center items-center py-2 px-1 text-sm font-semibold ${activeTab === 'envelope'
+                ? 'text-blue-600 border-b-2 border-blue-600'
+                : 'text-gray-700 hover:text-blue-500'
+                }`}
+              onClick={() => setActiveTab('envelope')}
+            >
+              <Mail className="h-4 w-4 mr-2" />  Edit Envelope
+            </button>
+          </div>
+          {/* Next Button - Aligned to the right */}
           <button
-            className={`flex justify-center items-center py-2 px-1 text-sm font-semibold ${activeTab === 'editor'
-              ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-700 hover:text-blue-500'
-              }`}
-            onClick={() => setActiveTab('editor')}
+            className="flex items-center py-2 px-4 text-sm font-semibold bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+            onClick={() => {
+              if (activeTab === 'editor') setActiveTab('card');
+              else if (activeTab === 'card') setActiveTab('envelope');
+            }}
+            disabled={activeTab === 'envelope'}
           >
-            <Component className="h-4 w-4 mr-2" /> Editor
-          </button>
-          <button
-            className={`flex justify-center items-center py-2 px-1 text-sm font-semibold ${activeTab === 'card'
-              ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-700 hover:text-blue-500'
-              }`}
-            onClick={() => setActiveTab('card')}
-          >
-            <Edit className="h-4 w-4 mr-2" />  Edit Card
-          </button>
-          <button
-            className={`flex justify-center items-center py-2 px-1 text-sm font-semibold ${activeTab === 'envelope'
-              ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-700 hover:text-blue-500'
-              }`}
-            onClick={() => setActiveTab('envelope')}
-          >
-            <Mail className="h-4 w-4 mr-2" />  Edit Envelope
+            Next
           </button>
         </div>
 
