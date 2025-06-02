@@ -36,6 +36,8 @@ import { useParams } from "react-router-dom";
 const Index = () => {
   const { templateId } = useParams();
 
+  console.log("Template Id:", templateId);
+
   const initialTemplate = templateId ? cardTemplates.find(t => t.id === templateId) || cardTemplates[0] : cardTemplates[0];
 
   // Initialize editor with the first template
@@ -51,6 +53,9 @@ const Index = () => {
     trackContentBlockChange,
     originalContentRef
   } = useCardEditor(initialTemplate);
+
+  console.log("Selected Template:", selectedTemplate);
+
 
   // Template management 
   const {

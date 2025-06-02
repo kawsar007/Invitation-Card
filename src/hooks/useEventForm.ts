@@ -98,7 +98,7 @@ export const useEventForm = (template: CardTemplate, onSuccess?: EventModalProps
         if (craftSuccess) {
           resetForm();
           toast.success(result.message || "Event created successfully");
-          navigate(`/editor/${template?.id}`);
+          navigate(`/editor/${template?.id}?eventId=${result.data.id}`);
         } else {
           // Event was created but craft failed
           toast.warning("Event created successfully, but failed to craft invitation");
