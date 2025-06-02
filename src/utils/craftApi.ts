@@ -26,8 +26,6 @@ export const callCraftApi = async (eventId: string, formattedContent: string) =>
 
     const craftResult: CraftApiResponse = await craftResponse.json();
 
-    console.log("Craft Success from Craft API:-->", craftResult);
-
     if (craftResult.success) {
       toast.success(craftResult?.message || "Invitation crafted successfully!");
       return true;

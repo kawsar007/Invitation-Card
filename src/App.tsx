@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { CraftApiProvider } from "./context/CraftApiContext";
 import { UserProvider } from "./context/UserContext";
 import LandingPage from "./landing-page";
 import Navbar from "./landing-page/Navbar";
@@ -78,9 +79,11 @@ const App = () => {
       {/* <AuthProvider> */}
       <TooltipProvider>
         <UserProvider>
-          <BrowserRouter>
-            <AppContent />
-          </BrowserRouter>
+          <CraftApiProvider>
+            <BrowserRouter>
+              <AppContent />
+            </BrowserRouter>
+          </CraftApiProvider>
         </UserProvider>
       </TooltipProvider>
       {/* </AuthProvider> */}

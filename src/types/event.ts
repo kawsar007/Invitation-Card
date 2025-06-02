@@ -16,7 +16,7 @@ export interface Event {
   updated_at: string;
 }
 
-export interface ApiResponse {
+export interface EventApiResponse {
   success: boolean;
   message: string;
   data: Event[];

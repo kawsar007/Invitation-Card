@@ -1,10 +1,10 @@
 
 
 import { EventFormData, EventModalProps } from "@/components/design-templates/CreateEventModal";
+import { useCraftApi } from "@/context/CraftApiContext";
 import { Event } from "@/types/event";
 import { CardTemplate } from "@/types/types";
 import { getAuthToken, getUserData } from "@/utils/auth";
-import { callCraftApi } from "@/utils/craftApi";
 import { formatHtmlContent } from "@/utils/formatters";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -32,6 +32,14 @@ export const useEventForm = (template: CardTemplate, onSuccess?: EventModalProps
   const token = getAuthToken();
   const user = getUserData();
 
+  const {
+    invitations,
+    loading,
+    fetchInvitations,
+    craftInvitation,
+    getLatestInvitation,
+    clearError
+  } = useCraftApi();
 
   const formattedContent = formatHtmlContent(template?.content);
   const sender_name = `${user?.first_name} ${user?.last_name}`;
@@ -85,8 +93,8 @@ export const useEventForm = (template: CardTemplate, onSuccess?: EventModalProps
 
       if (result.success && result?.data?.id) {
         // Call craft API
-        const craftSuccess = await callCraftApi(result.data.id.toString(), formattedContent);
-
+        // const craftSuccess = await callCraftApi(result.data.id.toString(), formattedContent);  
+        const craftSuccess = await craftInvitation(result.data.id.toString(), formattedContent);
         if (craftSuccess) {
           resetForm();
           toast.success(result.message || "Event created successfully");

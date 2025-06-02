@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getThemeStyles } from "@/styles/TemplateStyles";
-import { ApiResponse, Event, FilterState } from "@/types/event";
+import { Event, EventApiResponse, FilterState } from "@/types/event";
 import { getAuthToken } from '@/utils/auth';
 import { Calendar, ChevronLeft, ChevronRight, Clock, Filter, MapPin, Search, Users, Video } from "lucide-react";
 import React, { useCallback, useEffect, useState } from 'react';
@@ -147,7 +147,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ theme }) => {
         throw new Error('Failed to fetch events');
       }
 
-      const data: ApiResponse = await response.json();
+      const data: EventApiResponse = await response.json();
 
       if (data.success) {
         setEvents(data.data);

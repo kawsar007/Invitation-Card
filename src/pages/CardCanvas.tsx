@@ -21,9 +21,6 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
   const editorRef = useRef<any>(null);
   const isMobile = useIsMobile();
 
-  console.log("Content from CardCanvas:", content);
-
-
   // Default to closed sidebar on mobile
   useEffect(() => {
     setSidebarOpen(!isMobile);
