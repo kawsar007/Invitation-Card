@@ -30,7 +30,7 @@ export const cardTemplates: CardTemplate[] = [
         }
     </style>
 </head>
-<body>
+<body id="invitation-card">
     <div style="display: flex; align-items: center; justify-content: center; text-align: center; min-height: 100vh; width: 100%; background-image: url('https://inviteloop.s3.ap-southeast-1.amazonaws.com/cards/42d69d3c-5f34-4386-9412-68e6416ecc1f-widding-elegant-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; box-sizing: border-box;">
         <div style="padding: min(40px, 5vw); margin: min(20px, 3vw); width: 100%; max-width: 100%; box-sizing: border-box;">
             <h1 id="block-h1-0" style="color: #a389f4; font-family: 'Georgia', serif; font-size: clamp(24px, 5vw, 32px); margin-bottom: max(10px, 2vh);">You're Invited Kawsar</h1>

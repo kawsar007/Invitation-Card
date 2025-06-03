@@ -118,7 +118,6 @@ export const CraftApiProvider: React.FC<CraftApiProviderProps> = ({ children }) 
 
       const result: CraftApiResponse = await response.json();
       setLastCraftedInvitation(result?.data);
-      console.log("Craft Result: ", result.data);
 
       if (result.success) {
         toast.success(result?.message || "Invitation crafted successfully!");
@@ -151,6 +150,7 @@ export const CraftApiProvider: React.FC<CraftApiProviderProps> = ({ children }) 
 
   // Generate image function
   const generateImage = useCallback(async (eventId: string, version: number): Promise<ImageGenerationResponse | null> => {
+
     setImageGenerating(true);
     setError(null);
 
@@ -160,7 +160,6 @@ export const CraftApiProvider: React.FC<CraftApiProviderProps> = ({ children }) 
       );
 
       const result: ImageGenerationResponse = await response.json();
-      console.log("Generate Image Result: ", result);
 
       if (result.success) {
         toast.success(result?.message || "Image generation queued successfully!");

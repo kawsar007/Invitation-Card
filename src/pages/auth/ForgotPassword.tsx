@@ -75,7 +75,6 @@ const ForgotPassword: React.FC = () => {
       });
 
       const responseData = await response.json();
-      console.log("Response Data:", responseData);
 
       if (!response.ok) {
         throw new Error(responseData.message || 'Failed to send verification code');
@@ -105,8 +104,7 @@ const ForgotPassword: React.FC = () => {
       });
 
       const responseData = await response.json();
-      console.log("Verification Response (full):", JSON.stringify(responseData, null, 2));
-      console.log("Verification responseData", responseData);
+
       if (!response.ok) {
         throw new Error(responseData.message || 'Verification failed');
       }

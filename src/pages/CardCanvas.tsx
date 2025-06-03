@@ -4,6 +4,7 @@ import { Component, SaveIcon, Scan } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import CardEditor from './CardEditor';
+import EventDetailsForm from './EventDetails';
 
 interface CardCanvasProps {
   content: string;
@@ -125,21 +126,8 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
         );
       case 'details':
         return (
-          <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-3xl mx-auto">
-            <h3 className="text-xl font-semibold mb-4">Edit Card Content</h3>
-            <p className="mb-4">Here you can customize the appearance and content of your card.</p>
-            <div className="mb-4">
-              <h4 className="text-lg font-medium mb-2">Card Options</h4>
-              <ul className="list-disc pl-5 space-y-2">
-                <li>Choose card size and orientation</li>
-                <li>Select paper type and quality</li>
-                <li>Add custom borders and patterns</li>
-                <li>Set font styles and typography</li>
-              </ul>
-            </div>
-            <div className="p-4 bg-gray-100 rounded">
-              <p className="italic text-gray-600">This is dummy text for the Edit Card tab. In a real implementation, this would contain actual card editing tools and options.</p>
-            </div>
+          <div className="p-6 w-full max-w-4xl mx-auto">
+            <EventDetailsForm eventId={eventId} />
           </div>
         );
 

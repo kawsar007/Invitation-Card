@@ -78,7 +78,6 @@ const SignUp: React.FC = () => {
       }
 
       // Handle successful registration
-      console.log('Registration successful console', result);
 
       toast.success(result?.message);
       navigate('/sign-in', { state: { registrationSuccess: true } });

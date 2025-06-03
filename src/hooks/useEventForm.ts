@@ -45,6 +45,7 @@ export const useEventForm = (template: CardTemplate, onSuccess?: EventModalProps
   const sender_name = `${user?.first_name} ${user?.last_name}`;
 
 
+
   const [formData, setFormData] = useState<EventFormData>(INITIAL_FORM_DATA);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<(string | null)>(null);

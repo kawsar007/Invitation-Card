@@ -20,7 +20,7 @@ export interface EventApiResponse {
   success: boolean;
   message: string;
   data: Event[];
-  meta: {
+  meta?: {
     total: number;
     page: number;
     limit: number;
@@ -35,4 +35,10 @@ export interface FilterState {
   locationType: string;
   page: number;
   limit: number;
+}
+
+export interface EventResponseObject {
+  success: boolean;
+  message: string;
+  data: Event;
 }
