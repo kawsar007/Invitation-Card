@@ -69,6 +69,7 @@ export const CraftApiProvider: React.FC<CraftApiProviderProps> = ({ children }) 
   // const [lastCraftedInvitation, setLastCraftedInvitation] = useState<InvitationCard | null>(null);
   const lastCraftedRef = useRef<InvitationCard | null>(null);
 
+
   const version = lastCraftedRef.current?.version || 0;
 
   const makeAuthenticatedRequest = useCallback(async (url: string, options: RequestInit = {}): Promise<Response> => {
@@ -163,7 +164,7 @@ export const CraftApiProvider: React.FC<CraftApiProviderProps> = ({ children }) 
 
     try {
       const response = await makeAuthenticatedRequest(
-        `${import.meta.env.VITE_BASE_URL}/api/invitation/${eventId}/generate?version=2`
+        `${import.meta.env.VITE_BASE_URL}/api/invitation/${eventId}/generate?version=${lastCraftedRef?.current?.version}`
       );
 
       const result: ImageGenerationResponse = await response.json();
