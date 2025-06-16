@@ -19,6 +19,8 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
   showGrid,
   onBackgroundChange,
 }) => {
+
+
   // Add this to get query parameters
   const [searchParams] = useSearchParams();
   const eventId = searchParams.get('eventId');
@@ -34,7 +36,7 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
     loading,
     previewLoading,
     error,
-    lastCraftedInvitation,
+    versionNo,
     previewData,
     generateImage,
     imageGenerating,
@@ -42,7 +44,7 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
   } = useCraftApi();
 
   // Get the latest invitation to get the version number
-  const version = lastCraftedInvitation?.version || 0;
+  // const version = lastCraftedInvitation?.version || 0;
 
   // Handle Next button click
   const handleNext = async () => {
@@ -50,7 +52,7 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
       // Craft the invitation when moving from editor to details
       try {
         const successCraft = await craftInvitation(eventId, content);
-        const successGenerateImage = await generateImage(eventId, version);
+        const successGenerateImage = await generateImage(eventId, versionNo);
         // const successPreview = await previewInvitation(eventId, version);
 
         if (successCraft && successGenerateImage) {
@@ -75,7 +77,7 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
         // For this example, let's assume you'll pass the version or get it from context
 
         // This is a simplified approach - you might need to adjust based on your data flow
-        await previewInvitation(eventId, version);
+        await previewInvitation(eventId, versionNo);
       } catch (error) {
         console.error('Error generating preview:', error);
       }
@@ -145,15 +147,15 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
                 <p className="text-green-600 font-medium">{previewData.message}</p>
 
                 <h2>Render Preview Image</h2>
-                {/* {previewData.image_url && (
+                {previewData.data?.imageUrl && (
                   <div className="border rounded-lg p-4">
                     <img
-                      src={previewData.image_url}
+                      src={previewData?.data?.imageUrl}
                       alt="Invitation Preview"
                       className="max-w-full h-auto mx-auto"
                     />
                   </div>
-                )} */}
+                )}
                 {/* Add more preview content based on your PreviewData structure */}
               </div>
             ) : (

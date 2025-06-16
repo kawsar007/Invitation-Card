@@ -13,7 +13,7 @@ const TemplatePreview = ({ template, theme }: { template: Template; theme: strin
             title={template.name}
             srcDoc={createTemplateIframe(template)}
             className="w-full h-full border-0"
-            sandbox="allow-same-origin"
+            sandbox="allow-same-origin allow-scripts"
           />
         </div>
       </div>

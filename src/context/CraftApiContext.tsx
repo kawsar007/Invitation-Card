@@ -1,10 +1,8 @@
-
 import { CraftApiResponse, InvitationCard, PreviewData } from '@/types/craftApi';
 import { getAuthToken } from "@/utils/auth";
-import React, { createContext, ReactNode, useCallback, useContext, useState } from 'react';
+import React, { createContext, ReactNode, useCallback, useContext, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
-// Add new type for image generation response
 interface ImageGenerationResponse {
   success: boolean;
   message: string;
@@ -23,21 +21,29 @@ interface CraftApiContextType {
   previewLoading: boolean;
   previewData: PreviewData | null;
   imageGenerating: boolean;
-
-  lastCraftedInvitation: InvitationCard | null;
+  // lastCraftedInvitation: InvitationCard | null;
+  versionNo: number; // Add this lin
 
   // Actions
-  craftInvitation: (eventId: string, formattedContent: string) => Promise<boolean>;
+  craftInvitation: (eventId: string, formattedContent: string) => Promise<{ success: boolean; data?: InvitationCard }>;
   fetchInvitations: (eventId: string) => Promise<void>;
   refreshInvitations: () => Promise<void>;
 
-  // New image generating actions
-  generateImage: (eventId: string, version: number) => Promise<PreviewData | null>;
-  craftPreviewAndGenerate: (eventId: string, formattedContent: string) => Promise<{ success: boolean; previewData?: PreviewData; imageGeneration?: ImageGenerationResponse }>;
+  // Image generation actions
+  generateImage: (eventId: string, version: number) => Promise<ImageGenerationResponse | null>;
+  craftPreviewAndGenerate: (eventId: string, formattedContent: string) => Promise<{
+    success: boolean;
+    previewData?: PreviewData;
+    imageGeneration?: ImageGenerationResponse;
+  }>;
 
   // Preview Actions
   previewInvitation: (eventId: string, version: number) => Promise<PreviewData | null>;
-  craftAndPreview: (eventId: string, formattedContent: string) => Promise<{ success: boolean; previewData?: PreviewData }>;
+  craftAndPreview: (eventId: string, formattedContent: string) => Promise<{
+    success: boolean;
+    previewData?: PreviewData;
+    craftedData?: InvitationCard;
+  }>;
   clearPreview: () => void;
 
   // Utilities
@@ -48,6 +54,7 @@ interface CraftApiContextType {
 }
 
 const CraftApiContext = createContext<CraftApiContextType | undefined>(undefined);
+
 interface CraftApiProviderProps {
   children: ReactNode;
 }
@@ -59,11 +66,13 @@ export const CraftApiProvider: React.FC<CraftApiProviderProps> = ({ children }) 
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewData, setPreviewData] = useState<PreviewData | null>(null);
   const [imageGenerating, setImageGenerating] = useState(false);
-  const [lastCraftedInvitation, setLastCraftedInvitation] = useState(null);
+  // const [lastCraftedInvitation, setLastCraftedInvitation] = useState<InvitationCard | null>(null);
+  const lastCraftedRef = useRef<InvitationCard | null>(null);
+
+  const version = lastCraftedRef.current?.version || 0;
 
   const makeAuthenticatedRequest = useCallback(async (url: string, options: RequestInit = {}): Promise<Response> => {
     const token = getAuthToken();
-
     return fetch(url, {
       ...options,
       headers: {
@@ -71,10 +80,9 @@ export const CraftApiProvider: React.FC<CraftApiProviderProps> = ({ children }) 
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-    })
-  }, [])
+    });
+  }, []);
 
-  // Fetch invitations
   const fetchInvitations = useCallback(async (eventId?: string): Promise<void> => {
     setLoading(true);
     setError(null);
@@ -91,72 +99,71 @@ export const CraftApiProvider: React.FC<CraftApiProviderProps> = ({ children }) 
         setError(result?.message || "Failed to fetch invitations");
       }
     } catch (error) {
-      const errorMsg = "Failed to fetch invitations";
-      setError(errorMsg);
+      setError("Failed to fetch invitations");
       console.error('Error fetching invitations:', error);
     } finally {
       setLoading(false);
     }
   }, [makeAuthenticatedRequest]);
 
-  // Craft a new invitation 
   const craftInvitation = useCallback(async (
     eventId: string,
     formattedContent: string,
-  ): Promise<boolean> => {
+  ): Promise<{ success: boolean; data?: InvitationCard }> => {
     setLoading(true);
     setError(null);
 
-
     try {
-      const response = await makeAuthenticatedRequest(`${import.meta.env.VITE_BASE_URL}/api/invitation/${eventId}/craft`, {
-        method: 'POST',
-        body: JSON.stringify({
-          html: formattedContent
-        })
-      })
+      const response = await makeAuthenticatedRequest(
+        `${import.meta.env.VITE_BASE_URL}/api/invitation/${eventId}/craft`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ html: formattedContent })
+        }
+      );
 
       const result: CraftApiResponse = await response.json();
-      setLastCraftedInvitation(result?.data);
 
       if (result.success) {
+        const craftedData = result?.data as InvitationCard;
+        // setLastCraftedInvitation(craftedData);
+        lastCraftedRef.current = craftedData;
+
         toast.success(result?.message || "Invitation crafted successfully!");
 
-        // If the response includes the new invitation data, add it to state
-        if (result?.data && !Array.isArray(result?.data)) {
-          setInvitations(prev => [...prev, result?.data as InvitationCard]);
+        if (craftedData && !Array.isArray(craftedData)) {
+          setInvitations(prev => [...prev, craftedData]);
         } else {
-          // Otherwise, refresh the invitations list
           await fetchInvitations(eventId);
         }
-        return true;
+
+        return { success: true, data: craftedData };
       } else {
         const errorMsg = result?.message || "Failed to craft invitation";
         setError(errorMsg);
         toast.error(errorMsg);
-        return false;
+        return { success: false };
       }
-
     } catch (error) {
       const errorMsg = "Failed to craft invitation";
       setError(error.message || errorMsg);
       toast.error(errorMsg);
-      return false;
+      return { success: false };
     } finally {
       setLoading(false);
     }
+  }, [fetchInvitations, makeAuthenticatedRequest]);
 
-  }, [fetchInvitations, makeAuthenticatedRequest])
-
-  // Generate image function
-  const generateImage = useCallback(async (eventId: string, version: number): Promise<ImageGenerationResponse | null> => {
-
+  const generateImage = useCallback(async (
+    eventId: string,
+    version: number
+  ): Promise<ImageGenerationResponse | null> => {
     setImageGenerating(true);
     setError(null);
 
     try {
       const response = await makeAuthenticatedRequest(
-        `${import.meta.env.VITE_BASE_URL}/api/invitation/${eventId}/generate?version=${version}`
+        `${import.meta.env.VITE_BASE_URL}/api/invitation/${eventId}/generate?version=2`
       );
 
       const result: ImageGenerationResponse = await response.json();
@@ -170,22 +177,23 @@ export const CraftApiProvider: React.FC<CraftApiProviderProps> = ({ children }) 
         toast.error(errorMsg);
         return null;
       }
-
     } catch (error) {
       const errorMsg = "Failed to queue image generation";
       setError(errorMsg);
       toast.error(errorMsg);
-      console.error('Error calling image generation API:', error);
       return null;
     } finally {
       setImageGenerating(false);
     }
   }, [makeAuthenticatedRequest]);
 
-  // Preview invitation function
-  const previewInvitation = useCallback(async (eventId: string, version: number): Promise<PreviewData | null> => {
+  const previewInvitation = useCallback(async (
+    eventId: string,
+    version: number
+  ): Promise<PreviewData | null> => {
     setPreviewLoading(true);
     setError(null);
+
     try {
       const response = await makeAuthenticatedRequest(
         `${import.meta.env.VITE_BASE_URL}/api/invitation/${eventId}/preview?version=${version}`
@@ -203,44 +211,53 @@ export const CraftApiProvider: React.FC<CraftApiProviderProps> = ({ children }) 
         toast.error(errorMsg);
         return null;
       }
-
     } catch (error) {
       const errorMsg = "Failed to generate preview";
       setError(errorMsg);
       toast.error(errorMsg);
-      console.error('Error calling preview API:', error);
       return null;
     } finally {
       setPreviewLoading(false);
     }
   }, [makeAuthenticatedRequest]);
 
-  // Craft and immediately preview
-  const craftAndPreview = useCallback(async (eventId: string, formattedContent: string): Promise<{ success: boolean; previewData?: PreviewData }> => {
-    const craftSuccess = await craftInvitation(eventId, formattedContent);
-    if (craftSuccess && lastCraftedInvitation) {
-      const previewResult = await previewInvitation(eventId, lastCraftedInvitation.version);
+  const craftAndPreview = useCallback(async (
+    eventId: string,
+    formattedContent: string
+  ): Promise<{
+    success: boolean;
+    previewData?: PreviewData;
+    craftedData?: InvitationCard;
+  }> => {
+    const { success, data } = await craftInvitation(eventId, formattedContent);
+
+    if (success && data) {
+      const previewResult = await previewInvitation(eventId, data.version);
       return {
         success: true,
-        previewData: previewResult || undefined
+        previewData: previewResult || undefined,
+        craftedData: data
       };
     }
 
-    return { success: craftSuccess };
-  }, [craftInvitation, lastCraftedInvitation, previewInvitation]);
+    return { success: false };
+  }, [craftInvitation, previewInvitation]);
 
-  // Craft, preview, and generate image in sequence
   const craftPreviewAndGenerate = useCallback(async (
     eventId: string,
     formattedContent: string
-  ): Promise<{ success: boolean; previewData?: PreviewData; imageGeneration?: ImageGenerationResponse }> => {
-    const craftSuccess = await craftInvitation(eventId, formattedContent);
+  ): Promise<{
+    success: boolean;
+    previewData?: PreviewData;
+    imageGeneration?: ImageGenerationResponse;
+  }> => {
+    const { success, data } = await craftInvitation(eventId, formattedContent);
 
-    if (craftSuccess && lastCraftedInvitation) {
-      const previewResult = await previewInvitation(eventId, lastCraftedInvitation.version);
+    if (success && data) {
+      const previewResult = await previewInvitation(eventId, data.version);
 
       if (previewResult?.success) {
-        const imageGenResult = await generateImage(eventId, lastCraftedInvitation.version);
+        const imageGenResult = await generateImage(eventId, data.version);
         return {
           success: true,
           previewData: previewResult,
@@ -254,17 +271,15 @@ export const CraftApiProvider: React.FC<CraftApiProviderProps> = ({ children }) 
       };
     }
 
-    return { success: craftSuccess };
-  }, [craftInvitation, lastCraftedInvitation, previewInvitation, generateImage]);
+    return { success: false };
+  }, [craftInvitation, previewInvitation, generateImage]);
 
-  // Clear preview data
   const clearPreview = useCallback(() => {
     setPreviewData(null);
   }, []);
 
-  // Refresh invitations (alias for fetchInvitations)
   const refreshInvitations = useCallback(async (): Promise<void> => {
-    fetchInvitations();
+    await fetchInvitations();
   }, [fetchInvitations]);
 
   const getInvitationById = useCallback((id: number): InvitationCard | undefined => {
@@ -273,64 +288,57 @@ export const CraftApiProvider: React.FC<CraftApiProviderProps> = ({ children }) 
 
   const getLatestInvitation = useCallback((): InvitationCard | undefined => {
     if (invitations.length === 0) return undefined;
-
-    return invitations.reduce((latest, current) => new Date(current.updated_at) > new Date(latest.updated_at) ? current : latest)
+    return invitations.reduce((latest, current) =>
+      new Date(current.updated_at) > new Date(latest.updated_at) ? current : latest
+    );
   }, [invitations]);
 
   const clearError = useCallback(() => {
     setError(null);
   }, []);
 
-  // Check if user can proceed to next step (has successfully crafted and previewed)
   const canProceedToNext = useCallback((): boolean => {
-    return Boolean(lastCraftedInvitation && previewData?.success);
-  }, [lastCraftedInvitation, previewData]);
+    return Boolean(lastCraftedRef.current && previewData?.success);
+  }, [previewData]);
 
   const value: CraftApiContextType = {
-    // state
     invitations,
     loading,
     error,
     previewLoading,
     previewData,
     imageGenerating,
-    lastCraftedInvitation,
+    // lastCraftedInvitation,
+    versionNo: lastCraftedRef.current?.version || 0,
 
-    // Actions
     craftInvitation,
     fetchInvitations,
     refreshInvitations,
 
-    // Preview Actions
+    generateImage,
+    craftPreviewAndGenerate,
+
     previewInvitation,
     craftAndPreview,
     clearPreview,
 
-    // New image generation actions
-    generateImage,
-    craftPreviewAndGenerate,
-
-    // Utilities
     getInvitationById,
     getLatestInvitation,
     clearError,
     canProceedToNext
-  }
+  };
 
   return (
     <CraftApiContext.Provider value={value}>
       {children}
     </CraftApiContext.Provider>
-  )
-}
+  );
+};
 
-// Custom hook to use the context
 export const useCraftApi = (): CraftApiContextType => {
   const context = useContext(CraftApiContext);
-
   if (context === undefined) {
     throw new Error('useCraftApi must be used within a CraftApiProvider');
   }
-
   return context;
 };
