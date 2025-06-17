@@ -137,35 +137,6 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
       case 'preview':
         return (
           <PreviewCard versionNo={versionNo} setActiveTab={setActiveTab} previewLoading={previewLoading} previewData={previewData} />
-          // <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-3xl mx-auto">
-          //   <h3 className="text-xl font-semibold mb-4">Preview Your Invitation</h3>
-          //   {previewLoading ? (
-          //     <div className="flex items-center justify-center p-8">
-          //       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          //       <span className="ml-3">Generating preview...</span>
-          //     </div>
-          //   ) : previewData ? (
-          //     <div className="space-y-4">
-          //       <p className="text-green-600 font-medium">{previewData.message}</p>
-
-          //       <h2>Render Preview Image</h2>
-          //       {previewData.data?.imageUrl && (
-          //         <div className="border rounded-lg p-4">
-          //           <img
-          //             src={previewData?.data?.imageUrl}
-          //             alt="Invitation Preview"
-          //             className="max-w-full h-auto mx-auto"
-          //           />
-          //         </div>
-          //       )}
-          //       {/* Add more preview content based on your PreviewData structure */}
-          //     </div>
-          //   ) : (
-          //     <div className="p-4 bg-gray-100 rounded">
-          //       <p className="italic text-gray-600">Preview will be generated when you navigate to this tab.</p>
-          //     </div>
-          //   )}
-          // </div>
         );
       default:
         return null;

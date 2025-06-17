@@ -1,62 +1,65 @@
+import { X } from 'lucide-react';
+import InvitationCardAnimation from './CardAnimation';
 
-// Separate Modal Component
-const ImageModal = ({ isOpen, onClose, imageUrl, versionNo }) => {
+const ImageModal = ({ isOpen, onClose, imageUrl, versionNo, previewData, fromName }) => {
+
   if (!isOpen) return null;
-
-  const handleDownload = async (imageUrl, filename = `invitation-v${versionNo}.png`) => {
-    try {
-      const response = await fetch(imageUrl);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Download failed:', error);
-      window.open(imageUrl, '_blank');
-    }
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75">
-      <div className="relative max-w-7xl max-h-full bg-white rounded-lg overflow-hidden">
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Full Size Preview</h3>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => handleDownload(imageUrl)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center"
-            >
-              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-              Download
-            </button>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+      <div className="relative max-w-7xl w-full max-h-full bg-white rounded-lg overflow-hidden shadow-2xl">
+
+        {/* Top notification bar */}
+        <div className="bg-gray-100 border-b border-gray-200 p-3 text-center text-sm text-gray-600">
+          <div className="flex items-center justify-center">
+            <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center mr-2">
+              <span className="text-white text-xs">i</span>
+            </div>
+            <span>Please keep in mind that the front of the inviteloop says {fromName} in the preview, but when you actually send your mailing, your recipient's name will appear there instead.</span>
+            <button onClick={onClose} className="ml-4 text-gray-400 hover:text-gray-600"><X /></button>
           </div>
         </div>
 
-        <div className="p-4 max-h-[80vh] overflow-auto">
-          <img
-            src={imageUrl}
-            alt="Full Size Invitation Preview"
-            className="w-full h-auto mx-auto rounded-lg"
-            style={{ maxHeight: '70vh', objectFit: 'contain' }}
-          />
+        {/* Navigation bar */}
+        <div className="bg-white border-b border-gray-200 p-4 flex items-center justify-between">
+          <button onClick={onClose} className="text-gray-600 hover:text-gray-800 flex items-center">
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Preview Email
+          </button>
+          <div className="text-center">
+            <span className="text-gray-600">Full card preview. You can </span>
+            <button className="text-blue-600 hover:text-blue-800 underline">edit your card</button>
+            <span className="text-gray-600"> at any time.</span>
+          </div>
+          <button className="text-gray-600 hover:text-gray-800 flex items-center">
+            Continue to Add Contacts
+            <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+
+        {/* RSVP header */}
+        <div className="bg-gray-800 text-white p-4 text-center">
+          <span className="text-white mr-4">Please RSVP for this Event</span>
+          <button className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded text-sm font-semibold transition-colors">
+            RSVP NOW
+          </button>
+        </div>
+
+        <InvitationCardAnimation cardImage={previewData.data?.imageUrl} />
+
+        <div className="bg-white border-t border-gray-200 p-3 text-left">
+          <div className="flex items-center text-xs text-gray-500">
+            <span className="mr-2">Powered by</span>
+            <span className="font-bold text-gray-700 tracking-wider">INVITELOOP</span>
+          </div>
         </div>
       </div>
     </div>
   );
 };
+
 export default ImageModal;
