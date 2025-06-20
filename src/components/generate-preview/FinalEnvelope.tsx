@@ -1,6 +1,7 @@
+import { Calendar, Heart, MapPin } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 
-const Envelope: React.FC = () => {
+const FinalEnvelope: React.FC = () => {
   const [isEnvelopeOpen, setIsEnvelopeOpen] = useState<boolean>(false);
   const [imageUrl] = useState<string>("https://i.pinimg.com/originals/e0/ee/3c/e0ee3c89be2d8a9854eeb476ec423920.jpg");
   const [isImageVisible, setIsImageVisible] = useState<boolean>(false);
@@ -12,30 +13,40 @@ const Envelope: React.FC = () => {
       // Show image after envelope opens
       setTimeout(() => {
         setIsImageVisible(true);
-      }, 800); // Delay to let envelope animation complete
-    }, 1500); // 1.5 second delay before auto-opening
+      }, 800);
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, []);
 
+
+
   return (
     <div className="min-h-screen">
-      <style jsx>{`
+      <style>{`
         html {
           font-size: clamp(16px, 2.5vw, 20px);
         }
         
         .cssletter {
           position: relative;
-          width: 100%;
+          width: calc(100% - 320px);
           height: 100%;
           display: flex;
           align-items: center;
           justify-content: center;
           user-select: none;
           -webkit-user-select: none;
-          margin: 20vh 0;
+          margin: 30vh 0;
           padding: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+          .cssletter {
+            width: 100%;
+            margin-right: 0;
+            margin-bottom: 0;
+          }
         }
         
         .envelope {
@@ -250,20 +261,98 @@ const Envelope: React.FC = () => {
           border-radius: 0.5rem;
         }
         
+        .sidebar {
+          position: fixed;
+          top: 0;
+          right: 0;
+          height: 100vh;
+          width: 320px;
+          background: linear-gradient(135deg, #FFE4B5 0%, #DEB887 100%);
+          z-index: 1000;
+          box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+          overflow-y: auto;
+        }
+        
+        @media (max-width: 768px) {
+          .sidebar {
+            position: static;
+            width: 100%;
+            height: auto;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+          }
+        }
+        
+        .sidebar-content {
+          padding: 2rem 1.5rem;
+          height: 100%;
+        }
+        
+        .sidebar-header {
+          display: flex;
+          justify-content: between;
+          align-items: center;
+          margin-bottom: 2rem;
+          border-bottom: 2px solid #CD853F;
+          padding-bottom: 1rem;
+        }
+        
+        .sidebar-title {
+          font-family: 'Dancing Script', serif;
+          font-size: 1.8rem;
+          color: #8B0000;
+          font-weight: 600;
+        }
+        
+        .sidebar-image {
+          width: 100%;
+          max-width: 280px;
+          margin: 1rem 0;
+          border-radius: 0.75rem;
+          box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .event-details {
+          background: rgba(255,255,255,0.7);
+          border-radius: 0.75rem;
+          padding: 1.5rem;
+          margin: 1rem 0;
+          backdrop-filter: blur(10px);
+        }
+        
+        .detail-item {
+          display: flex;
+          align-items: center;
+          margin: 0.75rem 0;
+          color: #5D4037;
+        }
+        
+        .detail-item svg {
+          margin-right: 0.75rem;
+          color: #8B0000;
+        }
+        
+
+        
         /* Small screen adjustments */
         @media (max-width: 480px) {
           .cssletter {
+           width: 100%;
             margin: 10vh 0;
           }
           
-          .letter {
-            padding: 2rem 0.5rem 1rem;
+          .sidebar-content {
+            padding: 1.5rem 1rem;
+          }
+          
+          .sidebar-title {
+            font-size: 1.5rem;
           }
         }
       `}</style>
 
       <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap" rel="stylesheet" />
 
+      {/* Main Content */}
       <section className="cssletter">
         <div className={`envelope ${isEnvelopeOpen ? 'active' : ''}`}>
           <div className="heart absolute">
@@ -284,8 +373,61 @@ const Envelope: React.FC = () => {
           />
         </div>
       </section>
+
+      {/* Sidebar */}
+      <div className="sidebar">
+        <div className="sidebar-content">
+          <div className="sidebar-header">
+            <h2 className="sidebar-title">Event Details</h2>
+          </div>
+
+          <img
+            src={imageUrl}
+            alt="Event preview"
+            className="sidebar-image"
+          />
+
+          <div className="event-details">
+            <h3 style={{ color: '#8B0000', fontFamily: 'Dancing Script', fontSize: '1.4rem', marginBottom: '1rem' }}>
+              Cocktails + Conversation
+            </h3>
+
+            <div className="detail-item">
+              <MapPin size={18} />
+              <div>
+                <strong>The Alchemist Bar</strong><br />
+                224 W Ontario Street, Chicago
+              </div>
+            </div>
+
+            <div className="detail-item">
+              <Calendar size={18} />
+              <div>
+                <strong>Tuesday, November 18, 2025</strong><br />
+                5:00 PM - 8:00 PM
+              </div>
+            </div>
+
+            <div className="detail-item">
+              <Heart size={18} />
+              <div>
+                Join us for cocktails and conversations with drinks, good company, and live music.
+              </div>
+            </div>
+          </div>
+
+          <div className="event-details">
+            <h4 style={{ color: '#8B0000', fontFamily: 'Dancing Script', fontSize: '1.2rem', marginBottom: '0.5rem' }}>
+              Virtual Option Available
+            </h4>
+            <p style={{ color: '#5D4037', fontSize: '0.9rem', lineHeight: '1.4' }}>
+              Can't attend in person? Join us virtually! Link will go live 1 hour prior to event start time.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default Envelope;
+export default FinalEnvelope;

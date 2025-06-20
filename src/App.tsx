@@ -7,7 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Envelope from "./components/generate-preview/Envelope";
+import FinalEnvelope from "./components/generate-preview/FinalEnvelope";
 import { CraftApiProvider } from "./context/CraftApiContext";
 import { UserProvider } from "./context/UserContext";
 import LandingPage from "./landing-page";
@@ -59,7 +59,7 @@ const AppContent = () => {
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/trouble-signing-in" element={<ForgotPassword />} />
         <Route path="/templates" element={<TemplatesPage theme={theme} />} />
-        <Route path="/envelope" element={<Envelope />} />
+        <Route path="/envelope" element={<FinalEnvelope />} />
         <Route
           path="/events"
           element={

@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import InvitationCardAnimation from './CardAnimation';
+import Envelope from './Envelope';
 
 const ImageModal = ({ isOpen, onClose, imageUrl, versionNo, previewData, fromName }) => {
 
@@ -49,7 +49,9 @@ const ImageModal = ({ isOpen, onClose, imageUrl, versionNo, previewData, fromNam
           </button>
         </div>
 
-        <InvitationCardAnimation cardImage={previewData.data?.imageUrl} />
+        {/* <InvitationCardAnimation cardImage={previewData.data?.imageUrl} /> */}
+
+        <Envelope />
 
         <div className="bg-white border-t border-gray-200 p-3 text-left">
           <div className="flex items-center text-xs text-gray-500">
