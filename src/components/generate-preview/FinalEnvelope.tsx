@@ -1,5 +1,5 @@
-import { Calendar, Heart, MapPin } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import EnvelopeSidebar from './EnvelopeSidebar';
 
 const FinalEnvelope: React.FC = () => {
   const [isEnvelopeOpen, setIsEnvelopeOpen] = useState<boolean>(false);
@@ -267,10 +267,11 @@ const FinalEnvelope: React.FC = () => {
           right: 0;
           height: 100vh;
           width: 320px;
-          background: linear-gradient(135deg, #FFE4B5 0%, #DEB887 100%);
+          // background: linear-gradient(135deg, #FFE4B5 0%, #DEB887 100%);
           z-index: 1000;
-          box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+          // box-shadow: -2px 0 7px rgba(0,0,0,0.1);
           overflow-y: auto;
+          border-left: 1px solid #EEEEEE;
         }
         
         @media (max-width: 768px) {
@@ -377,53 +378,7 @@ const FinalEnvelope: React.FC = () => {
       {/* Sidebar */}
       <div className="sidebar">
         <div className="sidebar-content">
-          <div className="sidebar-header">
-            <h2 className="sidebar-title">Event Details</h2>
-          </div>
-
-          <img
-            src={imageUrl}
-            alt="Event preview"
-            className="sidebar-image"
-          />
-
-          <div className="event-details">
-            <h3 style={{ color: '#8B0000', fontFamily: 'Dancing Script', fontSize: '1.4rem', marginBottom: '1rem' }}>
-              Cocktails + Conversation
-            </h3>
-
-            <div className="detail-item">
-              <MapPin size={18} />
-              <div>
-                <strong>The Alchemist Bar</strong><br />
-                224 W Ontario Street, Chicago
-              </div>
-            </div>
-
-            <div className="detail-item">
-              <Calendar size={18} />
-              <div>
-                <strong>Tuesday, November 18, 2025</strong><br />
-                5:00 PM - 8:00 PM
-              </div>
-            </div>
-
-            <div className="detail-item">
-              <Heart size={18} />
-              <div>
-                Join us for cocktails and conversations with drinks, good company, and live music.
-              </div>
-            </div>
-          </div>
-
-          <div className="event-details">
-            <h4 style={{ color: '#8B0000', fontFamily: 'Dancing Script', fontSize: '1.2rem', marginBottom: '0.5rem' }}>
-              Virtual Option Available
-            </h4>
-            <p style={{ color: '#5D4037', fontSize: '0.9rem', lineHeight: '1.4' }}>
-              Can't attend in person? Join us virtually! Link will go live 1 hour prior to event start time.
-            </p>
-          </div>
+          <EnvelopeSidebar />
         </div>
       </div>
     </div>
