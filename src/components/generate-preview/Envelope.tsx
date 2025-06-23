@@ -1,8 +1,14 @@
 import React, { useEffect, useState } from 'react';
 
-const Envelope: React.FC = () => {
+interface EnvelopeProps {
+  image: string;
+}
+
+const Envelope: React.FC<EnvelopeProps> = ({ image }) => {
+
   const [isEnvelopeOpen, setIsEnvelopeOpen] = useState<boolean>(false);
-  const [imageUrl] = useState<string>("https://i.pinimg.com/originals/e0/ee/3c/e0ee3c89be2d8a9854eeb476ec423920.jpg");
+  // const [imageUrl] = useState<string>(image);
+  const [imageUrl] = useState<string>("https://cdn2.geckoandfly.com/wp-content/uploads/2019/12/wedding-invitation-template-19-1448x2048.jpg");
   const [isImageVisible, setIsImageVisible] = useState<boolean>(false);
 
   // Auto-open envelope with delay
@@ -20,7 +26,7 @@ const Envelope: React.FC = () => {
 
   return (
     <div className="min-h-screen">
-      <style jsx>{`
+      <style>{`
         html {
           font-size: clamp(16px, 2.5vw, 20px);
         }
