@@ -8,7 +8,7 @@ const Envelope: React.FC<EnvelopeProps> = ({ image }) => {
 
   const [isEnvelopeOpen, setIsEnvelopeOpen] = useState<boolean>(false);
   // const [imageUrl] = useState<string>(image);
-  const [imageUrl] = useState<string>("https://cdn2.geckoandfly.com/wp-content/uploads/2019/12/wedding-invitation-template-19-1448x2048.jpg");
+  const [imageUrl] = useState<string>(image);
   const [isImageVisible, setIsImageVisible] = useState<boolean>(false);
 
   // Auto-open envelope with delay

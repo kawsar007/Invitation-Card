@@ -12,7 +12,6 @@ interface PreviewCardProps {
 }
 
 const PreviewCard: React.FC<PreviewCardProps> = ({ versionNo, previewData, previewLoading, setActiveTab }) => {
-  console.log('previewData', previewData);
 
   const { user, isAuthenticated } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);

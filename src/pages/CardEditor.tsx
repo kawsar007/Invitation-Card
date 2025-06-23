@@ -14,7 +14,6 @@ interface CardEditorProps {
   cardSize: { width: number; height: number };
   toolbarTheme?: 'light' | 'dark';
   toolbarSize?: 'sm' | 'md' | 'lg';
-
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
   onBackgroundChange: (imageUrl: string) => void;
@@ -28,7 +27,6 @@ const CardEditor: React.FC<CardEditorProps> = ({
   cardSize,
   toolbarTheme = 'light',
   toolbarSize = 'md',
-
   sidebarOpen,
   setSidebarOpen,
   onBackgroundChange
@@ -39,24 +37,69 @@ const CardEditor: React.FC<CardEditorProps> = ({
   const [editorInstance, setEditorInstance] = useState<any>(null);
   const [showFormatting, setShowFormatting] = useState(false);
 
+  // Extract body content from full HTML for TinyMCE
+  const extractBodyContent = (htmlContent: string): string => {
+    const bodyMatch = htmlContent.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+    return bodyMatch ? bodyMatch[1].trim() : htmlContent;
+  };
+
+  // Reconstruct full HTML from body content
+  const reconstructFullHTML = (bodyContent: string): string => {
+    // Extract existing head content if it exists
+    const headMatch = content.match(/<head[^>]*>([\s\S]*?)<\/head>/i);
+    const existingHead = headMatch ? headMatch[1] : `
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elegant Wedding Invitation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Georgia:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            color: #333;
+            line-height: 1.6;
+        }
+    </style>`;
+
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+${existingHead}
+</head>
+<body id="invitation-card">
+${bodyContent}
+</body>
+</html>`;
+  };
+
+  // Handle content changes from TinyMCE
+  const handleEditorChange = (newContent: string) => {
+    const fullHTML = reconstructFullHTML(newContent);
+    onChange(fullHTML);
+  };
+
+  // Get the body content for TinyMCE
+  const editorContent = extractBodyContent(content);
 
   // Handle showing the formatting controls when the editor is clicked
   useEffect(() => {
     if (editorInstance) {
-      // Add click event listener to the editor
       const editorElement = editorInstance.getContainer();
 
       editorElement.addEventListener('click', () => {
         setShowFormatting(true);
       });
 
-      // Add focus event listener to the editor
       editorInstance.on('focus', () => {
         setShowFormatting(true);
       });
 
       return () => {
-        // Clean up event listeners when component unmounts
         editorElement.removeEventListener('click', () => {
           setShowFormatting(true);
         });
@@ -68,7 +111,6 @@ const CardEditor: React.FC<CardEditorProps> = ({
   // Handle clicking outside to hide formatting controls
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // If formatting is shown and click is outside editor and outside formatting controls
       if (showFormatting &&
         editorInstance &&
         !editorInstance.getContainer().contains(event.target) &&
@@ -84,11 +126,10 @@ const CardEditor: React.FC<CardEditorProps> = ({
     };
   }, [showFormatting, editorInstance]);
 
-  // Update handleAddText function
   const handleAddText = () => {
     if (editorInstance) {
       editorInstance.focus();
-      setShowFormatting(true); // Always show formatting controls when adding text
+      setShowFormatting(true);
     }
   };
 
@@ -96,7 +137,6 @@ const CardEditor: React.FC<CardEditorProps> = ({
   useEffect(() => {
     const updateSize = () => {
       if (containerRef.current) {
-        // Set fixed aspect ratio based on the cardSize
         setEditorHeight(`${(cardSize.height / cardSize.width * 100)}%`);
       }
     };
@@ -159,12 +199,12 @@ const CardEditor: React.FC<CardEditorProps> = ({
                 setEditorInstance(editor);
               }}
               apiKey={import.meta.env.VITE_TINYMCE_KEY}
-              value={content}
-              onEditorChange={onChange}
+              value={editorContent}
+              onEditorChange={handleEditorChange}
               init={{
                 height: '100%',
                 menubar: false,
-                toolbar: false, // Disable the default toolbar
+                toolbar: false,
                 plugins: [
                   'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
                   'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
@@ -173,39 +213,41 @@ const CardEditor: React.FC<CardEditorProps> = ({
                 image_advtab: true,
                 file_picker_types: 'image',
                 content_style: `
-              body { 
-                font-family: 'Helvetica', Arial, sans-serif; 
-                font-size: 14px; 
-                margin: 0; 
-                padding: 1rem;
-                height: 100%;
-                box-sizing: border-box;
-              }
-              p, h1, h2, h3, h4, h5, h6, div, section, article {
-                display: block;
-                padding: 0.5rem;
-                margin: 0.5rem 0;
-                min-height: 2rem;
-                cursor: move;
-                position: relative;
-                transition: all 0.2s ease;
-              }
-              p:hover, h1:hover, h2:hover, h3:hover, h4:hover, h5:hover, h6:hover, div:hover, section:hover, article:hover {
-                outline: 1px dashed #ccc;
-              }
-              .mce-selected-element {
-                outline: 1px solid #4a90e2 !important;
-                box-shadow: 0 0 0 1px #4a90e2;
-              }
-              img { 
-                max-width: 100%; 
-                height: auto;
-                cursor: move;
-                display: block;
-                margin: 0.5rem 0;
-              }
-              @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Pacifico&family=Great+Vibes&family=Satisfy&family=Tangerine:wght@400;700&family=Kalam:wght@300;400;700&family=Caveat:wght@400;700&family=Sacramento&family=Courgette&family=Marck+Script&family=Yellowtail&family=Italianno&family=Rouge+Script&display=swap');
-            `,
+                  body { 
+                    font-family: 'Georgia', serif; 
+                    font-size: 14px; 
+                    margin: 0; 
+                    padding: 1rem;
+                    height: 100%;
+                    box-sizing: border-box;
+                    color: #333;
+                    line-height: 1.6;
+                  }
+                  p, h1, h2, h3, h4, h5, h6, div, section, article {
+                    display: block;
+                    padding: 0.5rem;
+                    margin: 0.5rem 0;
+                    min-height: 2rem;
+                    cursor: move;
+                    position: relative;
+                    transition: all 0.2s ease;
+                  }
+                  p:hover, h1:hover, h2:hover, h3:hover, h4:hover, h5:hover, h6:hover, div:hover, section:hover, article:hover {
+                    outline: 1px dashed #ccc;
+                  }
+                  .mce-selected-element {
+                    outline: 1px solid #4a90e2 !important;
+                    box-shadow: 0 0 0 1px #4a90e2;
+                  }
+                  img { 
+                    max-width: 100%; 
+                    height: auto;
+                    cursor: move;
+                    display: block;
+                    margin: 0.5rem 0;
+                  }
+                  @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Pacifico&family=Great+Vibes&family=Tangerine:wght@400;700&family=Kalam:wght@300;400;700&family=Caveat:wght@400;700&family=Sacramento&family=Courgette&family=Marck+Script&family=Yellowtail&family=Italianno&family=Rouge+Script&display=swap');
+                `,
                 images_upload_handler: (blobInfo, progress) => {
                   return new Promise((resolve, reject) => {
                     const reader = new FileReader();
