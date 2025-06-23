@@ -46,7 +46,7 @@ const ImageModal = ({ isOpen, onClose, imageUrl, versionNo, previewData, fromNam
         {/* RSVP header */}
         <div className="bg-gray-800 text-white p-1 text-center">
           <span className="text-white mr-4">Please RSVP for this Event</span>
-          <button className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded text-sm font-semibold transition-colors">
+          <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded text-sm font-semibold transition-colors">
             RSVP NOW
           </button>
         </div>

@@ -212,7 +212,7 @@ const Envelope: React.FC<EnvelopeProps> = ({ image }) => {
         }
         
         .envelope.active .envelope-flap {
-          transform: rotateX(-180deg) translateY(0);
+          transform: rotateX(-135deg) translateY(0);
           perspective: 10px;
         }
         
