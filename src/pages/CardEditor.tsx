@@ -217,7 +217,7 @@ ${bodyContent}
                     font-family: 'Georgia', serif; 
                     font-size: 14px; 
                     margin: 0; 
-                    padding: 1rem;
+                    // padding: 1rem;
                     height: 100%;
                     box-sizing: border-box;
                     color: #333;

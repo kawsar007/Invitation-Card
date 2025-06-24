@@ -187,7 +187,7 @@ const PreviewCard: React.FC<PreviewCardProps> = ({ versionNo, previewData, previ
                     </div>
 
                     {previewData.data?.imageUrl ? (
-                      <div className="p-8 bg-gradient-to-br from-gray-50 via-white to-blue-50">
+                      <div className="py-8 bg-gradient-to-br from-gray-50 via-white to-blue-50">
                         <div className="relative group">
                           <div className="absolute -inset-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur opacity-20 group-hover:opacity-30 transition-opacity"></div>
                           <div className="relative">
@@ -195,7 +195,7 @@ const PreviewCard: React.FC<PreviewCardProps> = ({ versionNo, previewData, previ
                               src={previewData.data.imageUrl}
                               alt="Invitation Preview"
                               className="w-full h-auto mx-auto rounded-xl shadow-2xl border border-gray-200 transition-all duration-500 group-hover:scale-[1.02] group-hover:shadow-3xl"
-                              style={{ maxHeight: '600px', objectFit: 'contain' }}
+                              style={{ maxHeight: '900px', objectFit: 'contain' }}
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-xl flex items-center justify-center">
                               <button

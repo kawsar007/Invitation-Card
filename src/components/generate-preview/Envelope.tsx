@@ -233,8 +233,7 @@ const Envelope: React.FC<EnvelopeProps> = ({ image }) => {
           max-width: 90vw;
           max-height: 80vh;
           z-index: 5;
-          background: white;
-          padding: 1rem;
+          // padding: 1rem;
           border-radius: 1rem;
           box-shadow: 0 20px 40px rgba(0,0,0,0.3);
           opacity: 0;

@@ -9,7 +9,7 @@ export const cardTemplates: CardTemplate[] = [
     description: "A sophisticated, elegant wedding invitation with classic typography",
     category: "wedding",
     content: `
-      <!DOCTYPE html>
+     <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -27,12 +27,17 @@ export const cardTemplates: CardTemplate[] = [
             font-family: 'Georgia', serif;
             color: #333;
             line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f5f5f5;
         }
     </style>
 </head>
 <body>
-    <div style="display: flex; align-items: center; justify-content: center; text-align: center; min-height: 100vh; width: 100%; background-image: url('https://inviteloop.s3.ap-southeast-1.amazonaws.com/cards/42d69d3c-5f34-4386-9412-68e6416ecc1f-widding-elegant-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; box-sizing: border-box;">
-        <div style="padding: min(40px, 5vw); margin: min(20px, 3vw); width: 100%; max-width: 100%; box-sizing: border-box;">
+    <div style="width: 100%; max-width: 700px; max-height: 900px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; aspect-ratio: 520/780; background-image: url('https://inviteloop.s3.ap-southeast-1.amazonaws.com/cards/42d69d3c-5f34-4386-9412-68e6416ecc1f-widding-elegant-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+        <div style="padding: min(40px, 5vw); margin: auto; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
             <h1 id="block-h1-0" style="color: #a389f4; font-family: 'Georgia', serif; font-size: clamp(24px, 5vw, 32px); margin-bottom: max(10px, 2vh);">You're Invited Kawsar</h1>
             <p id="block-p-0" style="font-size: clamp(14px, 3vw, 18px); margin-bottom: max(15px, 3vh);">Please join us to celebrate</p>
             <h2 id="block-h2-0" style="font-family: 'Georgia', serif; font-size: clamp(20px, 4vw, 26px); margin-bottom: max(10px, 2vh);">Jerry & Jayson's Wedding</h2>
@@ -55,38 +60,112 @@ export const cardTemplates: CardTemplate[] = [
     content: `
     <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Elegant Wedding Invitation</title>
-    <link href="https://fonts.googleapis.com/css2?family=Georgia:wght@400;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Georgia:wght@400;700&family=Great+Vibes&display=swap"
+      rel="stylesheet" />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Georgia', serif;
-            color: #333;
-            line-height: 1.6;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Georgia", serif;
+        color: #333;
+        line-height: 1.6;
+        background-color: #f5f5f5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
     </style>
-</head>
-<body>
-      <div style="display: flex; align-items: center; justify-content: center; text-align: center; min-height: 100vh; width: 100%; background-image: url('https://inviteloop.s3.ap-southeast-1.amazonaws.com/cards/9a6a6014-f1b2-47a0-a608-db3e45b8bcfd-widding-vintage-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; box-sizing: border-box;">
-        <div style="padding: min(40px, 5vw); margin: min(20px, 3vw); width: 100%; max-width: 100%; border-radius: 12px; box-sizing: border-box;">
-          <h1 id="block-h1-0" style="color: #d2b48c; font-family: 'Great Vibes', cursive; font-size: clamp(30px, 6vw, 40px); margin-bottom: max(10px, 2vh);">Join Us</h1>
-          <p id="block-p-0" style="font-size: clamp(14px, 3vw, 18px); margin-bottom: max(15px, 3vh); color: #333;">In celebrating the union of</p>
-          <h2 id="block-h2-0" style="font-family: 'Great Vibes', cursive; font-size: clamp(24px, 5vw, 32px); margin-bottom: max(10px, 2vh); color: #d2b48c;">Emma & John</h2>
-          <p id="block-p-1" style="font-size: clamp(12px, 2.5vw, 16px); margin-bottom: max(5px, 1vh);">Sunday, May 10th, 2025 at 5:00 PM</p>
-          <p id="block-p-2" style="font-size: clamp(12px, 2.5vw, 16px); margin-bottom: max(15px, 3vh);">The Vintage Garden, Banani</p>
-          <p id="block-p-3" style="font-style: italic; color: #666; font-size: clamp(12px, 2.5vw, 16px);">Cocktails and reception to follow</p>
-        </div>
+  </head>
+  <body>
+    <div
+      style="
+        width: 100%;
+        max-width: 700px;
+        max-height: 900px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        aspect-ratio: 520/780;
+        background-image: url('https://inviteloop.s3.ap-southeast-1.amazonaws.com/cards/9a6a6014-f1b2-47a0-a608-db3e45b8bcfd-widding-vintage-bg.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+      ">
+      <div
+        style="
+          padding: min(40px, 5vw);
+          margin: auto;
+          text-align: center;
+          flex-grow: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        ">
+        <h1
+          style="
+            color: #d2b48c;
+            font-family: 'Great Vibes', cursive;
+            font-size: clamp(30px, 6vw, 40px);
+            margin-bottom: max(10px, 2vh);
+          ">
+          Join Us
+        </h1>
+        <p
+          style="
+            font-size: clamp(14px, 3vw, 18px);
+            margin-bottom: max(15px, 3vh);
+            color: #333;
+          ">
+          In celebrating the union of
+        </p>
+        <h2
+          style="
+            font-family: 'Great Vibes', cursive;
+            font-size: clamp(24px, 5vw, 32px);
+            margin-bottom: max(10px, 2vh);
+            color: #d2b48c;
+          ">
+          Emma & John
+        </h2>
+        <p
+          style="
+            font-size: clamp(12px, 2.5vw, 16px);
+            margin-bottom: max(5px, 1vh);
+          ">
+          Sunday, May 10th, 2025 at 5:00 PM
+        </p>
+        <p
+          style="
+            font-size: clamp(12px, 2.5vw, 16px);
+            margin-bottom: max(15px, 3vh);
+          ">
+          The Vintage Garden, Banani
+        </p>
+        <p
+          style="
+            font-style: italic;
+            color: #666;
+            font-size: clamp(12px, 2.5vw, 16px);
+          ">
+          Cocktails and reception to follow
+        </p>
       </div>
-      </body>
-      </html>
+    </div>
+  </body>
+</html>
     `
   },
   {
@@ -103,7 +182,7 @@ export const cardTemplates: CardTemplate[] = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elegant Wedding Invitation</title>
-    <link href="https://fonts.googleapis.com/css2?family=Georgia:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Georgia:wght@400;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -115,22 +194,28 @@ export const cardTemplates: CardTemplate[] = [
             font-family: 'Georgia', serif;
             color: #333;
             line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            background-color: #f5f5f5;
         }
     </style>
 </head>
 <body>
-      <div style="display: flex; align-items: center; justify-content: center; text-align: center; min-height: 100vh; width: 100%; background-image: url('https://inviteloop.s3.ap-southeast-1.amazonaws.com/cards/83184adc-d9e9-4bfb-a51d-9b88dd35edbb-widding.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; box-sizing: border-box;">
-        <div style="padding: min(40px, 5vw); margin: min(20px, 3vw); width: 100%; max-width: 100%; border-radius: 12px; box-sizing: border-box;">
-          <h1 id="block-h1-0" style="color: #111111; font-family: 'Montserrat', sans-serif; font-size: clamp(26px, 5vw, 36px); margin-bottom: max(10px, 2vh);">Save the Date</h1>
-          <p id="block-p-0" style="font-size: clamp(14px, 3vw, 18px); margin-bottom: max(15px, 3vh); color: #111;">You are cordially invited to the wedding of</p>
-          <h2 id="block-h2-0" style="font-family: 'Montserrat', sans-serif; font-size: clamp(22px, 4.5vw, 30px); margin-bottom: max(10px, 2vh); color: #111111;">Alice & Bob</h2>
-          <p id="block-p-1" style="font-size: clamp(12px, 2.5vw, 16px); margin-bottom: max(5px, 1vh); color: #111;">Saturday, June 21st, 2025 at 6:00 PM</p>
-          <p id="block-p-2" style="font-size: clamp(12px, 2.5vw, 16px); margin-bottom: max(15px, 3vh); color: #111;">The Modern Loft, Dhanmondi</p>
-          <p id="block-p-3" style="font-style: italic; color: #aaa; font-size: clamp(12px, 2.5vw, 16px);">Formal attire requested</p>
+    <div style="width: 100%; max-width: 700px; max-height: 900px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; aspect-ratio: 520/780; background-image: url('https://inviteloop.s3.ap-southeast-1.amazonaws.com/cards/83184adc-d9e9-4bfb-a51d-9b88dd35edbb-widding.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+        <div style="padding: min(40px, 5vw); margin: auto; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
+            <h1 style="color: #111111; font-family: 'Montserrat', sans-serif; font-size: clamp(26px, 5vw, 36px); margin-bottom: max(10px, 2vh); font-weight: 600;">Save the Date</h1>
+            <p style="font-size: clamp(14px, 3vw, 18px); margin-bottom: max(15px, 3vh); color: #111;">You are cordially invited to the wedding of</p>
+            <h2 style="font-family: 'Montserrat', sans-serif; font-size: clamp(22px, 4.5vw, 30px); margin-bottom: max(10px, 2vh); color: #111111; font-weight: 600;">Alice & Bob</h2>
+            <p style="font-size: clamp(12px, 2.5vw, 16px); margin-bottom: max(5px, 1vh); color: #111;">Saturday, June 21st, 2025 at 6:00 PM</p>
+            <p style="font-size: clamp(12px, 2.5vw, 16px); margin-bottom: max(15px, 3vh); color: #111;">The Modern Loft, Dhanmondi</p>
+            <p style="font-style: italic; color: #aaa; font-size: clamp(12px, 2.5vw, 16px);">Formal attire requested</p>
         </div>
-      </div>
-      </body>
-      </html>
+    </div>
+</body>
+</html>
     `
   },
   {
@@ -146,8 +231,8 @@ export const cardTemplates: CardTemplate[] = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elegant Wedding Invitation</title>
-    <link href="https://fonts.googleapis.com/css2?family=Georgia:wght@400;700&display=swap" rel="stylesheet">
+    <title>Birthday Party Invitation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Georgia:wght@400;700&family=Comic+Sans+MS&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -157,24 +242,28 @@ export const cardTemplates: CardTemplate[] = [
         
         body {
             font-family: 'Georgia', serif;
-            color: #333;
-            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            background-color: #f5f5f5;
         }
     </style>
 </head>
 <body>
-      <div style="display: flex; align-items: center; justify-content: center; text-align: center; min-height: 100vh; width: 100%; background-image: url('https://inviteloop.s3.ap-southeast-1.amazonaws.com/cards/d8ebd9b5-2fd1-4a13-a4c1-0691161384c1-birthday-fun-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; box-sizing: border-box;">
-        <div style="padding: min(40px, 5vw); margin: min(20px, 3vw); width: 100%; max-width: 100%; background-color: rgba(255, 255, 255, 0.8); border-radius: 12px; box-sizing: border-box;">
-          <h1 id="block-h1-0" style="color: #ff6b6b; font-family: 'Comic Sans MS', cursive; font-size: clamp(28px, 5.5vw, 38px); margin-bottom: max(8px, 1.5vh);">It's Party Time!</h1>
-          <p id="block-p-0" style="font-size: clamp(15px, 3.2vw, 20px); margin-bottom: max(10px, 2vh); color: #5a67d8;">You're invited to celebrate</p>
-          <h2 id="block-h2-0" style="font-family: 'Comic Sans MS', cursive; font-size: clamp(24px, 5vw, 32px); margin-bottom: max(8px, 1.5vh); color: #ff6b6b;">Sarah's 30th Birthday</h2>
-          <p id="block-p-1" style="font-size: clamp(14px, 3vw, 18px); margin-bottom: max(5px, 1vh);">Friday, May 16th, 2025 at 7:00 PM</p>
-          <p id="block-p-2" style="font-size: clamp(14px, 3vw, 18px); margin-bottom: max(10px, 2vh);">Skyline Lounge, Downtown</p>
-          <p id="block-p-3" style="font-weight: bold; color: #5a67d8; font-size: clamp(14px, 3vw, 18px);">Food, drinks & fun guaranteed!</p>
+    <div style="width: 100%; max-width: 700px; max-height: 900px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; aspect-ratio: 520/780; background-image: url('https://inviteloop.s3.ap-southeast-1.amazonaws.com/cards/d8ebd9b5-2fd1-4a13-a4c1-0691161384c1-birthday-fun-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+        <div style="padding: min(40px, 5vw); margin: auto; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; background-color: rgba(255, 255, 255, 0.8); border-radius: 12px;">
+            <h1 style="color: #ff6b6b; font-family: 'Comic Sans MS', cursive; font-size: clamp(28px, 5.5vw, 38px); margin-bottom: max(8px, 1.5vh);">It's Party Time!</h1>
+            <p style="font-size: clamp(15px, 3.2vw, 20px); margin-bottom: max(10px, 2vh); color: #5a67d8;">You're invited to celebrate</p>
+            <h2 style="font-family: 'Comic Sans MS', cursive; font-size: clamp(24px, 5vw, 32px); margin-bottom: max(8px, 1.5vh); color: #ff6b6b;">Sarah's 30th Birthday</h2>
+            <p style="font-size: clamp(14px, 3vw, 18px); margin-bottom: max(5px, 1vh);">Friday, May 16th, 2025 at 7:00 PM</p>
+            <p style="font-size: clamp(14px, 3vw, 18px); margin-bottom: max(10px, 2vh);">Skyline Lounge, Downtown</p>
+            <p style="font-weight: bold; color: #5a67d8; font-size: clamp(14px, 3vw, 18px);">Food, drinks & fun guaranteed!</p>
         </div>
-      </div>
-      </body>
-      </html>
+    </div>
+</body>
+</html>
     `
   },
   {
@@ -190,8 +279,8 @@ export const cardTemplates: CardTemplate[] = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elegant Wedding Invitation</title>
-    <link href="https://fonts.googleapis.com/css2?family=Georgia:wght@400;700&display=swap" rel="stylesheet">
+    <title>Kids Birthday Invitation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Georgia:wght@400;700&family=Bubblegum+Sans&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -201,24 +290,28 @@ export const cardTemplates: CardTemplate[] = [
         
         body {
             font-family: 'Georgia', serif;
-            color: #333;
-            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            background-color: #f5f5f5;
         }
     </style>
 </head>
 <body>
-      <div style="display: flex; align-items: center; justify-content: center; text-align: center; min-height: 100vh; width: 100%; background-image: url('https://inviteloop.s3.ap-southeast-1.amazonaws.com/cards/47759fd7-9770-4584-8378-bd20676d495a-birthday-kids-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; box-sizing: border-box;">
-        <div style="padding: min(40px, 5vw); margin: min(20px, 3vw); width: 100%; max-width: 100%; border-radius: 12px; box-sizing: border-box;">
-          <h1 id="block-h1-0" style="color: #ff9f1c; font-family: 'Bubblegum Sans', cursive; font-size: clamp(32px, 6vw, 42px); margin-bottom: max(8px, 1.5vh);">Happy Birthday!</h1>
-          <p id="block-p-0" style="font-size: clamp(15px, 3.2vw, 20px); margin-bottom: max(10px, 2vh); color: #4a90e2;">Come join the fun</p>
-          <h2 id="block-h2-0" style="font-family: 'Bubblegum Sans', cursive; font-size: clamp(26px, 5.2vw, 34px); margin-bottom: max(8px, 1.5vh); color: #ff9f1c;">Timmy's 5th Birthday</h2>
-          <p id="block-p-1" style="font-size: clamp(14px, 3vw, 18px); margin-bottom: max(5px, 1vh);">Saturday, April 26th, 2025 at 2:00 PM</p>
-          <p id="block-p-2" style="font-size: clamp(14px, 3vw, 18px); margin-bottom: max(10px, 2vh);">Funland Park, Mirpur</p>
-          <p id="block-p-3" style="font-weight: bold; color: #4a90e2; font-size: clamp(14px, 3vw, 18px);">Games, cake, and lots of surprises!</p>
+    <div style="width: 100%; max-width: 700px; max-height: 900px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; aspect-ratio: 520/780; background-image: url('https://inviteloop.s3.ap-southeast-1.amazonaws.com/cards/47759fd7-9770-4584-8378-bd20676d495a-birthday-kids-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+        <div style="padding: min(40px, 5vw); margin: auto; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
+            <h1 style="color: #ff9f1c; font-family: 'Bubblegum Sans', cursive; font-size: clamp(32px, 6vw, 42px); margin-bottom: max(8px, 1.5vh);">Happy Birthday!</h1>
+            <p style="font-size: clamp(15px, 3.2vw, 20px); margin-bottom: max(10px, 2vh); color: #4a90e2;">Come join the fun</p>
+            <h2 style="font-family: 'Bubblegum Sans', cursive; font-size: clamp(26px, 5.2vw, 34px); margin-bottom: max(8px, 1.5vh); color: #ff9f1c;">Timmy's 5th Birthday</h2>
+            <p style="font-size: clamp(14px, 3vw, 18px); margin-bottom: max(5px, 1vh);">Saturday, April 26th, 2025 at 2:00 PM</p>
+            <p style="font-size: clamp(14px, 3vw, 18px); margin-bottom: max(10px, 2vh);">Funland Park, Mirpur</p>
+            <p style="font-weight: bold; color: #4a90e2; font-size: clamp(14px, 3vw, 18px);">Games, cake, and lots of surprises!</p>
         </div>
-      </div>
-      </body>
-      </html>
+    </div>
+</body>
+</html>
     `
   },
   {
@@ -234,8 +327,8 @@ export const cardTemplates: CardTemplate[] = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elegant Wedding Invitation</title>
-    <link href="https://fonts.googleapis.com/css2?family=Georgia:wght@400;700&display=swap" rel="stylesheet">
+    <title>Elegant Birthday Invitation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Georgia:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -245,24 +338,28 @@ export const cardTemplates: CardTemplate[] = [
         
         body {
             font-family: 'Georgia', serif;
-            color: #333;
-            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            background-color: #f5f5f5;
         }
     </style>
 </head>
 <body>
-      <div style="display: flex; align-items: center; justify-content: center; text-align: center; min-height: 100vh; width: 100%; background-image: url('https://inviteloop.s3.ap-southeast-1.amazonaws.com/cards/90614fde-9e92-4022-8231-08695fb06953-birthday-elegant-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; box-sizing: border-box;">
-        <div style="padding: min(40px, 5vw); margin: min(20px, 3vw); width: 100%; max-width: 100%; border-radius: 12px; box-sizing: border-box;">
-          <h1 id="block-h1-0" style="color: #2e2e2e; font-family: 'Playfair Display', serif; font-size: clamp(28px, 5.5vw, 38px); margin-bottom: max(8px, 1.5vh);">Celebrate with Us</h1>
-          <p id="block-p-0" style="font-size: clamp(15px, 3.2vw, 20px); margin-bottom: max(10px, 2vh); color: #777;">You are invited to</p>
-          <h2 id="block-h2-0" style="font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 32px); margin-bottom: max(8px, 1.5vh); color: #2e2e2e;">Michael's 40th Birthday</h2>
-          <p id="block-p-1" style="font-size: clamp(14px, 3vw, 18px); margin-bottom: max(5px, 1vh);">Saturday, June 7th, 2025 at 7:00 PM</p>
-          <p id="block-p-2" style="font-size: clamp(14px, 3vw, 18px); margin-bottom: max(10px, 2vh);">The Royal Ballroom, Gulshan</p>
-          <p id="block-p-3" style="font-style: italic; color: #777; font-size: clamp(14px, 3vw, 18px);">Black tie optional</p>
+    <div style="width: 100%; max-width: 700px; max-height: 900px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; aspect-ratio: 520/780; background-image: url('https://inviteloop.s3.ap-southeast-1.amazonaws.com/cards/90614fde-9e92-4022-8231-08695fb06953-birthday-elegant-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+        <div style="background: rgba(255, 255, 255, 0.85); padding: min(50px, 5vw); margin: auto; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; border-radius: 12px;">
+            <h1 style="color: #2e2e2e; font-family: 'Playfair Display', serif; font-size: clamp(30px, 5.5vw, 40px); margin-bottom: max(15px, 2vh); font-weight: 700;">Celebrate with Us</h1>
+            <p style="font-size: clamp(16px, 3.2vw, 20px); margin-bottom: max(15px, 2vh); color: #777;">You are invited to</p>
+            <h2 style="font-family: 'Playfair Display', serif; font-size: clamp(26px, 5vw, 34px); margin-bottom: max(15px, 2vh); color: #2e2e2e; font-weight: 700;">Michael's 40th Birthday</h2>
+            <p style="font-size: clamp(15px, 3vw, 18px); margin-bottom: max(10px, 1.5vh);">Saturday, June 7th, 2025 at 7:00 PM</p>
+            <p style="font-size: clamp(15px, 3vw, 18px); margin-bottom: max(15px, 2vh);">The Royal Ballroom, Gulshan</p>
+            <p style="font-style: italic; color: #777; font-size: clamp(15px, 3vw, 18px);">Black tie optional</p>
         </div>
-      </div>
-      </body>
-      </html>
+    </div>
+</body>
+</html>
     `
   },
   {
@@ -412,8 +509,8 @@ export const cardTemplates: CardTemplate[] = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elegant Wedding Invitation</title>
-    <link href="https://fonts.googleapis.com/css2?family=Georgia:wght@400;700&display=swap" rel="stylesheet">
+    <title>Birthday Party Invitation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Georgia:wght@400;700&family=Comic+Sans+MS&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -423,32 +520,29 @@ export const cardTemplates: CardTemplate[] = [
         
         body {
             font-family: 'Georgia', serif;
-            color: #333;
-            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            background-color: #f5f5f5;
         }
     </style>
 </head>
 <body>
-    <div style="display: flex; align-items: center; justify-content: center; text-align: center; min-height: 100vh; width: 100%; background-image: url('/public/business/business-casual-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; box-sizing: border-box;">
-    <div style="background: rgba(255, 255, 255, 0.9); padding: min(40px, 5vw); margin: min(20px, 3vw); border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); width: 100%; max-width: 450px; box-sizing: border-box;">
-      <h1 id="block-h1-0" style="color: #ff6b6b; font-family: 'Comic Sans MS', cursive; font-size: clamp(32px, 6vw, 42px); margin-bottom: max(15px, 2vh); text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">🎉 YOU'RE INVITED! 🎉</h1>
-      <p id="block-p-0" style="font-size: clamp(16px, 3.5vw, 20px); margin-bottom: max(20px, 3vh); color: #2c3e50; font-weight: 600;">Join us for an amazing birthday party!</p>
-      <h2 id="block-h2-0" style="font-family: 'Comic Sans MS', cursive; font-size: clamp(24px, 5vw, 32px); margin-bottom: max(15px, 2vh); color: #feca57;">ALEX'S 25TH BIRTHDAY</h2>
-      <p id="block-p-1" style="font-size: clamp(14px, 3vw, 18px); margin-bottom: max(8px, 1.5vh); color: #2c3e50;">🗓️ Saturday, March 8th, 2025</p>
-      <p id="block-p-2" style="font-size: clamp(14px, 3vw, 18px); margin-bottom: max(8px, 1.5vh); color: #2c3e50;">⏰ 7:00 PM onwards</p>
-      <p id="block-p-3" style="font-size: clamp(14px, 3vw, 18px); margin-bottom: max(20px, 3vh); color: #2c3e50;">📍 Party Hall, Uttara Dhaka</p>
-      <p id="block-p-4" style="font-style: italic; color: #e74c3c; font-size: clamp(13px, 2.8vw, 17px); font-weight: 600;">Cake, Music, and Great Memories Await! 🎂🎵</p>
+    <div style="width: 100%; max-width: 700px; max-height: 900px; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; aspect-ratio: 520/780; background-image: url('/public/business/business-casual-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+        <div style="background: rgba(255, 255, 255, 0.9); padding: min(45px, 5vw); margin: auto; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; border-radius: 25px;">
+            <h1 style="color: #ff6b6b; font-family: 'Comic Sans MS', cursive; font-size: clamp(34px, 6vw, 44px); margin-bottom: max(18px, 2.5vh); text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">🎉 YOU'RE INVITED! 🎉</h1>
+            <p style="font-size: clamp(18px, 3.8vw, 22px); margin-bottom: max(22px, 3.5vh); color: #2c3e50; font-weight: 600;">Join us for an amazing birthday party!</p>
+            <h2 style="font-family: 'Comic Sans MS', cursive; font-size: clamp(26px, 5.2vw, 34px); margin-bottom: max(18px, 2.5vh); color: #feca57;">ALEX'S 25TH BIRTHDAY</h2>
+            <p style="font-size: clamp(16px, 3.2vw, 20px); margin-bottom: max(10px, 1.8vh); color: #2c3e50;">🗓️ Saturday, March 8th, 2025</p>
+            <p style="font-size: clamp(16px, 3.2vw, 20px); margin-bottom: max(10px, 1.8vh); color: #2c3e50;">⏰ 7:00 PM onwards</p>
+            <p style="font-size: clamp(16px, 3.2vw, 20px); margin-bottom: max(22px, 3.5vh); color: #2c3e50;">📍 Party Hall, Uttara Dhaka</p>
+            <p style="font-style: italic; color: #e74c3c; font-size: clamp(15px, 3vw, 19px); font-weight: 600;">Cake, Music, and Great Memories Await! 🎂🎵</p>
+        </div>
     </div>
-  </div>
-  <style>
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-  </style>
-  </body>
-  </html>`
+</body>
+</html>`
   },
   {
     id: "modern-birthday-elegant",
