@@ -1,6 +1,6 @@
 import { CraftApiResponse, InvitationCard, PreviewData } from '@/types/craftApi';
 import { getAuthToken } from "@/utils/auth";
-import React, { createContext, ReactNode, useCallback, useContext, useRef, useState } from 'react';
+import React, { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 interface ImageGenerationResponse {
@@ -22,6 +22,7 @@ interface CraftApiContextType {
   previewData: PreviewData | null;
   imageGenerating: boolean;
   // lastCraftedInvitation: InvitationCard | null;
+  imageGeneratingWithDelay: boolean;
   versionNo: number; // Add this lin
 
   // Actions
@@ -66,8 +67,10 @@ export const CraftApiProvider: React.FC<CraftApiProviderProps> = ({ children }) 
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewData, setPreviewData] = useState<PreviewData | null>(null);
   const [imageGenerating, setImageGenerating] = useState(false);
+  const [imageGeneratingWithDelay, setImageGeneratingWithDelay] = useState(false);
   // const [lastCraftedInvitation, setLastCraftedInvitation] = useState<InvitationCard | null>(null);
   const lastCraftedRef = useRef<InvitationCard | null>(null);
+  const imageGenerationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
 
   const version = lastCraftedRef.current?.version || 0;
@@ -159,7 +162,12 @@ export const CraftApiProvider: React.FC<CraftApiProviderProps> = ({ children }) 
     eventId: string,
     version: number
   ): Promise<ImageGenerationResponse | null> => {
+    // Clear any existing timeout
+    if (imageGenerationTimeoutRef.current) {
+      clearTimeout(imageGenerationTimeoutRef.current);
+    }
     setImageGenerating(true);
+    setImageGeneratingWithDelay(true);
     setError(null);
 
     try {
@@ -171,6 +179,11 @@ export const CraftApiProvider: React.FC<CraftApiProviderProps> = ({ children }) 
 
       if (result.success) {
         toast.success(result?.message || "Image generation queued successfully!");
+
+        imageGenerationTimeoutRef.current = setTimeout(() => {
+          setImageGeneratingWithDelay(false);
+          // toast.info("Image is still being generated. Please check back in a moment.");
+        }, 3000);
         return result;
       } else {
         const errorMsg = result.message || "Failed to queue image generation";
@@ -302,6 +315,14 @@ export const CraftApiProvider: React.FC<CraftApiProviderProps> = ({ children }) 
     return Boolean(lastCraftedRef.current && previewData?.success);
   }, [previewData]);
 
+  useEffect(() => {
+    return () => {
+      if (imageGenerationTimeoutRef.current) {
+        clearTimeout(imageGenerationTimeoutRef.current);
+      }
+    }
+  }, []);
+
   const value: CraftApiContextType = {
     invitations,
     loading,
@@ -310,6 +331,7 @@ export const CraftApiProvider: React.FC<CraftApiProviderProps> = ({ children }) 
     previewData,
     imageGenerating,
     // lastCraftedInvitation,
+    imageGeneratingWithDelay,
     versionNo: lastCraftedRef.current?.version || 0,
 
     craftInvitation,

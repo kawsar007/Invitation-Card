@@ -39,6 +39,7 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
     error,
     versionNo,
     previewData,
+    imageGeneratingWithDelay,
     generateImage,
     imageGenerating,
     craftPreviewAndGenerate
@@ -88,14 +89,16 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
   // Check if Next button should be disabled
   const isNextDisabled = () => {
     if (activeTab === 'preview') return true;
-    if (activeTab === 'editor' && loading) return true;
-    if (activeTab === 'details' && previewLoading) return true;
+    if (activeTab === 'editor' && (loading || imageGeneratingWithDelay)) return true;
+    if (activeTab === 'details' && (previewLoading || imageGeneratingWithDelay)) return true;
     return false;
   };
 
   // Get Next button text
   const getNextButtonText = () => {
     if (activeTab === 'editor' && loading) return 'Crafting...';
+    if (activeTab === 'editor' && imageGeneratingWithDelay) return 'Generating Image...';
+    if (activeTab === 'details' && imageGeneratingWithDelay) return 'Generating Image...';
     if (activeTab === 'details' && previewLoading) return 'Generating Preview...';
     if (activeTab === 'editor') return 'Next';
     if (activeTab === 'details') return 'Generate Preview';
@@ -187,7 +190,7 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
             onClick={handleNext}
             disabled={isNextDisabled()}
           >
-            {(loading || previewLoading) && (
+            {(loading || previewLoading || imageGeneratingWithDelay) && (
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
             )}
             {getNextButtonText()}
