@@ -16,6 +16,7 @@ export const useRSVPForm = () => {
     firstName: '',
     lastName: '',
     foodAllergies: '',
+    allergyDetails: '',
     transportation: [],
   });
   const [isExpandedSection, setIsExpandedSection] = useState<boolean>(false);
@@ -44,13 +45,21 @@ export const useRSVPForm = () => {
       firstName: '',
       lastName: '',
       foodAllergies: '',
+      allergyDetails: '',
       transportation: []
     });
     setIsExpandedSection(false);
   };
 
   const updateGuestInfo = (field: keyof GuestInfo, value: string | string[]) => {
-    setGuestInfo(prev => ({ ...prev, [field]: value }));
+    setGuestInfo(prev => {
+      const updated = { ...prev, [field]: value };
+      // Clear allergy details if user selects "no" for food allergies
+      if (field === 'foodAllergies' && value === 'no') {
+        updated.allergyDetails = '';
+      }
+      return updated;
+    })
   }
 
   const handleTransportationChange = (option: string) => {

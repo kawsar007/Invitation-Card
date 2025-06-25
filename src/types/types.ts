@@ -59,6 +59,7 @@ export interface GuestInfo {
   firstName: string;
   lastName: string;
   foodAllergies: 'yes' | 'no' | '';
+  allergyDetails: string;
   transportation: string[];
 }
 

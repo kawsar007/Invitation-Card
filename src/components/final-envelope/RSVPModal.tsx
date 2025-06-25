@@ -5,6 +5,7 @@ import React from 'react';
 import { AttendanceButtons } from './AttendanceButtons';
 import { GuestForm } from './GuestForm';
 
+
 interface RSVPModalProps {
   isOpen: boolean;
   attendanceStatus: AttendanceStatus;
@@ -38,7 +39,7 @@ export const RSVPModal: React.FC<RSVPModalProps> = ({
   onToggleExpanded,
   onSubmit
 }) => {
-  const { user, isAuthenticated } = useUser();
+  const { user } = useUser();
 
   if (!isOpen) return null;
 
@@ -91,6 +92,7 @@ export const RSVPModal: React.FC<RSVPModalProps> = ({
               attendanceStatus={attendanceStatus}
               onAttendanceChange={onAttendanceChange}
             />
+
           </div>
           <div className="border-t border-gray-200 my-3"></div>
           {/* Bring a Guest Button */}

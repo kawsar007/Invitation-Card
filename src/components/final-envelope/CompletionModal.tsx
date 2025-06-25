@@ -1,3 +1,4 @@
+import { useUser } from '@/context/UserContext';
 import { SubmittedData } from '@/types/types';
 import { Check, X } from 'lucide-react';
 import React from 'react';
@@ -13,6 +14,7 @@ export const CompletionModal: React.FC<CompletionModalProps> = ({
   submittedData,
   onClose
 }) => {
+  const { user } = useUser();
   if (!isOpen || !submittedData) return null;
 
   return (
@@ -42,7 +44,7 @@ export const CompletionModal: React.FC<CompletionModalProps> = ({
               <div className="w-6 h-6 bg-green-500 rounded flex items-center justify-center mr-3">
                 <Check size={14} className="text-white" />
               </div>
-              <span className="font-medium text-gray-800">Amelia Clark</span>
+              <span className="font-medium text-gray-800">{user?.first_name} {user?.last_name}</span>
             </div>
 
             <div className="ml-9 space-y-2 text-sm text-gray-600">
@@ -80,12 +82,14 @@ export const CompletionModal: React.FC<CompletionModalProps> = ({
                       submittedData.guestInfo.foodAllergies === 'no' ? 'No' : 'Incomplete'}
                   </span>
                   {submittedData.guestInfo.foodAllergies === 'yes' && (
-                    <>
-                      <br />
+                    <div className="mt-2">
                       <span className="font-medium">Q: Please list food allergies below.</span>
                       <br />
-                      <span className="text-gray-500">A: Incomplete</span>
-                    </>
+                      <span className="text-gray-500">
+                        A: {submittedData.guestInfo.allergyDetails ?
+                          submittedData.guestInfo.allergyDetails : 'Not specified'}
+                      </span>
+                    </div>
                   )}
                 </div>
                 <div>

@@ -38,9 +38,6 @@ export const GuestForm: React.FC<GuestFormProps> = ({
           title="Remove guest"
         >
           <Trash2 />
-          {/* <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" />
-          </svg> */}
         </button>
       </div>
 
@@ -81,7 +78,6 @@ export const GuestForm: React.FC<GuestFormProps> = ({
 
         {isExpanded && (
           <div className="p-4 border-t border-gray-200 bg-white">
-            {/* Food Allergies */}
             <div className="mb-6">
               <p className="text-sm text-gray-600 mb-3">Do you have any food allergies?</p>
               <div className="space-y-2">
@@ -108,9 +104,23 @@ export const GuestForm: React.FC<GuestFormProps> = ({
                   <span className="text-sm text-gray-600">No</span>
                 </label>
               </div>
+
+              {guestInfo.foodAllergies === 'yes' && (
+                <div className="mt-4">
+                  <label className="block text-sm text-gray-600 mb-2">
+                    Please specify your food allergies:
+                  </label>
+                  <textarea
+                    value={guestInfo.allergyDetails}
+                    onChange={(e) => onGuestInfoChange('allergyDetails', e.target.value)}
+                    className="w-full p-2 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-300 resize-none"
+                    placeholder="e.g., peanuts, shellfish, dairy..."
+                    rows={2}
+                  />
+                </div>
+              )}
             </div>
 
-            {/* Transportation Options */}
             <div>
               <p className="text-sm text-gray-600 mb-3">What transportation options will your group be utilizing?</p>
               <div className="space-y-2">
