@@ -52,3 +52,22 @@ export interface Template {
   name: string;
   content: string;
 }
+
+// Submit RSVP Types
+
+export interface GuestInfo {
+  firstName: string;
+  lastName: string;
+  foodAllergies: 'yes' | 'no' | '';
+  transportation: string[];
+}
+
+export interface SubmittedData {
+  attendance: 'attend' | 'not-attend';
+  message: string;
+  bringGuest: boolean;
+  guestInfo: GuestInfo | null;
+  submittedAt: string;
+}
+
+export type AttendanceStatus = 'attend' | 'not-attend' | '';
