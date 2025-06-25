@@ -7,7 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
-import FinalEnvelope from "./components/generate-preview/FinalEnvelope";
+import FinalEnvelope from "./components/final-envelope";
 import { CraftApiProvider } from "./context/CraftApiContext";
 import { UserProvider } from "./context/UserContext";
 import LandingPage from "./landing-page";
