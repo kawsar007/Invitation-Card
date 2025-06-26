@@ -4,7 +4,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { isAuthenticated, logoutUser } from '@/utils/auth';
 import { Menu, Moon, Search, Sun, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 
 interface NavbarProps {
   theme: string;
@@ -124,7 +124,7 @@ export default function Navbar({ theme, toggleTheme }: NavbarProps) {
       <div className="container mx-auto px-4 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center">
-          <span className={`text-xl font-bold ${theme === 'light' ? 'text-teal-500' : 'text-teal-400'}`}>InviteLoop</span>
+          <NavLink to="/" className={`text-xl font-bold ${theme === 'light' ? 'text-teal-500' : 'text-teal-400'}`}>InviteLoop</NavLink>
         </div>
 
         {/* Desktop Navigation */}

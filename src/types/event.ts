@@ -22,8 +22,8 @@ export interface EventApiResponse {
   data: Event[];
   meta?: {
     total: number;
-    page: number;
-    limit: number;
+    page?: number;
+    limit?: number;
     pages: number;
   };
 }
