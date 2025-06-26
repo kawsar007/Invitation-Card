@@ -1,4 +1,5 @@
 import { useRSVPForm } from '@/hooks/useRSVPForm';
+import { OctagonMinus } from 'lucide-react';
 import React from 'react';
 import { CompletionModal } from './CompletionModal';
 import { EventDetails } from './EventDetails';
@@ -46,7 +47,9 @@ const EnvelopeSidebar: React.FC = () => {
     <div>
       <EventDetails />
 
-      <div className="sticky bottom-0 left-0 right-0 bg-white py-4 border-gray-200">
+      <div className="sticky bottom-0 left-0 right-0 bg-white pb-4 border-gray-200">
+        {submittedData?.attendance === 'not-attend' && <p className='text-xs text-gray-400 p-1 flex justify-start'> <span className='mr-1 mt-[2px]'> <OctagonMinus size={18} color='red' /></span> RSVP Submitted Successfully
+          0 Attending in Your Group</p>}
         <button
           onClick={handleButtonClick}
           className={`w-full py-3 px-8 rounded text-sm font-medium transition-colors tracking-wide ${isSubmitted

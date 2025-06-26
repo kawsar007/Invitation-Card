@@ -1,7 +1,65 @@
 import { Calendar, Copy, MapPin } from 'lucide-react';
-import React from 'react';
+import React, { useState } from 'react';
 
 export const EventDetails: React.FC = () => {
+  const meetingLink = "https://www.medser.us";
+  const location = "Sena Kunjo, Dhaka";
+  const [copied, setCopied] = useState(false);
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(meetingLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy: ', error);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = meetingLink;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  }
+
+  const openInMaps = () => {
+    const encodedLocation = encodeURIComponent(location);
+    window.open(`https://www.google.com/maps/search/?api=1&query=${encodedLocation}`, '_blank');
+  }
+
+  // Function to add in-person event to Google Calendar
+  const addInPersonEventToCalendar = () => {
+    const eventDetails = {
+      text: 'Cocktails and Conversations',
+      dates: '20250625T170000Z/20250625T200000Z', // June 25, 2025, 5:00 PM - 8:00 PM UTC
+      details: 'Join us for cocktails and conversations with drinks, good company, and live music. Semi-formal attire. Complimentary valet parking provided.',
+      location: 'Sena Kunjo, Dhaka',
+      ctz: 'Asia/Dhaka'
+    };
+
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventDetails.text)}&dates=${eventDetails.dates}&details=${encodeURIComponent(eventDetails.details)}&location=${encodeURIComponent(eventDetails.location)}&ctz=${eventDetails.ctz}`;
+
+    window.open(googleCalendarUrl, '_blank');
+  }
+
+  // Function to add virtual event to Google Calendar
+  const addVirtualEventToCalendar = () => {
+    const eventDetails = {
+      text: 'Virtual Cocktails and Conversations',
+      dates: '20251119T010000Z/20251119T040000Z', // November 19, 2025, 1:00 AM - 4:00 AM UTC (5:00 PM PST Nov 18)
+      details: `Join us virtually for cocktails and conversations with drinks, good company, and live music. Virtual Event Link: ${meetingLink}. The link will go live 1 hour prior to event start time.`,
+      location: 'Virtual Event',
+      ctz: 'America/Los_Angeles'
+    };
+
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventDetails.text)}&dates=${eventDetails.dates}&details=${encodeURIComponent(eventDetails.details)}&location=${encodeURIComponent(eventDetails.location)}&ctz=${eventDetails.ctz}`;
+
+    window.open(googleCalendarUrl, '_blank');
+  }
+
   return (
     <>
       <h1 className="text-xl text-center font-bold text-gray-700 mb-6">DETAILS</h1>
@@ -27,14 +85,20 @@ export const EventDetails: React.FC = () => {
           <p className="text-gray-400 mb-1 text-sm">Wednesday, June 25, 2025</p>
           <p className="text-gray-400 mb-4 text-xs">Additional Information for Location</p>
           <div className="flex justify-center">
-            <a href="#" className="text-green-600 hover:text-green-700 text-xs flex items-center mr-4">
+            <button
+              onClick={openInMaps}
+              className="text-green-600 hover:text-green-700 text-xs flex items-center mr-4 bg-transparent border-none cursor-pointer"
+            >
               <MapPin size={14} className="mr-1" />
               View Map
-            </a>
-            <a href="#" className="text-blue-500 text-xs flex items-center hover:text-blue-600">
+            </button>
+            <button
+              onClick={addInPersonEventToCalendar}
+              className="text-blue-500 text-xs flex items-center hover:text-blue-600 bg-transparent border-none cursor-pointer"
+            >
               <Calendar size={14} className="mr-1" />
               Add to calendar
-            </a>
+            </button>
           </div>
         </div>
 
@@ -43,23 +107,28 @@ export const EventDetails: React.FC = () => {
         {/* Virtual event */}
         <div className="text-center">
           <h3 className="text-base text-gray-400 font-medium mb-6 tracking-wider text-center">ATTEND VIRTUALLY</h3>
-          <div className="bg-teal-500 text-white px-4 py-2 rounded text-sm font-medium mb-3 inline-block">
+          <a href={meetingLink} target="_blank" className="bg-teal-500 text-white px-4 py-2 rounded text-sm font-medium mb-3 inline-block">
             Virtual Event Link
-          </div>
+          </a>
 
-          <div className="flex items-center justify-center mb-2 cursor-pointer text-green-600 hover:text-green-700">
+          <div onClick={copyToClipboard} className="flex items-center justify-center mb-2 cursor-pointer text-green-600 hover:text-green-700">
             <Copy size={14} />
-            <span className="ml-1 text-xs">Copy Link to Event</span>
+            <span className="ml-1 text-xs">{copied ? 'Link Copied!' : 'Copy Link to Event'}</span>
           </div>
 
           <p className="mb-3 text-xs text-gray-400">5:00 PM (PST) Tuesday, November 18, 2025</p>
           <p className="mb-3 text-xs text-gray-400">
             We will also be offering a virtual event option for those who cannot attend in-person. The link will go live 1 hour prior to event start time.
           </p>
-          <a href="#" className="text-blue-500 text-xs flex items-center justify-center hover:text-blue-600">
-            <Calendar size={14} className="mr-1" />
-            Add to calendar
-          </a>
+          <div className='flex items-center justify-center'>
+            <button
+              onClick={addVirtualEventToCalendar}
+              className="text-blue-500 text-xs flex items-center justify-center hover:text-blue-600 bg-transparent border-none cursor-pointer"
+            >
+              <Calendar size={14} className="mr-1" />
+              Add to calendar
+            </button>
+          </div>
         </div>
       </section>
 
