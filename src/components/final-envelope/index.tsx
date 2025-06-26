@@ -51,7 +51,15 @@ const FinalEnvelope: React.FC = () => {
   margin: 0;
   padding: 1rem;
   box-sizing: border-box;
-  // background: linear-gradient(135deg, #2c1810 0%, #1a0e08 100%);
+  background-image: url('/public/bg-img/bg1.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  
+  /* Optional: Add overlay for better contrast */
+  // background-blend-mode: overlay;
+  // background-color: rgba(.44, 24, 16, 0.7);
 }
 
 /* Mobile: Stack vertically */
@@ -87,7 +95,7 @@ const FinalEnvelope: React.FC = () => {
   width: min(85vw, 280px);
   height: min(55vw, 180px);
   background: #FFE4B5;
-  // box-shadow: inset 0 0 30px -5px #CD853F, 0 0 30px 0 #540000;
+  box-shadow: inset 0 0 10px -5px #CD853F, 0 0 10px 0 #540000;
   transition: transform 0.3s ease;
   margin: 0 auto;
 }
