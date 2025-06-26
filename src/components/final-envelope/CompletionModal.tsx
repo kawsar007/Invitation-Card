@@ -51,12 +51,30 @@ export const CompletionModal: React.FC<CompletionModalProps> = ({
               <div>
                 <span className="font-medium">Q: Do you have any food allergies?</span>
                 <br />
-                <span className="text-gray-500">A: Incomplete</span>
+                <span className="text-gray-500">
+                  A: {submittedData.ownInfo.foodAllergies === 'yes' ? 'Yes' :
+                    submittedData.ownInfo.foodAllergies === 'no' ? 'No' : 'Incomplete'}
+                </span>
+                {submittedData.ownInfo.foodAllergies === 'yes' && (
+                  <div className="mt-2">
+                    <span className="font-medium">Q: Please list food allergies below.</span>
+                    <br />
+                    <span className="text-gray-500">
+                      A: {submittedData.ownInfo.allergyDetails ?
+                        submittedData.ownInfo.allergyDetails : 'Not specified'}
+                    </span>
+                  </div>
+                )}
+                {/* <span className="text-gray-500">A: Incomplete</span> */}
               </div>
               <div>
                 <span className="font-medium">Q: What transportation options will your group be utilizing?</span>
                 <br />
-                <span className="text-gray-500">A: Incomplete</span>
+                <span className="text-gray-500">
+                  A: {submittedData.ownInfo.transportation.length > 0
+                    ? submittedData.ownInfo.transportation.join(', ')
+                    : 'Incomplete'}
+                </span>
               </div>
             </div>
           </div>

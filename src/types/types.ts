@@ -63,7 +63,14 @@ export interface GuestInfo {
   transportation: string[];
 }
 
+export interface OwnInfo {
+  foodAllergies: 'yes' | 'no' | '';
+  allergyDetails: string;
+  transportation: string[];
+}
+
 export interface SubmittedData {
+  ownInfo: OwnInfo;
   attendance: 'attend' | 'not-attend';
   message: string;
   bringGuest: boolean;

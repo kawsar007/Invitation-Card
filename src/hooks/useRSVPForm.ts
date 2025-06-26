@@ -1,4 +1,4 @@
-import { AttendanceStatus, GuestInfo, SubmittedData } from "@/types/types";
+import { AttendanceStatus, GuestInfo, OwnInfo, SubmittedData } from "@/types/types";
 import { useState } from "react";
 
 
@@ -10,6 +10,12 @@ export const useRSVPForm = () => {
   const [bringGuest, setBringGuest] = useState(false);
   const [submittedData, setSubmittedData] = useState<SubmittedData | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const [ownInfo, setOwnInfo] = useState<OwnInfo>({
+    foodAllergies: '',
+    allergyDetails: '',
+    transportation: [],
+  });
 
   // Guest form fields
   const [guestInfo, setGuestInfo] = useState<GuestInfo>({
@@ -46,10 +52,25 @@ export const useRSVPForm = () => {
       lastName: '',
       foodAllergies: '',
       allergyDetails: '',
-      transportation: []
+      transportation: [],
+    });
+    setOwnInfo({
+      foodAllergies: '',
+      allergyDetails: '',
+      transportation: [],
     });
     setIsExpandedSection(false);
   };
+
+  const updateOwnInfo = (field: keyof OwnInfo, value: string | string[]) => {
+    setOwnInfo(prev => {
+      const updated = { ...prev, [field]: value };
+      if (field === 'foodAllergies' && value === 'no') {
+        updated.allergyDetails = '';
+      }
+      return updated;
+    })
+  }
 
   const updateGuestInfo = (field: keyof GuestInfo, value: string | string[]) => {
     setGuestInfo(prev => {
@@ -71,8 +92,23 @@ export const useRSVPForm = () => {
     }))
   }
 
+  const handleOwnTransportationChange = (option: string) => {
+    setOwnInfo(prev => ({
+      ...prev,
+      transportation: prev.transportation.includes(option) ?
+        prev.transportation.filter(item => item !== option) :
+        [...prev.transportation, option]
+    }))
+  }
+
   const handleSubmit = () => {
     const submissionData: SubmittedData = {
+      ownInfo: {
+        foodAllergies: ownInfo.foodAllergies,
+        allergyDetails: ownInfo.allergyDetails,
+        transportation: ownInfo.transportation,
+      },
+      ...ownInfo,
       attendance: attendanceStatus as 'attend' | 'not-attend',
       message,
       bringGuest,
@@ -96,6 +132,7 @@ export const useRSVPForm = () => {
     submittedData,
     isSubmitted,
     guestInfo,
+    ownInfo,
     isExpandedSection,
 
     // Actions
@@ -107,8 +144,10 @@ export const useRSVPForm = () => {
     setMessage,
     setBringGuest,
     updateGuestInfo,
+    updateOwnInfo,
     setIsExpandedSection,
     handleTransportationChange,
+    handleOwnTransportationChange,
     handleSubmit
   }
 }

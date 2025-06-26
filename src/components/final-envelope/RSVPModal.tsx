@@ -1,6 +1,6 @@
 import { useUser } from '@/context/UserContext';
-import { AttendanceStatus, GuestInfo } from '@/types/types';
-import { CirclePlus, User, X } from 'lucide-react';
+import { AttendanceStatus, GuestInfo, OwnInfo } from '@/types/types';
+import { ChevronDown, ChevronUp, CirclePlus, User, X } from 'lucide-react';
 import React from 'react';
 import { AttendanceButtons } from './AttendanceButtons';
 import { GuestForm } from './GuestForm';
@@ -11,6 +11,7 @@ interface RSVPModalProps {
   attendanceStatus: AttendanceStatus;
   message: string;
   bringGuest: boolean;
+  ownInfo: OwnInfo;
   guestInfo: GuestInfo;
   isExpandedSection: boolean;
   onClose: () => void;
@@ -18,16 +19,27 @@ interface RSVPModalProps {
   onMessageChange: (message: string) => void;
   onBringGuestChange: (bring: boolean) => void;
   onGuestInfoChange: (field: keyof GuestInfo, value: string | string[]) => void;
+  onOwnInfoChange: (field: keyof OwnInfo, value: string | string[]) => void;
   onTransportationChange: (option: string) => void;
+  onOwnTransportationChange: (option: string) => void;
   onToggleExpanded: () => void;
   onSubmit: () => void;
 }
+
+const TRANSPORTATION_OPTIONS = [
+  'Public transit',
+  'Rideshare/Taxi',
+  'Personal vehicle',
+  'Carpool',
+  'Other'
+];
 
 export const RSVPModal: React.FC<RSVPModalProps> = ({
   isOpen,
   attendanceStatus,
   message,
   bringGuest,
+  ownInfo,
   guestInfo,
   isExpandedSection,
   onClose,
@@ -35,7 +47,9 @@ export const RSVPModal: React.FC<RSVPModalProps> = ({
   onMessageChange,
   onBringGuestChange,
   onGuestInfoChange,
+  onOwnInfoChange,
   onTransportationChange,
+  onOwnTransportationChange,
   onToggleExpanded,
   onSubmit
 }) => {
@@ -92,6 +106,81 @@ export const RSVPModal: React.FC<RSVPModalProps> = ({
               attendanceStatus={attendanceStatus}
               onAttendanceChange={onAttendanceChange}
             />
+
+            <div className="border border-gray-200 rounded">
+              <button
+                type="button"
+                onClick={onToggleExpanded}
+                className="w-full flex items-center justify-between p-3 text-left text-sm text-gray-600 hover:bg-gray-50"
+              >
+                <span>Additional Information</span>
+                {isExpandedSection ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </button>
+
+              {isExpandedSection && (
+                <div className="p-4 border-t border-gray-200 bg-white">
+                  <div className="mb-6">
+                    <p className="text-sm text-gray-600 mb-3">Do you have any food allergies?</p>
+                    <div className="space-y-2">
+                      <label className="flex items-center cursor-pointer">
+                        <input
+                          type="radio"
+                          name="ownFoodAllergies"
+                          value="yes"
+                          checked={ownInfo.foodAllergies === 'yes'}
+                          onChange={(e) => onOwnInfoChange('foodAllergies', e.target.value as 'yes' | 'no')}
+                          className="mr-3"
+                        />
+                        <span className="text-sm text-gray-600">Yes</span>
+                      </label>
+                      <label className="flex items-center cursor-pointer">
+                        <input
+                          type="radio"
+                          name="ownFoodAllergies"
+                          value="no"
+                          checked={ownInfo.foodAllergies === 'no'}
+                          onChange={(e) => onOwnInfoChange('foodAllergies', e.target.value as 'yes' | 'no')}
+                          className="mr-3"
+                        />
+                        <span className="text-sm text-gray-600">No</span>
+                      </label>
+                    </div>
+
+                    {ownInfo.foodAllergies === 'yes' && (
+                      <div className="mt-4">
+                        <label className="block text-sm text-gray-600 mb-2">
+                          Please specify your food allergies:
+                        </label>
+                        <textarea
+                          value={ownInfo.allergyDetails}
+                          onChange={(e) => onOwnInfoChange('allergyDetails', e.target.value)}
+                          className="w-full p-2 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-300 resize-none"
+                          placeholder="e.g., peanuts, shellfish, dairy..."
+                          rows={2}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-600 mb-3">What transportation options will your group be utilizing?</p>
+                    <div className="space-y-2">
+                      {TRANSPORTATION_OPTIONS.map(option => (
+                        <label key={option} className="flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={ownInfo.transportation.includes(option)}
+                            onChange={() => onOwnTransportationChange(option)}
+                            className="mr-3"
+                          />
+                          <span className="text-sm text-gray-600">{option}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
 
           </div>
           <div className="border-t border-gray-200 my-3"></div>

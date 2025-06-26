@@ -12,6 +12,7 @@ const EnvelopeSidebar: React.FC = () => {
     attendanceStatus,
     message,
     bringGuest,
+    ownInfo,
     guestInfo,
     isExpandedSection,
     submittedData,
@@ -26,8 +27,10 @@ const EnvelopeSidebar: React.FC = () => {
     setMessage,
     setBringGuest,
     updateGuestInfo,
+    updateOwnInfo,
     setIsExpandedSection,
     handleTransportationChange,
+    handleOwnTransportationChange,
     handleSubmit
   } = useRSVPForm();
 
@@ -60,6 +63,7 @@ const EnvelopeSidebar: React.FC = () => {
         attendanceStatus={attendanceStatus}
         message={message}
         bringGuest={bringGuest}
+        ownInfo={ownInfo}
         guestInfo={guestInfo}
         isExpandedSection={isExpandedSection}
         onClose={closeModal}
@@ -67,7 +71,9 @@ const EnvelopeSidebar: React.FC = () => {
         onMessageChange={setMessage}
         onBringGuestChange={setBringGuest}
         onGuestInfoChange={updateGuestInfo}
+        onOwnInfoChange={updateOwnInfo}
         onTransportationChange={handleTransportationChange}
+        onOwnTransportationChange={handleOwnTransportationChange}
         onToggleExpanded={() => setIsExpandedSection(!isExpandedSection)}
         onSubmit={handleSubmit}
       />
