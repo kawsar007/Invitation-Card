@@ -1,11 +1,13 @@
 import PreviewCard from '@/components/generate-preview/PreviewCard';
 import { useCraftApi } from '@/context/CraftApiContext';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Component, SaveIcon, Scan } from 'lucide-react';
+import { BarChart3, Component, SaveIcon, Scan, Send } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import CardEditor from './CardEditor';
 import EventDetailsForm from './EventDetails';
+import SendInvitationPage from './sent';
+import TrackInvitationPage from './track';
 
 interface CardCanvasProps {
   content: string;
@@ -20,13 +22,11 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
   showGrid,
   onBackgroundChange,
 }) => {
-
-
   // Add this to get query parameters
   const [searchParams] = useSearchParams();
   const eventId = searchParams.get('eventId');
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [activeTab, setActiveTab] = useState<'editor' | 'details' | 'preview'>('editor');
+  const [activeTab, setActiveTab] = useState<'editor' | 'details' | 'preview' | 'send' | 'track'>('editor');
   const editorRef = useRef<any>(null);
   const isMobile = useIsMobile();
 
@@ -45,9 +45,6 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
     craftPreviewAndGenerate
   } = useCraftApi();
 
-  // Get the latest invitation to get the version number
-  // const version = lastCraftedInvitation?.version || 0;
-
   // Handle Next button click
   const handleNext = async () => {
     if (activeTab === 'editor') {
@@ -55,40 +52,33 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
       try {
         const successCraft = await craftInvitation(eventId, content);
         const successGenerateImage = await generateImage(eventId, versionNo);
-        // const successPreview = await previewInvitation(eventId, version);
 
         if (successCraft && successGenerateImage) {
           setActiveTab('details');
         }
-        // If craftInvitation fails, stay on editor tab and let the toast show the error
       } catch (error) {
         console.error('Error crafting invitation:', error);
-        // Error handling is already done in the context
       }
     } else if (activeTab === 'details') {
       // Move to preview tab and trigger preview
       setActiveTab('preview');
-
-      // Get the latest invitation to get the version number
-      // You might need to fetch invitations first or use lastCraftedInvitation
-      // For now, let's assume we can get the version from the latest invitation
       try {
-        // You might need to adjust this based on how you want to get the version
-        // Option 1: If you have the version from the craft response
-        // Option 2: Get it from the latest invitation
-        // For this example, let's assume you'll pass the version or get it from context
-
-        // This is a simplified approach - you might need to adjust based on your data flow
         await previewInvitation(eventId, versionNo);
       } catch (error) {
         console.error('Error generating preview:', error);
       }
+    } else if (activeTab === 'preview') {
+      // Move to send tab
+      setActiveTab('send');
+    } else if (activeTab === 'send') {
+      // Move to track tab
+      setActiveTab('track');
     }
   };
 
   // Check if Next button should be disabled
   const isNextDisabled = () => {
-    if (activeTab === 'preview') return true;
+    if (activeTab === 'track') return true; // Last tab
     if (activeTab === 'editor' && (loading || imageGeneratingWithDelay)) return true;
     if (activeTab === 'details' && (previewLoading || imageGeneratingWithDelay)) return true;
     return false;
@@ -102,9 +92,15 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
     if (activeTab === 'details' && previewLoading) return 'Generating Preview...';
     if (activeTab === 'editor') return 'Next';
     if (activeTab === 'details') return 'Generate Preview';
+    if (activeTab === 'preview') return 'Send Invitations';
+    if (activeTab === 'send') return 'Track Responses';
     return 'Next';
   };
 
+  // Check if we should show the Next button
+  const shouldShowNextButton = () => {
+    return activeTab !== 'track'; // Hide on the last tab
+  };
 
   // Default to closed sidebar on mobile
   useEffect(() => {
@@ -136,11 +132,14 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
             <EventDetailsForm eventId={eventId} />
           </div>
         );
-
       case 'preview':
         return (
           <PreviewCard versionNo={versionNo} setActiveTab={setActiveTab} previewLoading={previewLoading} previewData={previewData} />
         );
+      case 'send':
+        return <SendInvitationPage />;
+      case 'track':
+        return <TrackInvitationPage />;
       default:
         return null;
     }
@@ -148,7 +147,6 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
 
   return (
     <div className="flex flex-1 h-full overflow-hidden">
-
       {/* Main canvas area */}
       <div className="flex-1 overflow-auto p-4 bg-gray-50">
         <div className="flex items-center justify-between gap-8 mb-4 border-b border-gray-200">
@@ -169,7 +167,7 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
                 }`}
               onClick={() => setActiveTab('details')}
             >
-              <Scan className="h-4 w-4 mr-2" />  Details
+              <Scan className="h-4 w-4 mr-2" /> Details
             </button>
             <button
               className={`flex justify-center items-center py-2 px-1 text-sm font-semibold ${activeTab === 'preview'
@@ -178,23 +176,44 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
                 }`}
               onClick={() => setActiveTab('preview')}
             >
-              <SaveIcon className="h-4 w-4 mr-2" />  Preview
+              <SaveIcon className="h-4 w-4 mr-2" /> Preview
+            </button>
+            <button
+              className={`flex justify-center items-center py-2 px-1 text-sm font-semibold ${activeTab === 'send'
+                ? 'text-blue-600 border-b-2 border-blue-600'
+                : 'text-gray-700 hover:text-blue-500'
+                }`}
+              onClick={() => setActiveTab('send')}
+            >
+              <Send className="h-4 w-4 mr-2" /> Send
+            </button>
+            <button
+              className={`flex justify-center items-center py-2 px-1 text-sm font-semibold ${activeTab === 'track'
+                ? 'text-blue-600 border-b-2 border-blue-600'
+                : 'text-gray-700 hover:text-blue-500'
+                }`}
+              onClick={() => setActiveTab('track')}
+            >
+              <BarChart3 className="h-4 w-4 mr-2" /> Track
             </button>
           </div>
-          {/* Next Button - Aligned to the right */}
-          <button
-            className={`flex items-center py-2 px-4 text-sm font-semibold rounded transition-colors ${isNextDisabled()
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-blue-600 text-white hover:bg-blue-700'
-              }`}
-            onClick={handleNext}
-            disabled={isNextDisabled()}
-          >
-            {(loading || previewLoading || imageGeneratingWithDelay) && (
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-            )}
-            {getNextButtonText()}
-          </button>
+
+          {/* Next Button - Only show if not on the last tab */}
+          {shouldShowNextButton() && (
+            <button
+              className={`flex items-center py-2 px-4 text-sm font-semibold rounded transition-colors ${isNextDisabled()
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-blue-600 text-white hover:bg-blue-700'
+                }`}
+              onClick={handleNext}
+              disabled={isNextDisabled()}
+            >
+              {(loading || previewLoading || imageGeneratingWithDelay) && (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              )}
+              {getNextButtonText()}
+            </button>
+          )}
         </div>
 
         <div className="flex justify-center">
