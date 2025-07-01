@@ -40,7 +40,7 @@ export const CompletionModal: React.FC<CompletionModalProps> = ({
             {formatDate(submittedData.submittedAt)} - RSVP Submitted (
             {submittedData.attendance === "not-attend"
               ? <span className="text-red-500 font-bold">Not Attending</span>
-              : `Attending ${submittedData.bringGuest ? 2 : 1}`}
+              : `Attending ${submittedData.bringGuest ? (1 + submittedData.guestInfo.length) : 1}`}
             )
           </p>
 
@@ -88,14 +88,14 @@ export const CompletionModal: React.FC<CompletionModalProps> = ({
               </div>
 
               {/* Guest information */}
-              {submittedData.bringGuest && submittedData.guestInfo && (
+              {submittedData.bringGuest && submittedData.guestInfo.map((guest, i) => (
                 <div className="mb-6">
                   <div className="flex items-center mb-4">
                     <div className="w-6 h-6 bg-green-500 rounded flex items-center justify-center mr-3">
                       <Check size={14} className="text-white" />
                     </div>
                     <span className="font-medium text-gray-800">
-                      {submittedData.guestInfo.firstName} {submittedData.guestInfo.lastName}
+                      {guest.firstName} {guest.lastName}
                     </span>
                   </div>
 
@@ -104,16 +104,16 @@ export const CompletionModal: React.FC<CompletionModalProps> = ({
                       <span className="font-medium">Q: Do you have any food allergies?</span>
                       <br />
                       <span className="text-gray-500">
-                        A: {submittedData.guestInfo.foodAllergies === 'yes' ? 'Yes' :
-                          submittedData.guestInfo.foodAllergies === 'no' ? 'No' : 'Incomplete'}
+                        A: {guest.foodAllergies === 'yes' ? 'Yes' :
+                          guest.foodAllergies === 'no' ? 'No' : 'Incomplete'}
                       </span>
-                      {submittedData.guestInfo.foodAllergies === 'yes' && (
+                      {guest.foodAllergies === 'yes' && (
                         <div className="mt-2">
                           <span className="font-medium">Q: Please list food allergies below.</span>
                           <br />
                           <span className="text-gray-500">
-                            A: {submittedData.guestInfo.allergyDetails ?
-                              submittedData.guestInfo.allergyDetails : 'Not specified'}
+                            A: {guest.allergyDetails ?
+                              guest.allergyDetails : 'Not specified'}
                           </span>
                         </div>
                       )}
@@ -122,14 +122,14 @@ export const CompletionModal: React.FC<CompletionModalProps> = ({
                       <span className="font-medium">Q: What transportation options will your group be utilizing?</span>
                       <br />
                       <span className="text-gray-500">
-                        A: {submittedData.guestInfo.transportation.length > 0
-                          ? submittedData.guestInfo.transportation.join(', ')
+                        A: {guest.transportation.length > 0
+                          ? guest.transportation.join(', ')
                           : 'Incomplete'}
                       </span>
                     </div>
                   </div>
                 </div>
-              )}
+              ))}
             </>
           }
 

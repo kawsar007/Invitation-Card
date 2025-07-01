@@ -58,23 +58,26 @@ export interface Template {
 export interface GuestInfo {
   firstName: string;
   lastName: string;
-  foodAllergies: 'yes' | 'no' | '';
+  foodAllergies: string;
   allergyDetails: string;
   transportation: string[];
 }
 
 export interface OwnInfo {
-  foodAllergies: 'yes' | 'no' | '';
+  foodAllergies: string;
   allergyDetails: string;
   transportation: string[];
 }
 
 export interface SubmittedData {
   ownInfo: OwnInfo;
+  foodAllergies: string;
+  allergyDetails: string;
+  transportation: string[];
   attendance: 'attend' | 'not-attend';
   message: string;
   bringGuest: boolean;
-  guestInfo: GuestInfo | null;
+  guestInfo: GuestInfo[] | null; // Changed from single GuestInfo to array
   submittedAt: string;
 }
 

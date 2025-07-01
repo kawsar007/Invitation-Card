@@ -321,7 +321,7 @@ const FinalEnvelope: React.FC = () => {
   box-shadow: 0 15px 30px rgba(0,0,0,0.3);
   opacity: 0;
   transform: translate(-50%, -50%) scale(0.8);
-  transition: all 0.4s ease;
+  transition: all 2s ease;
   pointer-events: none;
 }
 

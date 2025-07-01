@@ -1,10 +1,9 @@
 import { useUser } from '@/context/UserContext';
 import { AttendanceStatus, GuestInfo, OwnInfo } from '@/types/types';
 import { ChevronDown, ChevronUp, CirclePlus, User, X } from 'lucide-react';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { AttendanceButtons } from './AttendanceButtons';
 import { GuestForm } from './GuestForm';
-
 
 interface RSVPModalProps {
   isOpen: boolean;
@@ -12,15 +11,16 @@ interface RSVPModalProps {
   message: string;
   bringGuest: boolean;
   ownInfo: OwnInfo;
-  guestInfo: GuestInfo;
+  guests: GuestInfo[];
   isExpandedSection: boolean;
   onClose: () => void;
   onAttendanceChange: (status: AttendanceStatus) => void;
   onMessageChange: (message: string) => void;
-  onBringGuestChange: (bring: boolean) => void;
-  onGuestInfoChange: (field: keyof GuestInfo, value: string | string[]) => void;
+  onAddGuest: () => void;
+  onRemoveGuest: (index: number) => void;
+  onGuestInfoChange: (index: number, field: keyof GuestInfo, value: string | string[]) => void;
   onOwnInfoChange: (field: keyof OwnInfo, value: string | string[]) => void;
-  onTransportationChange: (option: string) => void;
+  onGuestTransportationChange: (guestIndex: number, option: string) => void;
   onOwnTransportationChange: (option: string) => void;
   onToggleExpanded: () => void;
   onSubmit: () => void;
@@ -40,32 +40,52 @@ export const RSVPModal: React.FC<RSVPModalProps> = ({
   message,
   bringGuest,
   ownInfo,
-  guestInfo,
+  guests,
   isExpandedSection,
   onClose,
   onAttendanceChange,
   onMessageChange,
-  onBringGuestChange,
+  onAddGuest,
+  onRemoveGuest,
   onGuestInfoChange,
   onOwnInfoChange,
-  onTransportationChange,
+  onGuestTransportationChange,
   onOwnTransportationChange,
   onToggleExpanded,
   onSubmit
 }) => {
   const { user } = useUser();
+  const guestRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const previousGuestCount = useRef(guests.length);
+
+  useEffect(() => {
+    if (guests.length > previousGuestCount.current) {
+      const lastGuestIndex = guests.length - 1;
+      const lastGuestRef = guestRefs.current[lastGuestIndex];
+
+      if (lastGuestRef) {
+        // Small delay to ensure the DOM is updated
+        setTimeout(() => {
+          // Try to focus on the first input field in the guest form
+          const firstInput = lastGuestRef.querySelector('input, textarea, select') as HTMLElement;
+          if (firstInput) {
+            firstInput.focus();
+          } else {
+            // Fallback: scroll the guest form into view
+            lastGuestRef.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        }, 50);
+      }
+    }
+    previousGuestCount.current = guests.length;
+  }, [guests.length]);
+
+  // Update refs array when guests array changes
+  useEffect(() => {
+    guestRefs.current = guestRefs.current.slice(0, guests.length);
+  }, [guests.length]);
 
   if (!isOpen) return null;
-
-
-  const handleRemoveGuest = () => {
-    onBringGuestChange(false);
-    onGuestInfoChange('firstName', '');
-    onGuestInfoChange('lastName', '');
-    onGuestInfoChange('foodAllergies', '');
-    onGuestInfoChange('transportation', []);
-    onToggleExpanded();
-  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -181,34 +201,38 @@ export const RSVPModal: React.FC<RSVPModalProps> = ({
                 </div>
               )}
             </div>
-
           </div>
-          <div className="border-t border-gray-200 my-3"></div>
-          {/* Bring a Guest Button */}
-          {!bringGuest && (
-            <div className="mb-3">
-              <button
-                type="button"
-                onClick={() => onBringGuestChange(true)}
-                className="text-teal-700 hover:text-teal-600 text-sm font-normal transition-colors flex justify-center items-center"
-              >
-                <CirclePlus size={16} className='mr-1' /> Bring a Guest
-              </button>
-            </div>
-          )}
+
           <div className="border-t border-gray-200 my-3"></div>
 
-          {/* Guest Information Form */}
-          {bringGuest && (
-            <GuestForm
-              guestInfo={guestInfo}
-              isExpanded={isExpandedSection}
-              onGuestInfoChange={onGuestInfoChange}
-              onTransportationChange={onTransportationChange}
-              onToggleExpanded={onToggleExpanded}
-              onRemoveGuest={handleRemoveGuest}
-            />
-          )}
+          {/* Bring a Guest Button */}
+          <div className="mb-3">
+            <button
+              type="button"
+              onClick={onAddGuest}
+              className="text-teal-700 hover:text-teal-600 text-sm font-normal transition-colors flex justify-center items-center"
+            >
+              <CirclePlus size={16} className='mr-1' /> Bring a Guest
+            </button>
+          </div>
+
+          <div className="border-t border-gray-200 my-3"></div>
+
+          {/* Guest Information Forms */}
+          {guests.map((guest, index) => (
+            <div key={index} ref={(el) => (guestRefs.current[index] = el)}>
+              <GuestForm
+                key={index}
+                guestIndex={index}
+                guestInfo={guest}
+                isExpanded={isExpandedSection}
+                onGuestInfoChange={onGuestInfoChange}
+                onTransportationChange={onGuestTransportationChange}
+                onToggleExpanded={onToggleExpanded}
+                onRemoveGuest={onRemoveGuest}
+              />
+            </div>
+          ))}
 
           {/* Message Textarea */}
           <div className="mb-6">

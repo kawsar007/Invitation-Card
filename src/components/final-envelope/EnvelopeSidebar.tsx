@@ -14,7 +14,7 @@ const EnvelopeSidebar: React.FC = () => {
     message,
     bringGuest,
     ownInfo,
-    guestInfo,
+    guests,
     isExpandedSection,
     submittedData,
     isSubmitted,
@@ -26,11 +26,12 @@ const EnvelopeSidebar: React.FC = () => {
     closeCompletionModal,
     setAttendanceStatus,
     setMessage,
-    setBringGuest,
+    addGuest,
+    removeGuest,
     updateGuestInfo,
     updateOwnInfo,
     setIsExpandedSection,
-    handleTransportationChange,
+    handleGuestTransportationChange,
     handleOwnTransportationChange,
     handleSubmit
   } = useRSVPForm();
@@ -43,13 +44,27 @@ const EnvelopeSidebar: React.FC = () => {
     }
   };
 
+  // Calculate total attending (user + guests)
+  const totalAttending = submittedData?.attendance === 'attend' ? 1 + (submittedData?.guestInfo?.length || 0) : 0;
+
   return (
     <div>
       <EventDetails />
 
       <div className="sticky bottom-0 left-0 right-0 bg-white pb-4 border-gray-200">
-        {submittedData?.attendance === 'not-attend' && <p className='text-xs text-gray-400 p-1 flex justify-start'> <span className='mr-1 mt-[2px]'> <OctagonMinus size={18} color='red' /></span> RSVP Submitted Successfully
-          0 Attending in Your Group</p>}
+        {submittedData?.attendance === 'not-attend' &&
+          <p className='text-xs text-gray-400 p-1 flex justify-start'>
+            <span className='mr-1 mt-[2px]'>
+              <OctagonMinus size={18} color='red' />
+            </span>
+            RSVP Submitted Successfully - 0 Attending in Your Group
+          </p>
+        }
+        {submittedData?.attendance === 'attend' &&
+          <p className='text-xs text-gray-400 p-1 flex justify-start'>
+            RSVP Submitted Successfully - {totalAttending} Attending in Your Group
+          </p>
+        }
         <button
           onClick={handleButtonClick}
           className={`w-full py-3 px-8 rounded text-sm font-medium transition-colors tracking-wide ${isSubmitted
@@ -67,15 +82,16 @@ const EnvelopeSidebar: React.FC = () => {
         message={message}
         bringGuest={bringGuest}
         ownInfo={ownInfo}
-        guestInfo={guestInfo}
+        guests={guests}
         isExpandedSection={isExpandedSection}
         onClose={closeModal}
         onAttendanceChange={setAttendanceStatus}
         onMessageChange={setMessage}
-        onBringGuestChange={setBringGuest}
+        onAddGuest={addGuest}
+        onRemoveGuest={removeGuest}
         onGuestInfoChange={updateGuestInfo}
         onOwnInfoChange={updateOwnInfo}
-        onTransportationChange={handleTransportationChange}
+        onGuestTransportationChange={handleGuestTransportationChange}
         onOwnTransportationChange={handleOwnTransportationChange}
         onToggleExpanded={() => setIsExpandedSection(!isExpandedSection)}
         onSubmit={handleSubmit}

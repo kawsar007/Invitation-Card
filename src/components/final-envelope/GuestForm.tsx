@@ -3,12 +3,13 @@ import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import React from 'react';
 
 interface GuestFormProps {
+  guestIndex: number;
   guestInfo: GuestInfo;
   isExpanded: boolean;
-  onGuestInfoChange: (field: keyof GuestInfo, value: string | string[]) => void;
-  onTransportationChange: (option: string) => void;
+  onGuestInfoChange: (index: number, field: keyof GuestInfo, value: string | string[]) => void;
+  onTransportationChange: (guestIndex: number, option: string) => void;
   onToggleExpanded: () => void;
-  onRemoveGuest: () => void;
+  onRemoveGuest: (index: number) => void;
 }
 
 const TRANSPORTATION_OPTIONS = [
@@ -20,6 +21,7 @@ const TRANSPORTATION_OPTIONS = [
 ];
 
 export const GuestForm: React.FC<GuestFormProps> = ({
+  guestIndex,
   guestInfo,
   isExpanded,
   onGuestInfoChange,
@@ -30,14 +32,14 @@ export const GuestForm: React.FC<GuestFormProps> = ({
   return (
     <div className="mb-6 p-4 bg-gray-50 rounded-lg">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-gray-700">Guest Information</h3>
+        <h3 className="text-sm font-medium text-gray-700">Guest {guestIndex + 1} Information</h3>
         <button
           type="button"
-          onClick={onRemoveGuest}
+          onClick={() => onRemoveGuest(guestIndex)}
           className="text-teal-500 hover:text-teal-600 p-1"
           title="Remove guest"
         >
-          <Trash2 />
+          <Trash2 size={16} />
         </button>
       </div>
 
@@ -47,7 +49,7 @@ export const GuestForm: React.FC<GuestFormProps> = ({
         <input
           type="text"
           value={guestInfo.firstName}
-          onChange={(e) => onGuestInfoChange('firstName', e.target.value)}
+          onChange={(e) => onGuestInfoChange(guestIndex, 'firstName', e.target.value)}
           className="w-full p-2 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-300"
           placeholder="Enter first name"
         />
@@ -59,7 +61,7 @@ export const GuestForm: React.FC<GuestFormProps> = ({
         <input
           type="text"
           value={guestInfo.lastName}
-          onChange={(e) => onGuestInfoChange('lastName', e.target.value)}
+          onChange={(e) => onGuestInfoChange(guestIndex, 'lastName', e.target.value)}
           className="w-full p-2 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-300"
           placeholder="Enter last name"
         />
@@ -84,10 +86,10 @@ export const GuestForm: React.FC<GuestFormProps> = ({
                 <label className="flex items-center cursor-pointer">
                   <input
                     type="radio"
-                    name="guestFoodAllergies"
+                    name={`guest${guestIndex}FoodAllergies`}
                     value="yes"
                     checked={guestInfo.foodAllergies === 'yes'}
-                    onChange={(e) => onGuestInfoChange('foodAllergies', e.target.value as 'yes' | 'no')}
+                    onChange={(e) => onGuestInfoChange(guestIndex, 'foodAllergies', e.target.value as 'yes' | 'no')}
                     className="mr-3"
                   />
                   <span className="text-sm text-gray-600">Yes</span>
@@ -95,10 +97,10 @@ export const GuestForm: React.FC<GuestFormProps> = ({
                 <label className="flex items-center cursor-pointer">
                   <input
                     type="radio"
-                    name="guestFoodAllergies"
+                    name={`guest${guestIndex}FoodAllergies`}
                     value="no"
                     checked={guestInfo.foodAllergies === 'no'}
-                    onChange={(e) => onGuestInfoChange('foodAllergies', e.target.value as 'yes' | 'no')}
+                    onChange={(e) => onGuestInfoChange(guestIndex, 'foodAllergies', e.target.value as 'yes' | 'no')}
                     className="mr-3"
                   />
                   <span className="text-sm text-gray-600">No</span>
@@ -112,7 +114,7 @@ export const GuestForm: React.FC<GuestFormProps> = ({
                   </label>
                   <textarea
                     value={guestInfo.allergyDetails}
-                    onChange={(e) => onGuestInfoChange('allergyDetails', e.target.value)}
+                    onChange={(e) => onGuestInfoChange(guestIndex, 'allergyDetails', e.target.value)}
                     className="w-full p-2 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-300 resize-none"
                     placeholder="e.g., peanuts, shellfish, dairy..."
                     rows={2}
@@ -129,7 +131,7 @@ export const GuestForm: React.FC<GuestFormProps> = ({
                     <input
                       type="checkbox"
                       checked={guestInfo.transportation.includes(option)}
-                      onChange={() => onTransportationChange(option)}
+                      onChange={() => onTransportationChange(guestIndex, option)}
                       className="mr-3"
                     />
                     <span className="text-sm text-gray-600">{option}</span>

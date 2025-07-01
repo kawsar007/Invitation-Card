@@ -1,13 +1,11 @@
 import { AttendanceStatus, GuestInfo, OwnInfo, SubmittedData } from "@/types/types";
 import { useState } from "react";
 
-
 export const useRSVPForm = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false);
   const [attendanceStatus, setAttendanceStatus] = useState<AttendanceStatus>('');
   const [message, setMessage] = useState('');
-  const [bringGuest, setBringGuest] = useState(false);
   const [submittedData, setSubmittedData] = useState<SubmittedData | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -17,14 +15,8 @@ export const useRSVPForm = () => {
     transportation: [],
   });
 
-  // Guest form fields
-  const [guestInfo, setGuestInfo] = useState<GuestInfo>({
-    firstName: '',
-    lastName: '',
-    foodAllergies: '',
-    allergyDetails: '',
-    transportation: [],
-  });
+  // Multiple guests - array of guest info
+  const [guests, setGuests] = useState<GuestInfo[]>([]);
   const [isExpandedSection, setIsExpandedSection] = useState<boolean>(false);
 
   const openModal = () => setIsModalOpen(true);
@@ -46,14 +38,7 @@ export const useRSVPForm = () => {
   const resetForm = () => {
     setAttendanceStatus('');
     setMessage('');
-    setBringGuest(false);
-    setGuestInfo({
-      firstName: '',
-      lastName: '',
-      foodAllergies: '',
-      allergyDetails: '',
-      transportation: [],
-    });
+    setGuests([]);
     setOwnInfo({
       foodAllergies: '',
       allergyDetails: '',
@@ -72,25 +57,48 @@ export const useRSVPForm = () => {
     })
   }
 
-  const updateGuestInfo = (field: keyof GuestInfo, value: string | string[]) => {
-    setGuestInfo(prev => {
-      const updated = { ...prev, [field]: value };
-      // Clear allergy details if user selects "no" for food allergies
-      if (field === 'foodAllergies' && value === 'no') {
-        updated.allergyDetails = '';
-      }
-      return updated;
-    })
-  }
+  const addGuest = () => {
+    const newGuest: GuestInfo = {
+      firstName: '',
+      lastName: '',
+      foodAllergies: '',
+      allergyDetails: '',
+      transportation: [],
+    };
+    setGuests(prev => [...prev, newGuest]);
+  };
 
-  const handleTransportationChange = (option: string) => {
-    setGuestInfo(prev => ({
-      ...prev,
-      transportation: prev.transportation.includes(option) ?
-        prev.transportation.filter(item => item !== option) :
-        [...prev.transportation, option]
-    }))
-  }
+  const removeGuest = (index: number) => {
+    setGuests(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const updateGuestInfo = (index: number, field: keyof GuestInfo, value: string | string[]) => {
+    setGuests(prev => prev.map((guest, i) => {
+      if (i === index) {
+        const updated = { ...guest, [field]: value };
+        // Clear allergy details if user selects "no" for food allergies
+        if (field === 'foodAllergies' && value === 'no') {
+          updated.allergyDetails = '';
+        }
+        return updated;
+      }
+      return guest;
+    }));
+  };
+
+  const handleGuestTransportationChange = (guestIndex: number, option: string) => {
+    setGuests(prev => prev.map((guest, i) => {
+      if (i === guestIndex) {
+        return {
+          ...guest,
+          transportation: guest.transportation.includes(option) ?
+            guest.transportation.filter(item => item !== option) :
+            [...guest.transportation, option]
+        };
+      }
+      return guest;
+    }));
+  };
 
   const handleOwnTransportationChange = (option: string) => {
     setOwnInfo(prev => ({
@@ -111,8 +119,8 @@ export const useRSVPForm = () => {
       ...ownInfo,
       attendance: attendanceStatus as 'attend' | 'not-attend',
       message,
-      bringGuest,
-      guestInfo: bringGuest ? guestInfo : null,
+      bringGuest: guests.length > 0,
+      guestInfo: guests.length > 0 ? guests : null,
       submittedAt: new Date().toISOString()
     };
     console.log("Submission Data: ", submissionData);
@@ -128,10 +136,10 @@ export const useRSVPForm = () => {
     isCompletionModalOpen,
     attendanceStatus,
     message,
-    bringGuest,
+    bringGuest: guests.length > 0,
     submittedData,
     isSubmitted,
-    guestInfo,
+    guests,
     ownInfo,
     isExpandedSection,
 
@@ -142,11 +150,12 @@ export const useRSVPForm = () => {
     closeCompletionModal,
     setAttendanceStatus,
     setMessage,
-    setBringGuest,
+    addGuest,
+    removeGuest,
     updateGuestInfo,
     updateOwnInfo,
     setIsExpandedSection,
-    handleTransportationChange,
+    handleGuestTransportationChange,
     handleOwnTransportationChange,
     handleSubmit
   }
