@@ -137,7 +137,11 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
           <PreviewCard versionNo={versionNo} setActiveTab={setActiveTab} previewLoading={previewLoading} previewData={previewData} />
         );
       case 'send':
-        return <SendInvitationPage />;
+        return (
+          <div className="p-6 w-full max-w-7xl mx-auto">
+            <SendInvitationPage />
+          </div>
+        );
       case 'track':
         return <TrackInvitationPage />;
       default:
