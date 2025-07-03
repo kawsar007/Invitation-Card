@@ -2,6 +2,7 @@ import { ContactHeader } from '@/components/send-ui/contact/ContactHeader';
 import { ContactTable } from '@/components/send-ui/contact/ContactTable';
 import { ContactTabs } from '@/components/send-ui/contact/ContactTabs';
 import { ContactFormModal } from '@/components/send-ui/modals/create-contact';
+import DeleteContactModal from '@/components/send-ui/modals/DeleteContactModal';
 import SelectContactModal from '@/components/send-ui/modals/SelectContactModal';
 import { useContactFilters } from '@/hooks/send-contact/useContactFilters';
 import { useContactForm } from '@/hooks/send-contact/useContactForm';
@@ -32,6 +33,11 @@ const SendContactTable: React.FC = () => {
   const [showNewContactModal, setShowNewContactModal] = useState(false);
   const [contactType, setContactType] = useState<'individual' | 'couple'>('individual');
   const [groupSize, setGroupSize] = useState(2);
+
+  // Delete confirmation modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [contactToDelete, setContactToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Custom hooks for specific functionality
   const { activeTab, setActiveTab, searchTerm, setSearchTerm, filteredContacts, tabs } =
@@ -71,11 +77,26 @@ const SendContactTable: React.FC = () => {
     setOpenDropdown(null);
 
     if (action === 'delete') {
-      if (window.confirm('Are you sure you want to delete this contact?')) {
-        await deleteContact(contactId);
-      }
+      // Find the contact to delete
+      const contact = contacts.find(c => c.id === contactId);
+      setContactToDelete(contact);
+      setShowDeleteModal(true);
     } else {
       console.log(`${action} for contact ${contactId}`);
+    }
+  };
+
+  // Handle delete confirmation
+  const handleDeleteConfirm = async () => {
+    if (contactToDelete) {
+      setIsDeleting(true);
+      const success = await deleteContact(contactToDelete.id);
+      setIsDeleting(false);
+
+      if (success) {
+        setShowDeleteModal(false);
+        setContactToDelete(null);
+      }
     }
   };
 
@@ -181,6 +202,15 @@ const SendContactTable: React.FC = () => {
         onSubmit={handleSubmitContact}
         onReset={resetForm}
         isSubmitting={isSubmitting}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <DeleteContactModal
+        contact={contactToDelete}
+        isDeleteDialogOpen={showDeleteModal}
+        setIsDeleteDialogOpen={setShowDeleteModal}
+        confirmDelete={handleDeleteConfirm}
+        isDeleting={isDeleting}
       />
     </div>
   );
