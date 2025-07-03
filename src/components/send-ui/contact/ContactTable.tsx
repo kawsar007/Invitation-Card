@@ -79,6 +79,7 @@ export const ContactTable: React.FC<ContactTableProps> = ({
                 </div>
               </th>
               <th className="text-left p-4 text-sm font-medium text-gray-700">Email</th>
+              <th className="text-left p-4 text-sm font-medium text-gray-700">Phone</th>
               <th className="text-left p-4 text-sm font-medium text-gray-700">
                 <div className="flex items-center space-x-1">
                   <span>Plus 1s</span>
