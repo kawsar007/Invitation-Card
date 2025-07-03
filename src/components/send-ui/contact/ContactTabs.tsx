@@ -7,20 +7,16 @@ interface ContactTabsProps {
   onTabChange: (tab: TabType) => void;
   searchTerm: string;
   onSearchChange: (term: string) => void;
+  tabs;
 }
 
 export const ContactTabs: React.FC<ContactTabsProps> = ({
   activeTab,
   onTabChange,
   searchTerm,
-  onSearchChange
+  onSearchChange,
+  tabs
 }) => {
-  const tabs = [
-    { key: 'All' as TabType, label: 'All', count: 2 },
-    { key: 'Unsent' as TabType, label: 'Unsent', count: 2 },
-    { key: 'Unopened' as TabType, label: 'Unopened', count: 0 },
-    { key: 'Opened' as TabType, label: 'Opened', count: 0 }
-  ];
 
   return (
     <div className="flex items-center justify-between p-4 border-b border-gray-200">

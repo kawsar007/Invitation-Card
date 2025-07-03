@@ -1,25 +1,31 @@
-
+import { plusOneOptions } from '@/components/send-ui/constant';
+import { ContactHeader } from '@/components/send-ui/contact/ContactHeader';
+import { ContactTable } from '@/components/send-ui/contact/ContactTable';
+import { ContactTabs } from '@/components/send-ui/contact/ContactTabs';
 import SelectContactModal from '@/components/send-ui/SelectContactModal';
-import { Contact, ContactFormData, ContactsResponseObject } from '@/types/sendContact';
-import { getAuthToken } from '@/utils/auth';
-import { Calendar, CheckCircle, ChevronDown, Copy, Download, Eye, Facebook, Filter, HelpCircle, History, Mail, MessageCircle, MessageSquare, Printer, Search, Share2, Trash2, Users, X } from 'lucide-react';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useContacts } from '@/hooks/send-contact/useContacts';
+import { ContactFormData, TiedContact } from '@/types/sendContact';
+import { HelpCircle, Users, X } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
 
+const SendContactTable: React.FC = () => {
+  // Use the custom hook
+  const {
+    contacts,
+    loading,
+    error,
+    isSubmitting,
+    fetchContacts,
+    createContact,
+    deleteContact,
+    deleteMultipleContacts,
+    validateContactData,
+    buildContactPayload,
+    clearError
+  } = useContacts();
 
-
-interface TiedContact {
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-}
-
-const ContactTable: React.FC = () => {
-  const token = getAuthToken();
+  // UI state (non-contact related)
   const [activeTab, setActiveTab] = useState<'All' | 'Unsent' | 'Unopened' | 'Opened'>('All');
-  const [contacts, setContacts] = useState<Contact[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedContacts, setSelectedContacts] = useState<number[]>([]);
   const [showAddContactModal, setShowAddContactModal] = useState(false);
@@ -31,7 +37,6 @@ const ContactTable: React.FC = () => {
   const [plusOneCount, setPlusOneCount] = useState(5);
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Form data for individual contact
@@ -48,29 +53,21 @@ const ContactTable: React.FC = () => {
     { first_name: '', last_name: '', email: '', phone: '' }
   ]);
 
-  const fetchContactsList = useCallback(async () => {
-    try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/contacts/list`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      const result: ContactsResponseObject = await response.json();
-      setContacts(result.contacts)
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Failed to fetch event');
-    }
-  }, [token]);
-
+  // Fetch contacts on component mount
   useEffect(() => {
-    fetchContactsList();
-  }, [fetchContactsList]);
+    fetchContacts();
+  }, [fetchContacts]);
+
+  // Show error alerts
+  useEffect(() => {
+    if (error) {
+      alert(`Error: ${error}`);
+      clearError();
+    }
+  }, [error, clearError]);
 
   const tabs = [
-    { key: 'All', label: 'All', count: 2 },
+    { key: 'All', label: 'All', count: contacts.length },
     { key: 'Unsent', label: 'Unsent', count: 2 },
     { key: 'Unopened', label: 'Unopened', count: 0 },
     { key: 'Opened', label: 'Opened', count: 0 }
@@ -98,10 +95,11 @@ const ContactTable: React.FC = () => {
       );
       setTiedContacts(newTiedContacts);
     }
-  }, [contactType, groupSize]);
+  }, [contactType, groupSize, tiedContacts]);
 
   const filteredContacts = contacts.filter(contact => {
-    const matchesSearch = contact.first_name.toLowerCase().includes(searchTerm.toLowerCase()) || contact.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = contact.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      contact.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       contact.email.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   });
@@ -116,16 +114,19 @@ const ContactTable: React.FC = () => {
     );
   };
 
-  const handleDropdownToggle = (contactId: number) => {
-    setOpenDropdown(openDropdown === contactId ? null : contactId);
-  };
-
-  const handleMenuAction = (action: string, contactId: number) => {
-    console.log(`${action} for contact ${contactId}`);
+  const handleMenuAction = async (action: string, contactId: number) => {
     setOpenDropdown(null);
+
+    if (action === 'delete') {
+      if (window.confirm('Are you sure you want to delete this contact?')) {
+        await deleteContact(contactId);
+      }
+    } else {
+      console.log(`${action} for contact ${contactId}`);
+    }
   };
 
-  const handleFormDataChange = (field: keyof FormData, value: string) => {
+  const handleFormDataChange = (field: keyof ContactFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -163,327 +164,93 @@ const ContactTable: React.FC = () => {
   };
 
   const handleSubmitContact = async (saveAndAddAnother: boolean = false) => {
-    setIsSubmitting(true);
+    // Validate form data
+    const validation = validateContactData(contactType, formData, tiedContacts);
+    if (!validation.isValid) {
+      alert(validation.error);
+      return;
+    }
 
-    try {
-      let payload;
+    // Build payload
+    const payload = buildContactPayload(contactType, formData, tiedContacts, tags);
 
-      if (contactType === 'individual') {
-        // Validate required fields for individual
-        if (!formData.first_name.trim() || !formData.email.trim()) {
-          alert('First name and email are required');
-          setIsSubmitting(false);
-          return;
-        }
+    // Create contact
+    const success = await createContact(payload);
 
-        payload = {
-          first_name: formData.first_name.trim(),
-          last_name: formData.last_name.trim(),
-          email: formData.email.trim(),
-          phone: formData.phone.trim(),
-          has_tied_contact: false,
-          tags: tags.length > 0 ? tags : undefined
-        };
+    if (success) {
+      if (saveAndAddAnother) {
+        resetForm();
       } else {
-        // Validate required fields for couple/family
-        const validTiedContacts = tiedContacts.filter(contact =>
-          contact.first_name.trim() && contact.email.trim()
-        );
-
-        if (validTiedContacts.length === 0) {
-          alert('At least one contact with first name and email is required');
-          setIsSubmitting(false);
-          return;
-        }
-
-        // Use first valid contact as main contact
-        const mainContact = validTiedContacts[0];
-        const otherContacts = validTiedContacts.slice(1);
-
-        payload = {
-          first_name: mainContact.first_name.trim(),
-          last_name: mainContact.last_name.trim(),
-          email: mainContact.email.trim(),
-          phone: mainContact.phone.trim(),
-          has_tied_contact: otherContacts.length > 0,
-          tied_contacts: otherContacts.length > 0 ? otherContacts.map(contact => ({
-            first_name: contact.first_name.trim(),
-            last_name: contact.last_name.trim(),
-            email: contact.email.trim(),
-            phone: contact.phone.trim()
-          })) : undefined,
-          tags: tags.length > 0 ? tags : undefined
-        };
+        setShowNewContactModal(false);
+        resetForm();
       }
+    }
+  };
 
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/contacts/create`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
+  const handleDeleteSelected = async () => {
+    if (selectedContacts.length === 0) return;
 
-      if (response.ok) {
-        // Refresh contacts list
-        await fetchContactsList();
+    const message = selectedContacts.length === 1
+      ? 'Are you sure you want to delete this contact?'
+      : `Are you sure you want to delete ${selectedContacts.length} contacts?`;
 
-        if (saveAndAddAnother) {
-          resetForm();
-        } else {
-          setShowNewContactModal(false);
-          resetForm();
-        }
-      } else {
-        const errorData = await response.json();
-        alert(`Error: ${errorData.message || 'Failed to create contact'}`);
+    if (window.confirm(message)) {
+      const success = await deleteMultipleContacts(selectedContacts);
+      if (success) {
+        setSelectedContacts([]);
       }
-    } catch (error) {
-      console.error('Error creating contact:', error);
-      alert('Failed to create contact. Please try again.');
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
   const isAllSelected = selectedContacts.length === contacts.length;
   const isIndeterminate = selectedContacts.length > 0 && selectedContacts.length < contacts.length;
 
-  const dropdownMenuItems = [
-    { icon: History, label: 'View History' },
-    { icon: MessageSquare, label: 'Send Message' },
-    { icon: Facebook, label: 'Send with Facebook', hasInfo: true },
-    { icon: MessageCircle, label: 'Send with WhatsApp', hasInfo: true },
-    { icon: Copy, label: 'Copy Link / Send Plaintext' },
-    { icon: CheckCircle, label: 'Mark as Sent' },
-    { icon: Mail, label: 'Preview Invitation' },
-    { icon: Mail, label: 'Preview Envelope' },
-    { icon: Trash2, label: 'Delete' }
-  ];
-
   return (
     <div className="bg-white min-h-screen">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={() => setShowAddContactModal(true)}
-            className="bg-gray-600 text-white px-4 py-2 text-sm font-medium rounded"
-          >
-            ADD CONTACTS
-          </button>
-          <div className="flex items-center space-x-2 text-gray-600">
-            <Share2 size={16} />
-            <span className="text-sm font-medium">SHARE URL</span>
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2 text-gray-600">
-            <Calendar size={16} />
-            <span className="text-sm">SCHEDULE SEND</span>
-          </div>
-          <button className="bg-green-500 text-white px-6 py-2 text-sm font-medium rounded">
-            SEND INVITATIONS
-          </button>
-        </div>
-      </div>
+      <ContactHeader
+        onAddContacts={() => setShowAddContactModal(true)}
+        onDeleteSelected={handleDeleteSelected}
+      />
 
       {/* Tabs and Search */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
-        <div className="flex space-x-1">
-          {tabs.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key as 'All' | 'Unsent' | 'Unopened' | 'Opened')}
-              className={`px-3 py-2 text-sm font-medium rounded ${activeTab === tab.key
-                ? 'bg-gray-100 text-gray-900'
-                : 'text-gray-600 hover:text-gray-900'
-                }`}
-            >
-              {tab.label} ({tab.count})
-            </button>
-          ))}
-          <button className="flex items-center space-x-1 px-3 py-2 text-sm text-gray-600 hover:text-gray-900">
-            <Filter size={16} />
-            <span>Custom Filters</span>
-          </button>
-        </div>
+      <ContactTabs
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        tabs={tabs}
+      />
 
-        <div className="flex items-center space-x-4">
-          <button className="flex items-center space-x-1 text-sm text-gray-600 hover:text-gray-900">
-            <Eye size={16} />
-            <span>View Preferences</span>
-          </button>
-          <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search Mailing List"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+      {/* Loading State */}
+      {loading && (
+        <div className="flex justify-center items-center py-8">
+          <div className="text-gray-500">Loading contacts...</div>
         </div>
-      </div>
+      )}
 
       {/* Table */}
-      <div className="">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th className="w-12 p-4">
-                <input
-                  type="checkbox"
-                  checked={isAllSelected}
-                  ref={(input) => {
-                    if (input) input.indeterminate = isIndeterminate;
-                  }}
-                  onChange={(e) => handleSelectAll(e.target.checked)}
-                  className="rounded border-gray-300"
-                />
-              </th>
-              <th className="text-left p-4 text-sm font-medium text-gray-700">
-                <div className="flex items-center space-x-1">
-                  <span>Name</span>
-                  <ChevronDown size={14} />
-                </div>
-              </th>
-              <th className="text-left p-4 text-sm font-medium text-gray-700">Email</th>
-              <th className="text-left p-4 text-sm font-medium text-gray-700">
-                <div className="flex items-center space-x-1">
-                  <span>Plus 1s</span>
-                  <div className="w-4 h-4 bg-gray-400 rounded-full flex items-center justify-center">
-                    <span className="text-xs text-white">?</span>
-                  </div>
-                </div>
-              </th>
-              <th className="text-left p-4 text-sm font-medium text-gray-700">Status</th>
-              <th className="text-left p-4 text-sm font-medium text-gray-700">
-                <div className="flex items-center space-x-1">
-                  <span>Tags</span>
-                  <div className="w-4 h-4 bg-gray-400 rounded-full flex items-center justify-center">
-                    <span className="text-xs text-white">?</span>
-                  </div>
-                </div>
-              </th>
-              <th className="text-left p-4 text-sm font-medium text-gray-700">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {contacts.map((contact) => (
-              <tr key={contact.id} className="hover:bg-gray-50">
-                <td className="p-4">
-                  <input
-                    type="checkbox"
-                    checked={selectedContacts.includes(contact.id)}
-                    onChange={(e) => handleSelectContact(contact.id, e.target.checked)}
-                    className="rounded border-gray-300"
-                  />
-                </td>
-                <td className="p-4">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm font-medium text-gray-900">{contact.first_name} {contact?.last_name}</span>
-                  </div>
-                </td>
-                <td className="p-4">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm text-gray-900">{contact.email}</span>
-                  </div>
-                </td>
-                <td className="p-4 text-sm text-gray-900">+ 3</td>
-                <td className="p-4">
-                  <span className="inline-flex items-center space-x-1 text-sm">
-                    <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
-                    <span className="text-gray-900">Unsent</span>
-                  </span>
-                </td>
-                <td className="p-4">
-                  <div className="flex items-center space-x-2">
-                    {contact?.tags?.map((tag, index) => (
-                      <span
-                        key={index}
-                        className="bg-gray-700 text-white px-2 py-1 text-xs rounded"
-                      >
-                        {tag} ×
-                      </span>
-                    ))}
-                    <button className="text-blue-600 text-sm hover:underline">+ Tag</button>
-                  </div>
-                </td>
-                <td className="p-4">
-                  <div className="flex items-center space-x-2 relative">
-                    <button
-                      onClick={() => handleMenuAction('send', contact.id)}
-                      className="bg-green-500 text-white px-3 py-1 text-sm rounded hover:bg-green-600"
-                    >
-                      SEND
-                    </button>
-                    <div className="relative">
-                      <button
-                        onClick={() => handleDropdownToggle(contact.id)}
-                        className="text-gray-600 hover:text-gray-900 p-1 rounded hover:bg-gray-100"
-                      >
-                        <ChevronDown size={16} />
-                      </button>
+      {!loading && (
+        <ContactTable
+          contacts={filteredContacts}
+          selectedContacts={selectedContacts}
+          onSelectAll={handleSelectAll}
+          onSelectContact={handleSelectContact}
+          onMenuAction={handleMenuAction}
+          searchTerm={searchTerm}
+          selectedCount={selectedContacts.length}
+          isAllSelected={isAllSelected}
+          isIndeterminate={isIndeterminate}
 
-                      {/* Dropdown Menu */}
-                      {openDropdown === contact.id && (
-                        <div
-                          ref={dropdownRef}
-                          className="absolute right-0 top-full mt-1 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-[9999]"
-                        >
-                          <div className="py-1">
-                            {dropdownMenuItems.map((item, index) => (
-                              <button
-                                key={index}
-                                onClick={() => handleMenuAction(item.label.toLowerCase().replace(/\s+/g, '_'), contact.id)}
-                                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-3"
-                              >
-                                <item.icon size={16} className="text-gray-500 flex-shrink-0" />
-                                <span className="flex-1">{item.label}</span>
-                                {item.hasInfo && (
-                                  <HelpCircle size={14} className="text-gray-400 flex-shrink-0" />
-                                )}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Footer */}
-      <div className="flex items-center justify-between p-4 border-t border-gray-200 text-sm text-gray-600">
-        <div>
-          {contacts.length} People (0 selected) → 7 Plus 1s = 9 Total
-        </div>
-        <div className="flex items-center space-x-4">
-          <span>Page 1 of 1</span>
-          <div className="flex items-center space-x-2">
-            <button className="p-2 hover:bg-gray-100 rounded">
-              <Download size={16} />
-            </button>
-            <button className="p-2 hover:bg-gray-100 rounded">
-              <Printer size={16} />
-            </button>
-          </div>
-        </div>
-      </div>
+        />
+      )}
 
       {/* Add Contacts Modal */}
       {showAddContactModal && (
-        <SelectContactModal setShowAddContactModal={setShowAddContactModal} setShowNewContactModal={setShowNewContactModal} />
+        <SelectContactModal
+          setShowAddContactModal={setShowAddContactModal}
+          setShowNewContactModal={setShowNewContactModal}
+        />
       )}
 
       {/* New Contact Modal */}
@@ -698,12 +465,11 @@ const ContactTable: React.FC = () => {
                 onChange={(e) => setPlusOneCount(parseInt(e.target.value))}
                 className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value={5}>Yes (+5)</option>
-                <option value={4}>Yes (+4)</option>
-                <option value={3}>Yes (+3)</option>
-                <option value={2}>Yes (+2)</option>
-                <option value={1}>Yes (+1)</option>
-                <option value={0}>No</option>
+                {plusOneOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -783,4 +549,4 @@ const ContactTable: React.FC = () => {
   );
 };
 
-export default ContactTable;
+export default SendContactTable;

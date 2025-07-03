@@ -3,9 +3,10 @@ import React from 'react';
 
 interface ContactHeaderProps {
   onAddContacts: () => void;
+  onDeleteSelected: () => void;
 }
 
-export const ContactHeader: React.FC<ContactHeaderProps> = ({ onAddContacts }) => {
+export const ContactHeader: React.FC<ContactHeaderProps> = ({ onAddContacts, onDeleteSelected }) => {
   return (
     <div className="flex items-center justify-between p-4 border-b border-gray-200">
       <div className="flex items-center space-x-4">

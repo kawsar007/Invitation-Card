@@ -10,6 +10,9 @@ interface ContactTableProps {
   onSelectContact: (id: number, checked: boolean) => void;
   onMenuAction: (action: string, contactId: number) => void;
   searchTerm: string;
+  selectedCount: number;
+  isAllSelected: boolean;
+  isIndeterminate: boolean;
 }
 
 export const ContactTable: React.FC<ContactTableProps> = ({
@@ -18,7 +21,10 @@ export const ContactTable: React.FC<ContactTableProps> = ({
   onSelectAll,
   onSelectContact,
   onMenuAction,
-  searchTerm
+  searchTerm,
+  selectedCount,
+  isAllSelected,
+  isIndeterminate
 }) => {
   const [openDropdown, setOpenDropdown] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -30,9 +36,6 @@ export const ContactTable: React.FC<ContactTableProps> = ({
       contact.email.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   });
-
-  const isAllSelected = selectedContacts.length === contacts.length;
-  const isIndeterminate = selectedContacts.length > 0 && selectedContacts.length < contacts.length;
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -116,7 +119,7 @@ export const ContactTable: React.FC<ContactTableProps> = ({
       {/* Footer */}
       <div className="flex items-center justify-between p-4 border-t border-gray-200 text-sm text-gray-600">
         <div>
-          {contacts.length} People (0 selected) → 7 Plus 1s = 9 Total
+          {contacts.length} People ({selectedCount} selected) → 7 Plus 1s = 9 Total
         </div>
         <div className="flex items-center space-x-4">
           <span>Page 1 of 1</span>

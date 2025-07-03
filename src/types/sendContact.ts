@@ -7,7 +7,7 @@ export interface TiedContact {
 }
 
 export interface Contact {
-  id: number;
+  id?: number;
   first_name: string;
   last_name: string;
   email: string;
@@ -17,6 +17,16 @@ export interface Contact {
   tags: string[];
   created_at: string; // ISO date string
   updated_at: string; // ISO date string
+}
+
+export interface ContactPayload {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  has_tied_contact: boolean;
+  tied_contacts?: TiedContact[];
+  tags?: string[];
 }
 
 export interface ContactsResponseObject {
