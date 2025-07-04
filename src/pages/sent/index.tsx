@@ -81,6 +81,10 @@ const SendContactTable: React.FC = () => {
       const contact = contacts.find(c => c.id === contactId);
       setContactToDelete(contact);
       setShowDeleteModal(true);
+    } else if (action === 'update') {
+      const contact = contacts.find(c => c.id === contactId);
+      console.log(`${action} for contact ${contactId}`);
+
     } else {
       console.log(`${action} for contact ${contactId}`);
     }
@@ -99,6 +103,24 @@ const SendContactTable: React.FC = () => {
       }
     }
   };
+
+  // Handle Bulk Actions
+  const handleBulkAction = (action: string, contactIds: number[]) => {
+    switch (action) {
+      case 'edit':
+        // Handle Bulk Edit
+        console.log('Edit contacts:', contactIds);
+        break;
+      case 'message':
+        // Handle bulk message
+        console.log('Message contacts:', contactIds);
+        break;
+      case 'delete':
+        // Handle bulk delete
+        console.log('Delete contacts:', contactIds);
+        break;
+    }
+  }
 
   // Submit contact handler
   const handleSubmitContact = async (saveAndAddAnother: boolean = false) => {
@@ -169,6 +191,7 @@ const SendContactTable: React.FC = () => {
           selectedCount={selectedCount}
           isAllSelected={isAllSelected}
           isIndeterminate={isIndeterminate}
+          onBulkAction={handleBulkAction}
         />
       )}
 

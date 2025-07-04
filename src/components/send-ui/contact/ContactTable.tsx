@@ -1,5 +1,5 @@
 import { Contact } from '@/types/sendContact';
-import { ChevronDown, Download, Printer } from 'lucide-react';
+import { ChevronDown, Download, Edit, MessageSquare, Printer, Trash2 } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { ContactTableRow } from './ContactTableRow';
 
@@ -13,6 +13,7 @@ interface ContactTableProps {
   selectedCount: number;
   isAllSelected: boolean;
   isIndeterminate: boolean;
+  onBulkAction?: (action: string, contactIds: number[]) => void;
 }
 
 export const ContactTable: React.FC<ContactTableProps> = ({
@@ -24,7 +25,8 @@ export const ContactTable: React.FC<ContactTableProps> = ({
   searchTerm,
   selectedCount,
   isAllSelected,
-  isIndeterminate
+  isIndeterminate,
+  onBulkAction
 }) => {
   const [openDropdown, setOpenDropdown] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -55,8 +57,56 @@ export const ContactTable: React.FC<ContactTableProps> = ({
     setOpenDropdown(openDropdown === contactId ? null : contactId);
   };
 
+  const handleBulkAction = (action: string) => {
+    if (onBulkAction) {
+      onBulkAction(action, selectedContacts);
+    }
+  };
+
   return (
     <>
+      {/* Bulk Actions Bar - Shows when contacts are selected */}
+      {selectedCount > 0 && (
+        <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <span className="text-sm font-medium text-blue-800">
+                {selectedCount} person{selectedCount > 1 ? 's' : ''} selected
+              </span>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => handleBulkAction('edit')}
+                  className="flex items-center space-x-1 px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                >
+                  <Edit size={14} />
+                  <span>Edit</span>
+                </button>
+                <button
+                  onClick={() => handleBulkAction('message')}
+                  className="flex items-center space-x-1 px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                >
+                  <MessageSquare size={14} />
+                  <span>Message</span>
+                </button>
+                <button
+                  onClick={() => handleBulkAction('delete')}
+                  className="flex items-center space-x-1 px-3 py-1 text-sm bg-white border border-red-300 text-red-600 rounded hover:bg-red-50 transition-colors"
+                >
+                  <Trash2 size={14} />
+                  <span>Delete</span>
+                </button>
+              </div>
+            </div>
+            <button
+              onClick={() => onSelectAll(false)}
+              className="text-sm text-blue-600 hover:text-blue-800"
+            >
+              Clear selection
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="">
         <table className="w-full">
           <thead className="bg-gray-50 border-b border-gray-200">

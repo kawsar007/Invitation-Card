@@ -1,6 +1,7 @@
 import {
   CheckCircle,
   Copy,
+  Edit,
   Facebook,
   HelpCircle,
   History,
@@ -26,13 +27,14 @@ export const ActionDropdown = forwardRef<HTMLDivElement, ActionDropdownProps>(
       { icon: CheckCircle, label: 'Mark as Sent' },
       { icon: Mail, label: 'Preview Invitation' },
       { icon: Mail, label: 'Preview Envelope' },
+      { icon: Edit, label: 'Update' },
       { icon: Trash2, label: 'Delete' }
     ];
 
     return (
       <div
         ref={ref}
-        className="absolute right-0 top-full mt-1 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-[9999]"
+        className="absolute right-0 top-full mt-1 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
       >
         <div className="py-1">
           {dropdownMenuItems.map((item, index) => (
