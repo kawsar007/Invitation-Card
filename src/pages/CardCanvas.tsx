@@ -134,7 +134,9 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
         );
       case 'preview':
         return (
-          <PreviewCard versionNo={versionNo} setActiveTab={setActiveTab} previewLoading={previewLoading} previewData={previewData} />
+          <div className="p-6 w-full max-w-4xl mx-auto">
+            <PreviewCard versionNo={versionNo} setActiveTab={setActiveTab} previewLoading={previewLoading} previewData={previewData} />
+          </div>
         );
       case 'send':
         return (

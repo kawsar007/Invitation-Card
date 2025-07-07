@@ -14,6 +14,7 @@ import LandingPage from "./landing-page";
 import Navbar from "./landing-page/Navbar";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import RequireEventId from "./pages/RequireEventId";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
@@ -50,7 +51,9 @@ const AppContent = () => {
           path="/editor/:templateId?"
           element={
             <ProtectedRoute>
-              <Index />
+              <RequireEventId>
+                <Index />
+              </RequireEventId>
             </ProtectedRoute>
           }
         />
