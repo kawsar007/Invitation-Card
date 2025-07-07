@@ -14,6 +14,10 @@ export interface Contact {
   phone: string;
   has_tied_contact: boolean;
   tied_contacts: TiedContact[];
+  couple_greeting?: string;
+  plus_one_count?: number;
+  contact_type?: "individual" | "couple";
+  group_size?: number;
   tags: string[];
   created_at: string; // ISO date string
   updated_at: string; // ISO date string

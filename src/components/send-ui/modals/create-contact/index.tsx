@@ -1,4 +1,4 @@
-import { ContactFormData, TiedContact } from '@/types/sendContact';
+import { Contact, ContactFormData, TiedContact } from '@/types/sendContact';
 import React from 'react';
 import { ContactTypeSelector } from './ContactTypeSelector';
 import { CoupleContactForm } from './CoupleContactForm';
@@ -32,6 +32,8 @@ interface ContactFormModalProps {
   onSubmit: (saveAndAddAnother: boolean) => void;
   onReset: () => void;
   isSubmitting: boolean;
+  isEditMode?: boolean;
+  editingContact?: Contact;
 }
 
 export const ContactFormModal: React.FC<ContactFormModalProps> = ({
@@ -56,8 +58,14 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
   onRemoveTag,
   onSubmit,
   onReset,
-  isSubmitting
+  isSubmitting,
+  isEditMode,
+  editingContact
 }) => {
+  console.log("Is Edit Mode", isEditMode);
+
+  console.log("Is Editing Content:", editingContact);
+
   if (!isOpen) return null;
 
   const handleClose = () => {
@@ -68,7 +76,7 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
-        <ModalHeader onClose={handleClose} />
+        <ModalHeader onClose={handleClose} isEditMode={isEditMode} />
 
         <ContactTypeSelector
           contactType={contactType}
@@ -123,6 +131,7 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
           onClose={handleClose}
           onSubmit={onSubmit}
           isSubmitting={isSubmitting}
+          isEditMode={isEditMode}
         />
       </div>
     </div>

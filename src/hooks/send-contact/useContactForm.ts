@@ -1,12 +1,15 @@
-import { ContactFormData, TiedContact } from '@/types/sendContact';
-import { useCallback, useEffect, useState } from 'react';
+import { Contact, ContactFormData, TiedContact } from '@/types/sendContact';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface UseContactFormProps {
   contactType: 'individual' | 'couple';
   groupSize: number;
+  editingContact?: Contact | null; // Contact to edit (null for create mode)
+  onUpdateComplete?: () => void; // Callback when update is complete
 }
 
-export const useContactForm = ({ contactType, groupSize }: UseContactFormProps) => {
+export const useContactForm = ({ contactType, groupSize, editingContact = null,
+  onUpdateComplete }: UseContactFormProps) => {
   const [formData, setFormData] = useState<ContactFormData>({
     first_name: '',
     last_name: '',
@@ -23,16 +26,56 @@ export const useContactForm = ({ contactType, groupSize }: UseContactFormProps) 
   const [plusOneCount, setPlusOneCount] = useState(5);
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
+  const [isEditMode, setIsEditMode] = useState(false);
 
-  // Update tied contacts when group size changes
+  // Use ref to track previous values and prevent unnecessary updates
+  const prevContactTypeRef = useRef(contactType);
+  const prevGroupSizeRef = useRef(groupSize);
+
+  // Initialize form with editing contact data
   useEffect(() => {
-    if (contactType === 'couple') {
-      const newTiedContacts = Array.from({ length: groupSize }, (_, index) =>
-        tiedContacts[index] || { first_name: '', last_name: '', email: '', phone: '' }
-      );
-      setTiedContacts(newTiedContacts);
+    if (editingContact) {
+      setIsEditMode(true);
+      setFormData({
+        first_name: editingContact.first_name || '',
+        last_name: editingContact.last_name || '',
+        email: editingContact.email || '',
+        phone: editingContact.phone || ''
+      });
+
+      // If editing contact has tied contacts, populate them
+      if (editingContact.tied_contacts && editingContact.tied_contacts.length > 0) {
+        setTiedContacts(editingContact.tied_contacts);
+      }
+
+      setCoupleGreeting(editingContact.couple_greeting || '');
+      setPlusOneCount(editingContact.plus_one_count || 5);
+      setTags(editingContact.tags || []);
+    } else {
+      setIsEditMode(false);
+      resetForm();
     }
-  }, [contactType, groupSize, tiedContacts]);
+  }, [editingContact]);
+
+  // Update tied contacts when contact type or group size changes
+  // Remove tiedContacts from dependencies to prevent circular updates
+  useEffect(() => {
+    const contactTypeChanged = prevContactTypeRef.current !== contactType;
+    const groupSizeChanged = prevGroupSizeRef.current !== groupSize;
+
+    if (contactType === 'couple' && (contactTypeChanged || groupSizeChanged)) {
+      setTiedContacts(prevTiedContacts => {
+        const newTiedContacts = Array.from({ length: groupSize }, (_, index) =>
+          prevTiedContacts[index] || { first_name: '', last_name: '', email: '', phone: '' }
+        );
+        return newTiedContacts;
+      });
+    }
+
+    // Update refs after processing
+    prevContactTypeRef.current = contactType;
+    prevGroupSizeRef.current = groupSize;
+  }, [contactType, groupSize]); // Removed tiedContacts from dependencies
 
   const handleFormDataChange = useCallback((field: keyof ContactFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -69,6 +112,54 @@ export const useContactForm = ({ contactType, groupSize }: UseContactFormProps) 
     setPlusOneCount(5);
   }, []);
 
+  // Get complete contact data for submission
+  const getContactData = useCallback(() => {
+    const baseData = {
+      ...formData,
+      contactType: contactType,
+      plus_one_count: plusOneCount,
+      tags,
+      ...(contactType === 'couple' && {
+        tied_contacts: tiedContacts.filter(contact => contact.first_name.trim() || contact.last_name.trim() ||
+          contact.email.trim() || contact.phone.trim()
+        ),
+        couple_greeting: coupleGreeting,
+        group_size: groupSize
+      })
+    };
+
+    if (isEditMode && editingContact) {
+      return { ...baseData, id: editingContact.id };
+    }
+    return baseData;
+  }, [contactType, coupleGreeting, editingContact, formData, groupSize, isEditMode, plusOneCount, tags, tiedContacts])
+
+  // Exit edit mode
+  const exitEditMode = useCallback(() => {
+    setIsEditMode(false);
+    resetForm();
+
+    if (onUpdateComplete) {
+      onUpdateComplete()
+    }
+  }, [onUpdateComplete, resetForm]);
+
+  // Check if form has been modified (useful for showing unsaved changes warning)
+  const isFormModified = useCallback(() => {
+    if (!editingContact) return false;
+
+    const currentData = getContactData();
+    return (
+      currentData.first_name !== editingContact.first_name ||
+      currentData.last_name !== editingContact.last_name ||
+      currentData.email !== editingContact.email ||
+      currentData.phone !== editingContact.phone ||
+      currentData.plus_one_count !== editingContact.plus_one_count ||
+      JSON.stringify(currentData.tags) !== JSON.stringify(editingContact.tags) ||
+      currentData.couple_greeting !== editingContact.couple_greeting
+    );
+  }, [getContactData, editingContact]);
+
   return {
     formData,
     tiedContacts,
@@ -76,6 +167,10 @@ export const useContactForm = ({ contactType, groupSize }: UseContactFormProps) 
     plusOneCount,
     tags,
     newTag,
+
+    isEditMode,
+    editingContact,
+
     handleFormDataChange,
     handleTiedContactChange,
     handleAddTag,
@@ -83,6 +178,10 @@ export const useContactForm = ({ contactType, groupSize }: UseContactFormProps) 
     resetForm,
     setCoupleGreeting,
     setPlusOneCount,
-    setNewTag
+    setNewTag,
+
+    getContactData,
+    exitEditMode,
+    isFormModified
   };
 };

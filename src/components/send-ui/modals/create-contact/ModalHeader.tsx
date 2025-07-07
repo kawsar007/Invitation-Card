@@ -3,12 +3,13 @@ import React from 'react';
 
 interface ModalHeaderProps {
   onClose: () => void;
+  isEditMode?: boolean;
 }
 
-export const ModalHeader: React.FC<ModalHeaderProps> = ({ onClose }) => (
+export const ModalHeader: React.FC<ModalHeaderProps> = ({ onClose, isEditMode }) => (
   <div className="flex items-center justify-between mb-6">
     <div className="flex items-center space-x-4">
-      <h2 className="text-xl font-medium text-gray-900">Add a New Contact</h2>
+      <h2 className="text-xl font-medium text-gray-900">{isEditMode ? "Update Contact" : "Add a New Contact"} </h2>
       <button className="text-blue-600 text-sm hover:underline">Show Advanced</button>
     </div>
     <button

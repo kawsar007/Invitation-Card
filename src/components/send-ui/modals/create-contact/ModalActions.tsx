@@ -4,12 +4,14 @@ interface ModalActionsProps {
   onClose: () => void;
   onSubmit: (saveAndAddAnother: boolean) => void;
   isSubmitting: boolean;
+  isEditMode: boolean;
 }
 
 export const ModalActions: React.FC<ModalActionsProps> = ({
   onClose,
   onSubmit,
-  isSubmitting
+  isSubmitting,
+  isEditMode
 }) => (
   <div className="flex items-center justify-end space-x-3">
     <button
@@ -19,19 +21,27 @@ export const ModalActions: React.FC<ModalActionsProps> = ({
     >
       Cancel
     </button>
-    <button
+    {!isEditMode && <button
       onClick={() => onSubmit(true)}
       disabled={isSubmitting}
       className="px-6 py-2 bg-green-100 text-green-700 rounded hover:bg-green-200 disabled:opacity-50"
     >
       {isSubmitting ? 'SAVING...' : 'SAVE AND ADD ANOTHER'}
-    </button>
+    </button>}
+
     <button
       onClick={() => onSubmit(false)}
       disabled={isSubmitting}
       className="px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
     >
-      {isSubmitting ? 'ADDING...' : 'ADD CONTACT'}
+      {/* {isSubmitting ? 'ADDING...' : 'ADD CONTACT'} */}
+      {isSubmitting
+        ? isEditMode
+          ? 'UPDATING...'
+          : 'ADDING...'
+        : isEditMode
+          ? 'UPDATE CONTACT'
+          : 'ADD CONTACT'}
     </button>
   </div>
 );

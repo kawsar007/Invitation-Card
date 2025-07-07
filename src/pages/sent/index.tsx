@@ -10,7 +10,8 @@ import { useContacts } from '@/hooks/send-contact/useContacts';
 import { useContactSelection } from '@/hooks/send-contact/useContactSelection';
 import { useDropdown } from '@/hooks/send-contact/useDropdown';
 import { useErrorHandler } from '@/hooks/send-contact/useErrorHandler';
-import React, { useEffect, useState } from 'react';
+import { Contact } from '@/types/sendContact';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 const SendContactTable: React.FC = () => {
   // Core contact data and operations
@@ -21,6 +22,7 @@ const SendContactTable: React.FC = () => {
     isSubmitting,
     fetchContacts,
     createContact,
+    updateContact, // Assuming this exists in your useContacts hook
     deleteContact,
     deleteMultipleContacts,
     validateContactData,
@@ -28,11 +30,17 @@ const SendContactTable: React.FC = () => {
     clearError
   } = useContacts();
 
-  // UI state
+  // UI state for create/add modals
   const [showAddContactModal, setShowAddContactModal] = useState(false);
   const [showNewContactModal, setShowNewContactModal] = useState(false);
   const [contactType, setContactType] = useState<'individual' | 'couple'>('individual');
   const [groupSize, setGroupSize] = useState(2);
+
+  // UI state for update modal
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [editingContact, setEditingContact] = useState<Contact | null>(null);
+  const [updateContactType, setUpdateContactType] = useState<'individual' | 'couple'>('individual');
+  const [updateGroupSize, setUpdateGroupSize] = useState(2);
 
   // Delete confirmation modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -48,21 +56,32 @@ const SendContactTable: React.FC = () => {
 
   const { openDropdown, setOpenDropdown, dropdownRef } = useDropdown();
 
-  const {
-    formData,
-    tiedContacts,
-    coupleGreeting,
-    plusOneCount,
-    tags,
-    newTag,
-    handleFormDataChange,
-    handleTiedContactChange,
-    handleAddTag,
-    handleRemoveTag,
-    resetForm,
-    setCoupleGreeting,
-    setPlusOneCount,
-    setNewTag } = useContactForm({ contactType, groupSize });
+  // Memoize the update complete callback to prevent unnecessary re-renders
+  const handleUpdateComplete = useCallback(() => {
+    setShowUpdateModal(false);
+    setEditingContact(null);
+    setUpdateContactType('individual');
+    setUpdateGroupSize(2);
+  }, []);
+
+  // Memoize form hook parameters to prevent unnecessary re-renders
+  const createFormParams = useMemo(() => ({
+    contactType,
+    groupSize
+  }), [contactType, groupSize]);
+
+  const updateFormParams = useMemo(() => ({
+    contactType: updateContactType,
+    groupSize: updateGroupSize,
+    editingContact,
+    onUpdateComplete: handleUpdateComplete
+  }), [updateContactType, updateGroupSize, editingContact, handleUpdateComplete]);
+
+  // Create form hook
+  const createFormHook = useContactForm(createFormParams);
+
+  // Update form hook
+  const updateFormHook = useContactForm(updateFormParams);
 
   // Error handling
   useErrorHandler(error, clearError);
@@ -72,8 +91,16 @@ const SendContactTable: React.FC = () => {
     fetchContacts();
   }, [fetchContacts]);
 
-  // Menu actions handler
-  const handleMenuAction = async (action: string, contactId: number) => {
+  // Initialize update form when editing contact changes
+  useEffect(() => {
+    if (editingContact) {
+      setUpdateContactType(editingContact.contact_type || 'individual');
+      setUpdateGroupSize(editingContact.group_size || 2);
+    }
+  }, [editingContact]);
+
+  // Memoize handlers to prevent unnecessary re-renders
+  const handleMenuAction = useCallback(async (action: string, contactId: number) => {
     setOpenDropdown(null);
 
     if (action === 'delete') {
@@ -82,16 +109,19 @@ const SendContactTable: React.FC = () => {
       setContactToDelete(contact);
       setShowDeleteModal(true);
     } else if (action === 'update') {
+      // Find the contact to update
       const contact = contacts.find(c => c.id === contactId);
-      console.log(`${action} for contact ${contactId}`);
-
+      if (contact) {
+        setEditingContact(contact);
+        setShowUpdateModal(true);
+      }
     } else {
       console.log(`${action} for contact ${contactId}`);
     }
-  };
+  }, [contacts]);
 
   // Handle delete confirmation
-  const handleDeleteConfirm = async () => {
+  const handleDeleteConfirm = useCallback(async () => {
     if (contactToDelete) {
       setIsDeleting(true);
       const success = await deleteContact(contactToDelete.id);
@@ -102,14 +132,24 @@ const SendContactTable: React.FC = () => {
         setContactToDelete(null);
       }
     }
-  };
+  }, [contactToDelete, deleteContact]);
 
   // Handle Bulk Actions
-  const handleBulkAction = (action: string, contactIds: number[]) => {
+  const handleBulkAction = useCallback((action: string, contactIds: number[]) => {
     switch (action) {
       case 'edit':
-        // Handle Bulk Edit
-        console.log('Edit contacts:', contactIds);
+        if (contactIds.length === 1) {
+          // Edit single contact
+          const contact = contacts.find(c => c.id === contactIds[0]);
+          if (contact) {
+            setEditingContact(contact);
+            setShowUpdateModal(true);
+          }
+        } else {
+          // Handle bulk edit (you can implement this later)
+          console.log('Bulk edit not implemented yet');
+          alert('Bulk edit is not implemented yet. Please select only one contact to edit.');
+        }
         break;
       case 'message':
         // Handle bulk message
@@ -117,34 +157,68 @@ const SendContactTable: React.FC = () => {
         break;
       case 'delete':
         // Handle bulk delete
-        console.log('Delete contacts:', contactIds);
+        if (contactIds.length > 0) {
+          const message = contactIds.length === 1
+            ? 'Are you sure you want to delete this contact?'
+            : `Are you sure you want to delete ${contactIds.length} contacts?`;
+
+          if (window.confirm(message)) {
+            handleBulkDelete(contactIds);
+          }
+        }
         break;
     }
-  }
+  }, [contacts]);
 
-  // Submit contact handler
-  const handleSubmitContact = async (saveAndAddAnother: boolean = false) => {
-    const validation = validateContactData(contactType, formData, tiedContacts);
+  // Handle bulk delete
+  const handleBulkDelete = useCallback(async (contactIds: number[]) => {
+    const success = await deleteMultipleContacts(contactIds);
+    if (success) {
+      clearSelection();
+    }
+  }, [deleteMultipleContacts, clearSelection]);
+
+  // Submit contact handler (for creating)
+  const handleSubmitContact = useCallback(async (saveAndAddAnother: boolean = false) => {
+    const validation = validateContactData(contactType, createFormHook.formData, createFormHook.tiedContacts);
     if (!validation.isValid) {
       alert(validation.error);
       return;
     }
 
-    const payload = buildContactPayload(contactType, formData, tiedContacts, tags);
+    const payload = buildContactPayload(contactType, createFormHook.formData, createFormHook.tiedContacts, createFormHook.tags);
     const success = await createContact(payload);
 
     if (success) {
       if (saveAndAddAnother) {
-        resetForm();
+        createFormHook.resetForm();
       } else {
         setShowNewContactModal(false);
-        resetForm();
+        createFormHook.resetForm();
       }
     }
-  };
+  }, [validateContactData, contactType, createFormHook, buildContactPayload, createContact]);
+
+  // Submit contact handler (for updating)
+  const handleUpdateContact = useCallback(async () => {
+    const validation = validateContactData(updateContactType, updateFormHook.formData, updateFormHook.tiedContacts);
+    if (!validation.isValid) {
+      alert(validation.error);
+      return;
+    }
+
+    const contactData = updateFormHook.getContactData();
+
+
+    const success = await updateContact(contactData.id, contactData);
+
+    if (success) {
+      updateFormHook.exitEditMode();
+    }
+  }, [validateContactData, updateContactType, updateFormHook, updateContact]);
 
   // Delete selected contacts
-  const handleDeleteSelected = async () => {
+  const handleDeleteSelected = useCallback(async () => {
     if (selectedContacts.length === 0) return;
 
     const message = selectedContacts.length === 1
@@ -157,7 +231,18 @@ const SendContactTable: React.FC = () => {
         clearSelection();
       }
     }
-  };
+  }, [selectedContacts, deleteMultipleContacts, clearSelection]);
+
+  // Handle unsaved changes warning
+  const handleCloseUpdateModal = useCallback(() => {
+    if (updateFormHook.isFormModified()) {
+      if (window.confirm('You have unsaved changes. Are you sure you want to close?')) {
+        updateFormHook.exitEditMode();
+      }
+    } else {
+      updateFormHook.exitEditMode();
+    }
+  }, [updateFormHook]);
 
   return (
     <div className="bg-white min-h-screen">
@@ -195,6 +280,7 @@ const SendContactTable: React.FC = () => {
         />
       )}
 
+      {/* Add Contact Modal */}
       {showAddContactModal && (
         <SelectContactModal
           setShowAddContactModal={setShowAddContactModal}
@@ -202,6 +288,7 @@ const SendContactTable: React.FC = () => {
         />
       )}
 
+      {/* Create Contact Modal */}
       <ContactFormModal
         isOpen={showNewContactModal}
         onClose={() => setShowNewContactModal(false)}
@@ -209,22 +296,51 @@ const SendContactTable: React.FC = () => {
         setContactType={setContactType}
         groupSize={groupSize}
         setGroupSize={setGroupSize}
-        formData={formData}
-        tiedContacts={tiedContacts}
-        coupleGreeting={coupleGreeting}
-        setCoupleGreeting={setCoupleGreeting}
-        plusOneCount={plusOneCount}
-        setPlusOneCount={setPlusOneCount}
-        tags={tags}
-        newTag={newTag}
-        setNewTag={setNewTag}
-        onFormDataChange={handleFormDataChange}
-        onTiedContactChange={handleTiedContactChange}
-        onAddTag={handleAddTag}
-        onRemoveTag={handleRemoveTag}
+        formData={createFormHook.formData}
+        tiedContacts={createFormHook.tiedContacts}
+        coupleGreeting={createFormHook.coupleGreeting}
+        setCoupleGreeting={createFormHook.setCoupleGreeting}
+        plusOneCount={createFormHook.plusOneCount}
+        setPlusOneCount={createFormHook.setPlusOneCount}
+        tags={createFormHook.tags}
+        newTag={createFormHook.newTag}
+        setNewTag={createFormHook.setNewTag}
+        onFormDataChange={createFormHook.handleFormDataChange}
+        onTiedContactChange={createFormHook.handleTiedContactChange}
+        onAddTag={createFormHook.handleAddTag}
+        onRemoveTag={createFormHook.handleRemoveTag}
         onSubmit={handleSubmitContact}
-        onReset={resetForm}
+        onReset={createFormHook.resetForm}
         isSubmitting={isSubmitting}
+      />
+
+      {/* Update Contact Modal */}
+      <ContactFormModal
+        isOpen={showUpdateModal}
+        onClose={handleCloseUpdateModal}
+        contactType={updateContactType}
+        setContactType={setUpdateContactType}
+        groupSize={updateGroupSize}
+        setGroupSize={setUpdateGroupSize}
+        formData={updateFormHook.formData}
+        tiedContacts={updateFormHook.tiedContacts}
+        coupleGreeting={updateFormHook.coupleGreeting}
+        setCoupleGreeting={updateFormHook.setCoupleGreeting}
+        plusOneCount={updateFormHook.plusOneCount}
+        setPlusOneCount={updateFormHook.setPlusOneCount}
+        tags={updateFormHook.tags}
+        newTag={updateFormHook.newTag}
+        setNewTag={updateFormHook.setNewTag}
+        onFormDataChange={updateFormHook.handleFormDataChange}
+        onTiedContactChange={updateFormHook.handleTiedContactChange}
+        onAddTag={updateFormHook.handleAddTag}
+        onRemoveTag={updateFormHook.handleRemoveTag}
+        onSubmit={handleUpdateContact}
+        onReset={updateFormHook.resetForm}
+        isSubmitting={isSubmitting}
+        // Additional props for update mode
+        isEditMode={true}
+        editingContact={editingContact}
       />
 
       {/* Delete Confirmation Modal */}

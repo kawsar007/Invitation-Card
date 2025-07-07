@@ -1,6 +1,7 @@
 import { Contact, ContactFormData, ContactsResponseObject, TiedContact } from '@/types/sendContact';
 import { getAuthToken } from '@/utils/auth';
 import { useCallback, useState } from 'react';
+import { toast } from 'sonner';
 
 interface ContactPayload {
   first_name: string;
@@ -87,9 +88,11 @@ export const useContacts = (): UseContactsReturn => {
 
       if (!response.ok) {
         const errorData = await response.json();
+        toast.error(errorData.message)
         throw new Error(errorData.message || 'Failed to create contact');
       }
-
+      const result = await response.json();
+      toast.success(result.message)
       // Refresh contacts list after successful creation
       await fetchContacts();
       return true;
@@ -117,8 +120,11 @@ export const useContacts = (): UseContactsReturn => {
 
       if (!response.ok) {
         const errorData = await response.json();
+        toast.error(errorData.message)
         throw new Error(errorData.message || 'Failed to delete contact');
       }
+      const result = await response.json();
+      toast.success(result.message)
 
       // Remove contact from local state
       setContacts(prev => prev.filter(contact => contact.id !== contactId));
@@ -164,7 +170,7 @@ export const useContacts = (): UseContactsReturn => {
     setError(null);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/contacts/${contactId}`, {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/contacts/update/${contactId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -175,8 +181,13 @@ export const useContacts = (): UseContactsReturn => {
 
       if (!response.ok) {
         const errorData = await response.json();
+        toast.error(errorData.message);
         throw new Error(errorData.message || 'Failed to update contact');
+
       }
+
+      const data = await response.json()
+      toast.success(data?.message)
 
       // Refresh contacts list after successful update
       await fetchContacts();
