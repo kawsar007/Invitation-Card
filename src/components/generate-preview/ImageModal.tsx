@@ -1,9 +1,14 @@
 import { ArrowLeft, ArrowRight, X } from 'lucide-react';
 import Envelope from './Envelope';
 
-const ImageModal = ({ isOpen, onClose, imageUrl, versionNo, previewData, fromName }) => {
+const ImageModal = ({ isOpen, onClose, imageUrl, versionNo, previewData, fromName, setActiveTab }) => {
 
   if (!isOpen) return null;
+
+  const handleContinueToAddContacts = () => {
+    setActiveTab('send');
+    onClose(); // Close the modal after navigation
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75">
@@ -34,11 +39,8 @@ const ImageModal = ({ isOpen, onClose, imageUrl, versionNo, previewData, fromNam
             <button className="text-blue-600 hover:text-blue-800 underline">edit your card</button>
             <span className="text-gray-600"> at any time.</span>
           </div>
-          <button className="text-gray-600 hover:text-gray-800 flex items-center text-xs">
+          <button onClick={handleContinueToAddContacts} className="text-gray-600 hover:text-blue-800 hover:underline flex items-center text-xs">
             Continue to Add Contacts
-            {/* <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg> */}
             <ArrowRight size={18} className='ml-1' />
           </button>
         </div>

@@ -301,6 +301,7 @@ const PreviewCard: React.FC<PreviewCardProps> = ({ versionNo, previewData, previ
           versionNo={versionNo}
           previewData={previewData}
           fromName={fromName}
+          setActiveTab={setActiveTab}
         />
 
       </div>

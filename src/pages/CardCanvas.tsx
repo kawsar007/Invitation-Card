@@ -27,7 +27,7 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
   const eventId = searchParams.get('eventId');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState<'editor' | 'details' | 'preview' | 'send' | 'track'>('editor');
-  const editorRef = useRef<any>(null);
+  const editorRef = useRef(null);
   const isMobile = useIsMobile();
 
   // Use the CraftApi context
