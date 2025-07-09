@@ -8,3 +8,18 @@ export const formatDate = (dateString: string | number | Date) => {
     minute: '2-digit'
   });
 };
+
+export const formatToReadableDate = (isoDate: string): string => {
+  if (!isoDate) return '';
+
+  const date = new Date(isoDate);
+  if (isNaN(date.getTime())) return '';
+
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  };
+
+  return date.toLocaleDateString('en-US', options);
+};

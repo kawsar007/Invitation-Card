@@ -1,6 +1,7 @@
+import { EmailService, generateInvitationEmailContent } from '@/services/emailService';
 import { Contact } from '@/types/sendContact';
 import { X } from 'lucide-react';
-import React from 'react';
+import React, { useState } from 'react';
 
 // types/User.ts
 
@@ -26,6 +27,14 @@ interface SendInvitationModalProps {
   invitationPreview?: string;
   sendFromInfo: User;
   sendToInfo: Contact
+  // Add recipients array for email sending
+  recipients?: Contact[];
+  // Optional event details for email content
+  eventDetails?: {
+    eventName?: string;
+    eventDate?: string;
+    eventLocation?: string;
+  };
 }
 
 export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
@@ -36,8 +45,13 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
   sendFromInfo,
   subject,
   invitationPreview,
-  sendToInfo
+  sendToInfo,
+  recipients = [],
+  eventDetails
 }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   if (!isOpen) return null;
   const firstName = sendFromInfo?.first_name;
   const lastName = sendFromInfo?.last_name;
@@ -48,6 +62,58 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
   console.log("invitationPreview", invitationPreview);
   console.log("subject", subject);
   console.log("recipientCount", recipientCount);
+  console.log("recipients", recipients);
+  console.log("eventDetails", eventDetails);
+
+
+
+  const handleSendEmail = async () => {
+    setIsLoading(true)
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const recipientEmails = recipients.length > 0 ? recipients.map(recipient => recipient.email).filter(Boolean)
+        : [sendToInfo.email].filter(Boolean);
+
+      if (recipientEmails.length === 0) {
+        throw new Error('No valid email addresses found');
+      }
+
+      // Generate email content
+      const { text, html } = generateInvitationEmailContent(
+        recipients.length > 0 ? 'there' : (sendToInfo.first_name || 'there'),
+        fullName,
+        eventDetails
+      );
+
+      // Send email
+      const emailData = {
+        from: sendFromInfo.email,
+        to: recipientEmails,
+        subject: subject,
+        text: text,
+        html: html
+      };
+
+      const result = await EmailService.sendEmail(emailData);
+      if (result.statusCode === 200) {
+        setSuccess(`Email sent successfully to ${recipientEmails.length} recipient${recipientEmails.length > 1 ? 's' : ''}!`);
+
+        // Call the original onConfirmSend after successful email send
+        setTimeout(() => {
+          onConfirmSend();
+        }, 1500);
+      }
+
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred while sending the email';
+      setError(errorMessage);
+      console.error('Error sending email:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
 
   return (
@@ -86,6 +152,19 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
             </div>
           </div>
 
+          {/* Status Messages */}
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          )}
+
+          {success && (
+            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
+              <p className="text-sm text-green-600">{success}</p>
+            </div>
+          )}
+
           {/* Invitation Preview */}
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 mb-6 bg-gray-50">
             <div className="text-center">
@@ -115,14 +194,29 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
           <button
             onClick={onClose}
             className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            disabled={isLoading}
           >
             Cancel
           </button>
           <button
-            onClick={onConfirmSend}
-            className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            onClick={handleSendEmail}
+            disabled={isLoading}
+            className={`w-full sm:w-auto px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${isLoading
+              ? 'bg-gray-400 cursor-not-allowed'
+              : 'bg-green-600 hover:bg-green-700'
+              }`}
           >
-            Send to {recipientCount} {recipientCount === 1 ? 'person' : 'people'}
+            {isLoading ? (
+              <div className="flex items-center">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Sending...
+              </div>
+            ) : (
+              `Send to ${recipientCount} ${recipientCount === 1 ? 'person' : 'people'}`
+            )}
           </button>
         </div>
       </div>

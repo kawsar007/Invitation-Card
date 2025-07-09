@@ -1,6 +1,12 @@
+import { useCraftApi } from '@/context/CraftApiContext';
+import { useUser } from '@/context/UserContext';
+import useEventDetails from '@/hooks/events/useEventDetails';
 import { Contact } from '@/types/sendContact';
+import { formatToReadableDate } from '@/utils/date';
 import { ChevronDown, Download, Edit, MessageSquare, Printer, Trash2 } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { SendInvitationModal } from '../modals/SendModal';
 import { ContactTableRow } from './ContactTableRow';
 
 interface ContactTableProps {
@@ -28,8 +34,37 @@ export const ContactTable: React.FC<ContactTableProps> = ({
   isIndeterminate,
   onBulkAction
 }) => {
+  const [searchParams] = useSearchParams();
+  const eventId = searchParams.get('eventId');
+
+  const { event } = useEventDetails(eventId)
+
+  console.log("Event Details:", event);
+
+
   const [openDropdown, setOpenDropdown] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalContactId, setModalContactId] = useState<number | null>(null);
+  const [modalContacts, setModalContacts] = useState<Contact[]>([]);
+
+  // Craft API and User context
+  const {
+    craftInvitation,
+    previewInvitation,
+    loading,
+    previewLoading,
+    error,
+    versionNo,
+    previewData,
+    imageGeneratingWithDelay,
+    generateImage,
+    imageGenerating,
+    craftPreviewAndGenerate
+  } = useCraftApi();
+  const { user } = useUser();
 
   const filteredContacts = contacts.filter(contact => {
     const matchesSearch =
@@ -63,6 +98,66 @@ export const ContactTable: React.FC<ContactTableProps> = ({
     }
   };
 
+  // Handle send action for individual contact
+  const handleSendClick = (contactId: number) => {
+    const contact = contacts.find(c => c.id === contactId);
+    if (contact) {
+      setModalContactId(contactId);
+      setModalContacts([contact]);
+      setIsModalOpen(true);
+    }
+  };
+
+  // Handle bulk send action
+  const handleBulkSend = () => {
+    const selectedContactsData = contacts.filter(c => selectedContacts.includes(c.id));
+    setModalContactId(null);
+    setModalContacts(selectedContactsData);
+    setIsModalOpen(true);
+  };
+
+  const handleConfirmSend = () => {
+    // Close modal first
+    setIsModalOpen(false);
+
+    // Execute the appropriate send action
+    if (modalContactId) {
+      // Single contact send
+      onMenuAction('send', modalContactId);
+    } else {
+      // Bulk send
+      if (onBulkAction) {
+        onBulkAction('send', selectedContacts);
+      }
+    }
+
+    // Reset modal state
+    setModalContactId(null);
+    setModalContacts([]);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setModalContactId(null);
+    setModalContacts([]);
+  };
+
+  // Enhanced menu action handler to intercept send actions
+  const handleMenuAction = (action: string, contactId: number) => {
+    if (action === 'send') {
+      handleSendClick(contactId);
+    } else {
+      onMenuAction(action, contactId);
+    }
+  };
+
+  // Event details (you can make this dynamic or pass as props)
+  const eventDetails = {
+    eventName: event?.name,
+    eventDate: formatToReadableDate(event?.date),
+    eventLocation: event?.location_type === "virtual" ? event?.virtual_link : event?.venue_address
+  };
+
   return (
     <>
       {/* Bulk Actions Bar - Shows when contacts are selected */}
@@ -87,6 +182,12 @@ export const ContactTable: React.FC<ContactTableProps> = ({
                 >
                   <MessageSquare size={14} />
                   <span>Message</span>
+                </button>
+                <button
+                  onClick={handleBulkSend}
+                  className="flex items-center space-x-1 px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                >
+                  <span>Send</span>
                 </button>
                 <button
                   onClick={() => handleBulkAction('delete')}
@@ -157,7 +258,7 @@ export const ContactTable: React.FC<ContactTableProps> = ({
                 contact={contact}
                 isSelected={selectedContacts.includes(contact.id)}
                 onSelect={onSelectContact}
-                onMenuAction={onMenuAction}
+                onMenuAction={handleMenuAction}
                 openDropdown={openDropdown}
                 onDropdownToggle={handleDropdownToggle}
                 dropdownRef={dropdownRef}
@@ -184,6 +285,20 @@ export const ContactTable: React.FC<ContactTableProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Send Invitation Modal */}
+      <SendInvitationModal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        onConfirmSend={handleConfirmSend}
+        recipientCount={modalContacts.length}
+        subject="Birthday Party" // You can make this dynamic
+        invitationPreview={previewData?.data?.imageUrl}
+        sendFromInfo={user}
+        sendToInfo={modalContacts.length === 1 ? modalContacts[0] : null}
+        recipients={modalContacts}
+        eventDetails={eventDetails}
+      />
     </>
   );
 };
