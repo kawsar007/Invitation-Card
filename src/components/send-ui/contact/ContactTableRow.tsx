@@ -1,3 +1,5 @@
+import { useCraftApi } from '@/context/CraftApiContext';
+import { useUser } from '@/context/UserContext';
 import { Contact } from '@/types/sendContact';
 import { ChevronDown } from 'lucide-react';
 import React, { useState } from 'react';
@@ -23,6 +25,20 @@ export const ContactTableRow: React.FC<ContactTableRowProps> = ({
   onDropdownToggle,
   dropdownRef
 }) => {
+  const {
+    craftInvitation,
+    previewInvitation,
+    loading,
+    previewLoading,
+    error,
+    versionNo,
+    previewData,
+    imageGeneratingWithDelay,
+    generateImage,
+    imageGenerating,
+    craftPreviewAndGenerate
+  } = useCraftApi();
+  const { user } = useUser();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -125,9 +141,11 @@ export const ContactTableRow: React.FC<ContactTableRowProps> = ({
         onClose={handleModalClose}
         onConfirmSend={handleConfirmSend}
         recipientCount={1} // Since this is for a single contact
-        senderName="Kawsar Mia" // You can make this dynamic
+        // senderName={fullName} // You can make this dynamic
         subject="Birthday Party" // You can make this dynamic
-        invitationPreview="https://inviteloop.s3.amazonaws.com/cards/212/v4.png" // Optional
+        invitationPreview={previewData?.data?.imageUrl} // Optional
+        sendFromInfo={user}
+        sendToInfo={contact}
       />
 
     </>

@@ -1,14 +1,31 @@
+import { Contact } from '@/types/sendContact';
 import { X } from 'lucide-react';
 import React from 'react';
+
+// types/User.ts
+
+export interface User {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  role: 'host' | 'guest' | string; // adjust based on your system roles
+  profile_photo: string | null;
+  created_at: string; // ISO date string
+  updated_at: string; // ISO date string
+}
+
 
 interface SendInvitationModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirmSend: () => void;
   recipientCount: number;
-  senderName: string;
+  // senderName: string;
   subject: string;
   invitationPreview?: string;
+  sendFromInfo: User;
+  sendToInfo: Contact
 }
 
 export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
@@ -16,11 +33,22 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
   onClose,
   onConfirmSend,
   recipientCount,
-  senderName,
+  sendFromInfo,
   subject,
-  invitationPreview
+  invitationPreview,
+  sendToInfo
 }) => {
   if (!isOpen) return null;
+  const firstName = sendFromInfo?.first_name;
+  const lastName = sendFromInfo?.last_name;
+  const fullName = firstName + lastName;
+
+  console.log("sendFromInfo", sendFromInfo);
+  console.log("sendToInfo", sendToInfo);
+  console.log("invitationPreview", invitationPreview);
+  console.log("subject", subject);
+  console.log("recipientCount", recipientCount);
+
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
@@ -51,7 +79,7 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
 
           <div className="mb-4">
             <div className="text-sm text-gray-700 mb-1">
-              <span className="font-medium text-gray-800">From:</span> {senderName}
+              <span className="font-medium text-gray-800">From:</span> {fullName}
             </div>
             <div className="text-sm text-gray-700 mb-3">
               <span className="font-medium text-gray-800">Subject:</span> {subject}

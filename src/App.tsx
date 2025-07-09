@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import FinalEnvelope from "./components/final-envelope";
+import EmailTemplateGenerator from "./components/send-ui/contact/EmailTemplate";
 import { CraftApiProvider } from "./context/CraftApiContext";
 import { UserProvider } from "./context/UserContext";
 import LandingPage from "./landing-page";
@@ -57,6 +58,7 @@ const AppContent = () => {
             </ProtectedRoute>
           }
         />
+        <Route path="/email-template" element={<EmailTemplateGenerator />} />
         {/* <Route path="/editor" element={<Index />} /> */}
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
