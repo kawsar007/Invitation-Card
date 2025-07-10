@@ -1,9 +1,9 @@
 // Type definitions
 export interface Event {
-  id: number;
+  id?: number;
   name: string;
   sender_name: string;
-  location_type: 'virtual' | 'physical';
+  location_type: 'virtual' | 'physical' | 'inPerson';
   venue_name: string | null;
   venue_address: string | null;
   virtual_description: string | null;

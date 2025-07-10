@@ -39,8 +39,6 @@ export const ContactTable: React.FC<ContactTableProps> = ({
 
   const { event } = useEventDetails(eventId)
 
-  console.log("Event Details:", event);
-
 
   const [openDropdown, setOpenDropdown] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -292,7 +290,7 @@ export const ContactTable: React.FC<ContactTableProps> = ({
         onClose={handleModalClose}
         onConfirmSend={handleConfirmSend}
         recipientCount={modalContacts.length}
-        subject="Birthday Party" // You can make this dynamic
+        subject={eventDetails?.eventName} // You can make this dynamic
         invitationPreview={previewData?.data?.imageUrl}
         sendFromInfo={user}
         sendToInfo={modalContacts.length === 1 ? modalContacts[0] : null}

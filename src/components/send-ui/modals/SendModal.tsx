@@ -4,6 +4,11 @@ import { X } from 'lucide-react';
 import React, { useState } from 'react';
 
 // types/User.ts
+export interface EventDetails {
+  eventName?: string;
+  eventDate?: string;
+  eventLocation?: string;
+}
 
 export interface User {
   id: number;
@@ -30,11 +35,7 @@ interface SendInvitationModalProps {
   // Add recipients array for email sending
   recipients?: Contact[];
   // Optional event details for email content
-  eventDetails?: {
-    eventName?: string;
-    eventDate?: string;
-    eventLocation?: string;
-  };
+  eventDetails?: EventDetails;
 }
 
 export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
@@ -55,17 +56,7 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
   if (!isOpen) return null;
   const firstName = sendFromInfo?.first_name;
   const lastName = sendFromInfo?.last_name;
-  const fullName = firstName + lastName;
-
-  console.log("sendFromInfo", sendFromInfo);
-  console.log("sendToInfo", sendToInfo);
-  console.log("invitationPreview", invitationPreview);
-  console.log("subject", subject);
-  console.log("recipientCount", recipientCount);
-  console.log("recipients", recipients);
-  console.log("eventDetails", eventDetails);
-
-
+  const senderName = firstName + lastName;
 
   const handleSendEmail = async () => {
     setIsLoading(true)
@@ -83,7 +74,8 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
       // Generate email content
       const { text, html } = generateInvitationEmailContent(
         recipients.length > 0 ? 'there' : (sendToInfo.first_name || 'there'),
-        fullName,
+        senderName,
+        "PassInviteID",
         eventDetails
       );
 
@@ -145,10 +137,10 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
 
           <div className="mb-4">
             <div className="text-sm text-gray-700 mb-1">
-              <span className="font-medium text-gray-800">From:</span> {fullName}
+              <span className="font-medium text-gray-800">From:</span> {senderName}
             </div>
             <div className="text-sm text-gray-700 mb-3">
-              <span className="font-medium text-gray-800">Subject:</span> {subject}
+              <span className="font-medium text-gray-800">Subject:</span> {eventDetails?.eventName}
             </div>
           </div>
 

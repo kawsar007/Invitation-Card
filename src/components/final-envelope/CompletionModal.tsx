@@ -15,7 +15,6 @@ export const CompletionModal: React.FC<CompletionModalProps> = ({
   submittedData,
   onClose
 }) => {
-  console.log(submittedData);
 
   const { user } = useUser();
   if (!isOpen || !submittedData) return null;

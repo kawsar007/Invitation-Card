@@ -22,9 +22,6 @@ const EventsPage: React.FC<EventsPageProps> = ({ theme }) => {
     clearError } = useEvents();
   const { filters, updateFilters, resetFilters } = useUrlState();
 
-  console.log("Events:", events);
-
-
   // Fetch events when filters change
   useEffect(() => {
     fetchEvents(filters);

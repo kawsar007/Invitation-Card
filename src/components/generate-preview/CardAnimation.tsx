@@ -13,7 +13,6 @@ const InvitationCardAnimation: React.FC<InvitationCardAnimationProps> = ({
   fromName,
   autoPlay = true
 }) => {
-  console.log(cardImage);
 
   const [animationPhase, setAnimationPhase] = useState<'idle' | 'envelope-shake' | 'flap-open' | 'card-peek' | 'card-emerge' | 'card-slide' | 'complete'>('idle');
   const [showCard, setShowCard] = useState(false);

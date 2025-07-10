@@ -123,7 +123,6 @@ export const useRSVPForm = () => {
       guestInfo: guests.length > 0 ? guests : null,
       submittedAt: new Date().toISOString()
     };
-    console.log("Submission Data: ", submissionData);
     setSubmittedData(submissionData);
     setIsSubmitted(true);
     closeModal();

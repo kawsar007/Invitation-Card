@@ -62,9 +62,6 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
   isEditMode,
   editingContact
 }) => {
-  console.log("Is Edit Mode", isEditMode);
-
-  console.log("Is Editing Content:", editingContact);
 
   if (!isOpen) return null;
 

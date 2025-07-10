@@ -1,5 +1,7 @@
 import { useUser } from '@/context/UserContext';
 import { PreviewData } from '@/types/craftApi';
+import { Event } from '@/types/event';
+import { formatToReadableDate } from '@/utils/date';
 import { Eye, SquarePen, Users, X } from 'lucide-react';
 import React, { useState } from 'react';
 import ImageModal from './ImageModal';
@@ -9,16 +11,17 @@ interface PreviewCardProps {
   previewData: PreviewData;
   previewLoading: boolean;
   setActiveTab: (string) => void;
+  event: Event,
 }
 
-const PreviewCard: React.FC<PreviewCardProps> = ({ versionNo, previewData, previewLoading, setActiveTab }) => {
+const PreviewCard: React.FC<PreviewCardProps> = ({ versionNo, previewData, previewLoading, setActiveTab, event }) => {
 
   const { user, isAuthenticated } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editType, setEditType] = useState<'from' | 'subject'>('from');
   const [fromName, setFromName] = useState(`${user?.first_name || ''} ${user?.last_name || ''}`);
-  const [subject, setSubject] = useState('Birthday Party');
+  const [subject, setSubject] = useState(event.name);
   const [tempValue, setTempValue] = useState('');
 
   const handleEditClick = (type: 'from' | 'subject') => {
@@ -110,7 +113,7 @@ const PreviewCard: React.FC<PreviewCardProps> = ({ versionNo, previewData, previ
                   </div>
 
                   <div className="mb-6">
-                    <p className="text-gray-600 text-sm mb-4">Wednesday, June 25, 2025</p>
+                    <p className="text-gray-600 text-sm mb-4">{formatToReadableDate(event.date)}</p>
                     <div className="flex justify-center space-x-4">
                       <button className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded text-sm font-medium">
                         OPEN INVITATION
@@ -203,16 +206,17 @@ const PreviewCard: React.FC<PreviewCardProps> = ({ versionNo, previewData, previ
               )}
 
               {/* Location Info */}
-              <div className="bg-white border-t border-gray-200 p-6 text-center">
+              {event?.location_type === "inPerson" && <div className="bg-white border-t border-gray-200 p-6 text-center">
                 <div className="text-sm text-gray-600 space-y-2">
-                  <div className="font-medium">Sena Kunjo</div>
+                  <div className="font-medium">{event?.venue_name}</div>
                   <div>
-                    Dhaka (<span className="text-blue-600 hover:text-blue-700 cursor-pointer">View Map</span>)
+                    {event?.venue_address} (<span className="text-blue-600 hover:text-blue-700 cursor-pointer">View Map</span>)
                   </div>
-                  <div>Wednesday, June 25, 2025</div>
-                  <div className="text-xs text-gray-500">Additional Information for Location</div>
+                  <div>{formatToReadableDate(event?.date)}</div>
+                  <div className="text-xs text-gray-500">{event?.location_additional_information}</div>
                 </div>
-              </div>
+              </div>}
+
             </div>
 
             {/* Powered by footer */}

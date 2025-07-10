@@ -1,32 +1,33 @@
+import { Event } from '@/types/event';
 import { getAuthToken } from '@/utils/auth';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 // Define TypeScript interfaces for type safety
-interface EventData {
-  name: string;
-  date: string;
-  eventLocation: string;
-  location_type: string;
-  virtual_link?: string;
-  venue_address?: string;
-  // Add other event properties as needed
-}
+// interface EventData {
+//   name: string;
+//   date: string;
+//   eventLocation: string;
+//   location_type: string;
+//   virtual_link?: string;
+//   venue_address?: string;
+//   // Add other event properties as needed
+// }
 
 interface EventResponseObject {
   success: boolean;
-  data?: EventData;
+  data?: Event;
   message?: string;
 }
 
 interface EventDetailsHook {
-  event: EventData | null;
+  event: Event | null;
   loading: boolean;
   error: string | null;
 }
 
 const useEventDetails = (eventId: string | undefined): EventDetailsHook => {
-  const [event, setEvent] = useState<EventData | null>(null);
+  const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 

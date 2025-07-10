@@ -147,7 +147,6 @@ const SendContactTable: React.FC = () => {
           }
         } else {
           // Handle bulk edit (you can implement this later)
-          console.log('Bulk edit not implemented yet');
           alert('Bulk edit is not implemented yet. Please select only one contact to edit.');
         }
         break;

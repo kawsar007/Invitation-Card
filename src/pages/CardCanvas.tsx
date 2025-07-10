@@ -1,5 +1,6 @@
 import PreviewCard from '@/components/generate-preview/PreviewCard';
 import { useCraftApi } from '@/context/CraftApiContext';
+import useEventDetails from '@/hooks/events/useEventDetails';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { BarChart3, Component, SaveIcon, Scan, Send } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
@@ -29,6 +30,8 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
   const [activeTab, setActiveTab] = useState<'editor' | 'details' | 'preview' | 'send' | 'track'>('editor');
   const editorRef = useRef(null);
   const isMobile = useIsMobile();
+
+  const { event } = useEventDetails(eventId)
 
   // Use the CraftApi context
   const {
@@ -135,7 +138,7 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
       case 'preview':
         return (
           <div className="p-6 w-full max-w-4xl mx-auto">
-            <PreviewCard versionNo={versionNo} setActiveTab={setActiveTab} previewLoading={previewLoading} previewData={previewData} />
+            <PreviewCard versionNo={versionNo} setActiveTab={setActiveTab} previewLoading={previewLoading} previewData={previewData} event={event} />
           </div>
         );
       case 'send':

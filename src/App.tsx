@@ -31,7 +31,9 @@ const AppContent = () => {
   // Define routes where navbar should be hidden
   const hideNavbarRoutes = ['/editor', '/sign-in', '/sign-up', '/trouble-signing-in', '/envelope'];
   // const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname);
-  const shouldShowNavbar = !location.pathname.startsWith('/editor') && !hideNavbarRoutes.includes(location.pathname);
+  const shouldShowNavbar = !location.pathname.startsWith('/editor') &&
+    !location.pathname.startsWith('/envelope') &&
+    !hideNavbarRoutes.includes(location.pathname);
 
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
@@ -64,7 +66,7 @@ const AppContent = () => {
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/trouble-signing-in" element={<ForgotPassword />} />
         <Route path="/templates" element={<TemplatesPage theme={theme} />} />
-        <Route path="/envelope" element={<FinalEnvelope />} />
+        <Route path="/envelope/:invitationId" element={<FinalEnvelope />} />
         <Route
           path="/events"
           element={
