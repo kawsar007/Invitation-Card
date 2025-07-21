@@ -50,5 +50,30 @@ export interface ContactsResponseObject {
   contacts: Contact[];
 }
 
+export interface CreateContactResponse {
+  success: boolean;
+  message: string;
+  contact: Contact;
+}
+
+
+// RSVP types
+export interface RSVPPayload {
+  contact_id: number;
+  event_id: number;
+  invitation_card_id: number;
+  version: number;
+  user_id: number;
+  allow_count: number;
+  allow: string[];
+  tags: string[];
+}
+
+export interface RSVPResponse {
+  unique_id: string;
+  id: number;
+  message: string;
+}
+
 export type ContactType = 'individual' | 'couple';
 export type TabType = 'All' | 'Unsent' | 'Unopened' | 'Opened';

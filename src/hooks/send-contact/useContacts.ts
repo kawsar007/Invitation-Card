@@ -1,4 +1,4 @@
-import { Contact, ContactFormData, ContactsResponseObject, TiedContact } from '@/types/sendContact';
+import { Contact, ContactFormData, ContactsResponseObject, CreateContactResponse, TiedContact } from '@/types/sendContact';
 import { getAuthToken } from '@/utils/auth';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
@@ -22,7 +22,7 @@ interface UseContactsReturn {
 
   // Actions
   fetchContacts: () => Promise<void>;
-  createContact: (payload: ContactPayload) => Promise<boolean>;
+  createContact: (payload: ContactPayload) => Promise<CreateContactResponse | null>;
   deleteContact: (contactId: number) => Promise<boolean>;
   deleteMultipleContacts: (contactIds: number[]) => Promise<boolean>;
   updateContact: (contactId: number, payload: Partial<ContactPayload>) => Promise<boolean>;
@@ -72,7 +72,7 @@ export const useContacts = (): UseContactsReturn => {
     }
   }, [token]);
 
-  const createContact = useCallback(async (payload: ContactPayload): Promise<boolean> => {
+  const createContact = useCallback(async (payload: ContactPayload): Promise<CreateContactResponse | null> => {
     setIsSubmitting(true);
     setError(null);
 
@@ -91,16 +91,16 @@ export const useContacts = (): UseContactsReturn => {
         toast.error(errorData.message)
         throw new Error(errorData.message || 'Failed to create contact');
       }
-      const result = await response.json();
+      const result = await response.json() as CreateContactResponse;
       toast.success(result.message)
       // Refresh contacts list after successful creation
       await fetchContacts();
-      return true;
+      return result;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to create contact';
       setError(errorMessage);
       console.error('Error creating contact:', err);
-      return false;
+      return null;
     } finally {
       setIsSubmitting(false);
     }

@@ -4,16 +4,30 @@ import { ContactTabs } from '@/components/send-ui/contact/ContactTabs';
 import { ContactFormModal } from '@/components/send-ui/modals/create-contact';
 import DeleteContactModal from '@/components/send-ui/modals/DeleteContactModal';
 import SelectContactModal from '@/components/send-ui/modals/SelectContactModal';
+import { useCraftApi } from '@/context/CraftApiContext';
+import { useUser } from '@/context/UserContext';
 import { useContactFilters } from '@/hooks/send-contact/useContactFilters';
 import { useContactForm } from '@/hooks/send-contact/useContactForm';
 import { useContacts } from '@/hooks/send-contact/useContacts';
 import { useContactSelection } from '@/hooks/send-contact/useContactSelection';
 import { useDropdown } from '@/hooks/send-contact/useDropdown';
 import { useErrorHandler } from '@/hooks/send-contact/useErrorHandler';
-import { Contact } from '@/types/sendContact';
+import { Contact, RSVPPayload, RSVPResponse } from '@/types/sendContact';
+import { getAuthToken } from '@/utils/auth';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
 const SendContactTable: React.FC = () => {
+  const { user } = useUser();
+  const token = getAuthToken();
+  // Craft API and User context
+  const {
+    invitations
+  } = useCraftApi();
+  const latest = invitations.reduce((max, item) =>
+    new Date(item.created_at) > new Date(max.created_at) ? item : max
+    , invitations[0]);
+
   // Core contact data and operations
   const {
     contacts,
@@ -47,6 +61,11 @@ const SendContactTable: React.FC = () => {
   const [contactToDelete, setContactToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // RSVP state
+  const [isCreatingRSVP, setIsCreatingRSVP] = useState(false);
+  const [rsvpUniqueIds, setRSVPUniqueIds] = useState<string>();
+
+
   // Custom hooks for specific functionality
   const { activeTab, setActiveTab, searchTerm, setSearchTerm, filteredContacts, tabs } =
     useContactFilters(contacts);
@@ -55,6 +74,50 @@ const SendContactTable: React.FC = () => {
     useContactSelection(contacts);
 
   const { openDropdown, setOpenDropdown, dropdownRef } = useDropdown();
+
+  // Rsvp creation function
+  const createRSVP = useCallback(async (contactId: number, allowCount: number, tags: string[]): Promise<string | null> => {
+    try {
+      setIsCreatingRSVP(true);
+
+      //  Using dynamic values from the form
+      const rsvpPayload: RSVPPayload = {
+        contact_id: contactId,
+        event_id: latest?.event_id,
+        invitation_card_id: latest?.id,
+        version: latest?.version,
+        user_id: user?.id,
+        allow_count: allowCount,
+        allow: [],
+        tags: tags
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/rsvp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(rsvpPayload)
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      };
+
+      const data: RSVPResponse = await response.json();
+      setRSVPUniqueIds(data.unique_id);
+      toast.success(data?.message || 'RSVP created successfully');
+      return data.unique_id;
+
+    } catch (error) {
+      console.error('Failed to create RSVP:', error);
+      // You might want to show a toast notification or handle this error differently
+      return null;
+    } finally {
+      setIsCreatingRSVP(false);
+    }
+  }, [latest?.event_id, latest?.id, latest?.version, token, user?.id]);
 
   // Memoize the update complete callback to prevent unnecessary re-renders
   const handleUpdateComplete = useCallback(() => {
@@ -186,9 +249,26 @@ const SendContactTable: React.FC = () => {
     }
 
     const payload = buildContactPayload(contactType, createFormHook.formData, createFormHook.tiedContacts, createFormHook.tags);
-    const success = await createContact(payload);
+    const contactResult = await createContact(payload);
 
-    if (success) {
+    if (contactResult && contactResult.success) {
+      const newContactId = contactResult.contact?.id;
+
+      if (newContactId) {
+        const allowCount = createFormHook?.plusOneCount;
+        const tags = createFormHook?.tags || [];
+
+        const rsvpUniqueId = await createRSVP(newContactId, allowCount, tags)
+        if (rsvpUniqueId) {
+          toast.success("RSVP created successfully")
+          console.log('RSVP created with unique ID:', rsvpUniqueId);
+          // You can show a success notification here if needed
+        } else {
+          console.warn('Contact created but RSVP creation failed');
+          toast.warning("Contact created but RSVP creation failed");
+          // You might want to show a warning notification
+        }
+      }
       if (saveAndAddAnother) {
         createFormHook.resetForm();
       } else {
@@ -196,7 +276,7 @@ const SendContactTable: React.FC = () => {
         createFormHook.resetForm();
       }
     }
-  }, [validateContactData, contactType, createFormHook, buildContactPayload, createContact]);
+  }, [validateContactData, contactType, createFormHook, buildContactPayload, createContact, createRSVP]);
 
   // Submit contact handler (for updating)
   const handleUpdateContact = useCallback(async () => {
@@ -276,6 +356,7 @@ const SendContactTable: React.FC = () => {
           isAllSelected={isAllSelected}
           isIndeterminate={isIndeterminate}
           onBulkAction={handleBulkAction}
+          rsvpUniqueIds={rsvpUniqueIds}
         />
       )}
 

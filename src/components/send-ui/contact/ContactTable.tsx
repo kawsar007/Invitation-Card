@@ -20,6 +20,7 @@ interface ContactTableProps {
   isAllSelected: boolean;
   isIndeterminate: boolean;
   onBulkAction?: (action: string, contactIds: number[]) => void;
+  rsvpUniqueIds: string;
 }
 
 export const ContactTable: React.FC<ContactTableProps> = ({
@@ -32,13 +33,13 @@ export const ContactTable: React.FC<ContactTableProps> = ({
   selectedCount,
   isAllSelected,
   isIndeterminate,
-  onBulkAction
+  onBulkAction,
+  rsvpUniqueIds
 }) => {
   const [searchParams] = useSearchParams();
   const eventId = searchParams.get('eventId');
 
   const { event } = useEventDetails(eventId)
-
 
   const [openDropdown, setOpenDropdown] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -53,6 +54,7 @@ export const ContactTable: React.FC<ContactTableProps> = ({
     craftInvitation,
     previewInvitation,
     loading,
+    invitations,
     previewLoading,
     error,
     versionNo,
@@ -62,8 +64,9 @@ export const ContactTable: React.FC<ContactTableProps> = ({
     imageGenerating,
     craftPreviewAndGenerate
   } = useCraftApi();
-  const { user } = useUser();
 
+
+  const { user } = useUser();
   const filteredContacts = contacts.filter(contact => {
     const matchesSearch =
       contact.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -155,6 +158,9 @@ export const ContactTable: React.FC<ContactTableProps> = ({
     eventDate: formatToReadableDate(event?.date),
     eventLocation: event?.location_type === "virtual" ? event?.virtual_link : event?.venue_address
   };
+
+  console.log('Event:', event);
+
 
   return (
     <>
@@ -296,6 +302,7 @@ export const ContactTable: React.FC<ContactTableProps> = ({
         sendToInfo={modalContacts.length === 1 ? modalContacts[0] : null}
         recipients={modalContacts}
         eventDetails={eventDetails}
+        rsvpUniqueIds={rsvpUniqueIds}
       />
     </>
   );

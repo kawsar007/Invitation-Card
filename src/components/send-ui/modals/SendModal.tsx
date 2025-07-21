@@ -36,6 +36,7 @@ interface SendInvitationModalProps {
   recipients?: Contact[];
   // Optional event details for email content
   eventDetails?: EventDetails;
+  rsvpUniqueIds: string;
 }
 
 export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
@@ -48,8 +49,11 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
   invitationPreview,
   sendToInfo,
   recipients = [],
-  eventDetails
+  eventDetails,
+  rsvpUniqueIds
 }) => {
+  console.log("Event Details", eventDetails);
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -76,7 +80,8 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
         recipients.length > 0 ? 'there' : (sendToInfo.first_name || 'there'),
         senderName,
         "PassInviteID",
-        eventDetails
+        eventDetails,
+        rsvpUniqueIds
       );
 
       // Send email
