@@ -1,10 +1,59 @@
+import { getAuthToken } from '@/utils/auth';
 import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import EnvelopeSidebar from './EnvelopeSidebar';
 
+interface RSVPData {
+  // Define the shape of your API response
+  imageUrl?: string;
+  eventDetails?: {
+    title?: string;
+    date?: string;
+    location?: string;
+    // Add other fields as per your API response
+  };
+  // Add other fields as needed
+}
+
 const FinalEnvelope: React.FC = () => {
+  const token = getAuthToken();
+  const { rsvpId } = useParams();
   const [isEnvelopeOpen, setIsEnvelopeOpen] = useState<boolean>(false);
   const [imageUrl] = useState<string>("https://i.pinimg.com/originals/e0/ee/3c/e0ee3c89be2d8a9854eeb476ec423920.jpg");
   const [isImageVisible, setIsImageVisible] = useState<boolean>(false);
+
+  const [rsvpData, setRsvpData] = useState<RSVPData | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  // const [imageUrl] = useState<string>(rsvpData?.invitation_card?.image_url)
+
+  console.log("RSVP Data:-", rsvpData);
+
+
+  const apiUrl = `${import.meta.env.VITE_BASE_URL}/api/rsvp/${rsvpId}`;
+
+  useEffect(() => {
+    const fetchRsvpData = async () => {
+      try {
+        const response = await fetch(apiUrl, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        const data: RSVPData = await response.json();
+        setRsvpData(data);
+      } catch (error) {
+        setError('Failed to fetch RSVP data');
+        console.error(error);
+      }
+    }
+
+    fetchRsvpData();
+  }, [apiUrl, token]);
+
 
   // Auto-open envelope with delay
   useEffect(() => {

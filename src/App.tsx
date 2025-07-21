@@ -66,7 +66,7 @@ const AppContent = () => {
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/trouble-signing-in" element={<ForgotPassword />} />
         <Route path="/templates" element={<TemplatesPage theme={theme} />} />
-        <Route path="/envelope/:invitationId" element={<FinalEnvelope />} />
+        <Route path="/envelope/:rsvpId" element={<FinalEnvelope />} />
         <Route
           path="/events"
           element={
