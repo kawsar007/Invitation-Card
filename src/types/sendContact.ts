@@ -1,3 +1,5 @@
+import { InvitationCard } from "./craftApi";
+import { Event } from "./event";
 
 export interface TiedContact {
   first_name: string;
@@ -73,6 +75,20 @@ export interface RSVPResponse {
   unique_id: string;
   id: number;
   message: string;
+}
+
+export interface FinalRSVPResponse {
+  id: number;
+  unique_id: string;
+  allow_count: number;
+  allow: []; // adjust if `allow` has specific type
+  version: number;
+  tags: string[];
+  created_at: string;
+  updated_at: string;
+  contact: Contact;
+  event: Event;
+  invitation_card: InvitationCard;
 }
 
 export type ContactType = 'individual' | 'couple';

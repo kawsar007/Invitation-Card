@@ -1,11 +1,20 @@
 import { useRSVPForm } from '@/hooks/useRSVPForm';
+import { FinalRSVPResponse } from '@/types/sendContact';
 import { OctagonMinus } from 'lucide-react';
 import React from 'react';
 import { CompletionModal } from './CompletionModal';
 import { EventDetails } from './EventDetails';
 import { RSVPModal } from './RSVPModal';
 
-const EnvelopeSidebar: React.FC = () => {
+interface EnvelopeSidebarPropsType {
+  rsvpData: FinalRSVPResponse
+}
+
+const EnvelopeSidebar: React.FC<EnvelopeSidebarPropsType> = ({ rsvpData }) => {
+
+  // const { allow, allow_count, contact, event, invitation_card, tags, version } = rsvpData;
+  console.log("EnvelopeSidebarPropsType:->", rsvpData);
+
   const {
     // State
     isModalOpen,
@@ -49,7 +58,7 @@ const EnvelopeSidebar: React.FC = () => {
 
   return (
     <div>
-      <EventDetails />
+      <EventDetails rsvpData={rsvpData} />
 
       <div className="sticky bottom-0 left-0 right-0 bg-white pb-4 border-gray-200">
         {submittedData?.attendance === 'not-attend' &&
