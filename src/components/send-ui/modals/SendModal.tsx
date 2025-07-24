@@ -1,7 +1,8 @@
+import { EmailHistoryService } from '@/services/emailHistoryService';
 import { EmailService, generateInvitationEmailContent } from '@/services/emailService';
 import { Contact } from '@/types/sendContact';
 import { X } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 // types/User.ts
 export interface EventDetails {
@@ -37,6 +38,7 @@ interface SendInvitationModalProps {
   // Optional event details for email content
   eventDetails?: EventDetails;
   rsvpUniqueIds: string;
+  eventId?: number;
 }
 
 export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
@@ -50,22 +52,46 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
   sendToInfo,
   recipients = [],
   eventDetails,
-  rsvpUniqueIds
+  rsvpUniqueIds,
+  eventId
 }) => {
-  console.log("Event Details", eventDetails);
+  console.log("rsvpUniqueIds--->", rsvpUniqueIds);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  if (!isOpen) return null;
+  const [openedCount, setOpenedCount] = useState<number | null>(null);
+
+
   const firstName = sendFromInfo?.first_name;
   const lastName = sendFromInfo?.last_name;
   const senderName = firstName + lastName;
+
+  // Fetch opened email count after successful send
+  useEffect(() => {
+    if (success && eventId && sendFromInfo.id) {
+      const fetchOpenedCount = async () => {
+        try {
+          const count = await EmailHistoryService.getOpenedEmailCount(sendFromInfo.id, eventId);
+          setOpenedCount(count);
+        } catch (err) {
+          console.error('Error fetching opened email count:', err);
+        }
+      };
+      // Fetch immediately and then every 30 seconds
+      fetchOpenedCount();
+      const interval = setInterval(fetchOpenedCount, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [success, eventId, sendFromInfo.id]);
+
+  if (!isOpen) return null;
 
   const handleSendEmail = async () => {
     setIsLoading(true)
     setError(null);
     setSuccess(null);
+    setOpenedCount(null);
 
     try {
       const recipientEmails = recipients.length > 0 ? recipients.map(recipient => recipient.email).filter(Boolean)
@@ -75,33 +101,48 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
         throw new Error('No valid email addresses found');
       }
 
+      // Send emails one by one to capture individual emailHistoryId
+      const emailHistoryIds: number[] = [];
+      console.log("emailHistoryIds", emailHistoryIds);
+
       // Generate email content
-      const { text, html } = generateInvitationEmailContent(
-        recipients.length > 0 ? 'there' : (sendToInfo.first_name || 'there'),
-        senderName,
-        "PassInviteID",
-        eventDetails,
-        rsvpUniqueIds
-      );
+      for (const email of recipientEmails) {
+        const { text, html } = generateInvitationEmailContent(
+          recipients.length > 0 ? 'there' : (sendToInfo.first_name || 'there'),
+          senderName,
+          "PassInviteID",
+          eventDetails,
+          rsvpUniqueIds
+        );
 
-      // Send email
-      const emailData = {
-        from: sendFromInfo.email,
-        to: recipientEmails,
-        subject: subject,
-        text: text,
-        html: html
-      };
+        // Send email
+        const emailData = {
+          from: sendFromInfo.email,
+          to: recipientEmails,
+          subject: subject,
+          text: text,
+          html: html,
+          userId: sendFromInfo.id,
+          eventId: eventId,
+          contactId: recipients.length === 1 ? sendToInfo.id : undefined
+        };
 
-      const result = await EmailService.sendEmail(emailData);
-      if (result.statusCode === 200) {
-        setSuccess(`Email sent successfully to ${recipientEmails.length} recipient${recipientEmails.length > 1 ? 's' : ''}!`);
+        const result = await EmailService.sendEmail(emailData);
 
-        // Call the original onConfirmSend after successful email send
-        setTimeout(() => {
-          onConfirmSend();
-        }, 1500);
+        if (result.statusCode === 200 && result.emailHistoryId) {
+          emailHistoryIds.push(result.emailHistoryId);
+        } else {
+          throw new Error('Failed to send email');
+        }
       }
+
+      setSuccess(`Email sent successfully to ${recipientEmails.length} recipient${recipientEmails.length > 1 ? 's' : ''}!`);
+
+      // Call the original onConfirmSend after successful email send
+      setTimeout(() => {
+        onConfirmSend();
+      }, 1500);
+
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred while sending the email';

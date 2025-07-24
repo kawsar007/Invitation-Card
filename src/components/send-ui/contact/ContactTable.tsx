@@ -303,6 +303,7 @@ export const ContactTable: React.FC<ContactTableProps> = ({
         recipients={modalContacts}
         eventDetails={eventDetails}
         rsvpUniqueIds={rsvpUniqueIds}
+        eventId={Number(eventId)}
       />
     </>
   );

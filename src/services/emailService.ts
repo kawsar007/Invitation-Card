@@ -15,7 +15,9 @@ interface SendEmailResponse {
   message: string;
   data: {
     messageId: string;
+
   };
+  emailHistoryId?: number;
 }
 
 export class EmailService {
@@ -52,8 +54,11 @@ export const generateInvitationEmailContent = (
   senderName: string,
   invitationId: string,
   eventDetails?: EventDetails,
-  rsvpUniqueIds?: string
+  rsvpUniqueIds?: string,
+  emailHistoryId?: number
 ) => {
+  console.log("Email History Id:", emailHistoryId);
+
   const text = `
 Hello ${recipientName},
 
@@ -106,7 +111,7 @@ ${senderName}
             ${eventDetails?.eventDate || 'Wednesday, June 25, 2025'}
           </p>
           <div style="text-align: center; margin-bottom: 16px;">
-            <a href="${window.location.origin}/envelope/${rsvpUniqueIds}" style="background-color: #4b5563; color: #ffffff; padding: 8px 24px; border-radius: 4px; text-decoration: none; font-size: 14px; font-weight: 500; display: inline-block;">
+            <a href="${window.location.origin}/envelope/${rsvpUniqueIds}?emailHistoryId=${emailHistoryId}" style="background-color: #4b5563; color: #ffffff; padding: 8px 24px; border-radius: 4px; text-decoration: none; font-size: 14px; font-weight: 500; display: inline-block;">
               OPEN INVITATION
             </a>
           </div>

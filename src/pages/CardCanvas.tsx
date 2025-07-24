@@ -1,5 +1,6 @@
 import PreviewCard from '@/components/generate-preview/PreviewCard';
 import { useCraftApi } from '@/context/CraftApiContext';
+import { useUser } from '@/context/UserContext';
 import useEventDetails from '@/hooks/events/useEventDetails';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { BarChart3, Component, SaveIcon, Scan, Send } from 'lucide-react';
@@ -8,7 +9,7 @@ import { useSearchParams } from 'react-router-dom';
 import CardEditor from './CardEditor';
 import EventDetailsForm from './EventDetails';
 import SendInvitationPage from './sent';
-import TrackInvitationPage from './track';
+import { TrackInvitationPage } from './track';
 
 interface CardCanvasProps {
   content: string;
@@ -23,6 +24,11 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
   showGrid,
   onBackgroundChange,
 }) => {
+  const { user, isAuthenticated } = useUser();
+
+  console.log("Mu User:", user);
+
+
   // Add this to get query parameters
   const [searchParams] = useSearchParams();
   const eventId = searchParams.get('eventId');
@@ -148,7 +154,11 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
           </div>
         );
       case 'track':
-        return <TrackInvitationPage />;
+        return (
+          <div className="p-6 w-full max-w-7xl mx-auto">
+            <TrackInvitationPage eventId={Number(eventId)} userId={user?.id} />;
+          </div>
+        )
       default:
         return null;
     }

@@ -1,13 +1,15 @@
 import { FinalRSVPResponse } from '@/types/sendContact';
 import { getAuthToken } from '@/utils/auth';
+import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import EnvelopeSidebar from './EnvelopeSidebar';
 
 
 const FinalEnvelope: React.FC = () => {
   const token = getAuthToken();
   const { rsvpId } = useParams();
+  const [searchParams] = useSearchParams();
   const [isEnvelopeOpen, setIsEnvelopeOpen] = useState<boolean>(false);
   const [isImageVisible, setIsImageVisible] = useState<boolean>(false);
 
@@ -16,6 +18,23 @@ const FinalEnvelope: React.FC = () => {
 
 
   const apiUrl = `${import.meta.env.VITE_BASE_URL}/api/rsvp/${rsvpId}`;
+  const emailHistoryId = searchParams.get('emailHistoryId');
+
+  // Mark email as opened
+  useEffect(() => {
+    const markEmailAsOpened = async () => {
+      if (emailHistoryId) {
+        try {
+          await axios.get(`${import.meta.env.VITE_BASE_URL}/api/email/track/${emailHistoryId}`);
+          console.log(`Email marked as opened: ${emailHistoryId}`);
+        } catch (err) {
+          console.error('Error marking email as opened:', err);
+        }
+      }
+    };
+    markEmailAsOpened();
+  }, [emailHistoryId]);
+
 
   useEffect(() => {
     const fetchRsvpData = async () => {
