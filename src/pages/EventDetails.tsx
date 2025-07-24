@@ -53,7 +53,7 @@ const EventDetailsForm: React.FC<EventDetailsFormProps> = ({ eventId }) => {
         // popilate form fields
         setEventName(eventData.name);
         setSenderName(eventData.sender_name);
-        setLocationType(eventData.location_type === 'physical' ? 'inPerson' : 'virtual');
+        setLocationType(eventData.location_type === 'inPerson' ? 'inPerson' : 'virtual');
         setVenueName(eventData.venue_name || '');
         setVenueAddress(eventData.venue_address || '');
         setVirtualDescription(eventData.virtual_description || '');
@@ -205,9 +205,6 @@ const EventDetailsForm: React.FC<EventDetailsFormProps> = ({ eventId }) => {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-medium text-gray-800">Location</h2>
-            {/* <button className="p-2 hover:bg-gray-100 rounded-md transition-colors">
-              <Trash2 className="w-4 h-4 text-gray-500" />
-            </button> */}
           </div>
 
           {/* Location Type Radio Buttons */}
@@ -359,12 +356,6 @@ const EventDetailsForm: React.FC<EventDetailsFormProps> = ({ eventId }) => {
               placeholder="e.g. Parking available on 4th Ave"
             />
           </div>
-
-          {/* Add Another Location Button */}
-          {/* <button className="flex items-center text-blue-500 hover:text-blue-600 text-sm font-medium transition-colors">
-            <Plus className="w-4 h-4 mr-1" />
-            Add another location
-          </button> */}
         </div>
       </div>
     </div>
