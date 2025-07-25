@@ -28,14 +28,11 @@ interface SendInvitationModalProps {
   onClose: () => void;
   onConfirmSend: () => void;
   recipientCount: number;
-  // senderName: string;
   subject: string;
   invitationPreview?: string;
   sendFromInfo: User;
   sendToInfo: Contact
-  // Add recipients array for email sending
   recipients?: Contact[];
-  // Optional event details for email content
   eventDetails?: EventDetails;
   rsvpUniqueIds: string;
   eventId?: number;
@@ -55,8 +52,6 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
   rsvpUniqueIds,
   eventId
 }) => {
-  console.log("rsvpUniqueIds--->", rsvpUniqueIds);
-
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -105,52 +100,56 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
       const emailHistoryIds: number[] = [];
 
       for (const email of recipientEmails) {
+        const historyResponse = await fetch(`${import.meta.env.VITE_BASE_URL}/api/email/create-history`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            userId: sendFromInfo.id,
+            eventId: eventId,
+            contactId: recipients.length === 1 ? sendToInfo.id : undefined,
+            to: email,
+            subject: subject
+          }),
+        });
+        if (!historyResponse.ok) {
+          throw new Error(`Failed to create email history: ${historyResponse.status}`);
+        }
+
+        const historyResult = await historyResponse.json();
+        const emailHistoryId = historyResult.emailHistoryId;
+
+        // Generate email content with the emailHistoryId
+        const { text, html } = generateInvitationEmailContent(
+          recipients.length > 0 ? 'there' : (sendToInfo.first_name || 'there'),
+          senderName,
+          "PassInviteID",
+          eventDetails,
+          rsvpUniqueIds,
+          emailHistoryId
+        )
+
         // First, send email to get the emailHistoryId
         const emailData = {
           from: sendFromInfo.email,
           to: [email], // Send to one recipient at a time
           subject: subject,
-          text: '', // We'll update this after getting the emailHistoryId
-          html: '', // We'll update this after getting the emailHistoryId
+          text: text, // We'll update this after getting the emailHistoryId
+          html: html, // We'll update this after getting the emailHistoryId
           userId: sendFromInfo.id,
           eventId: eventId,
-          contactId: recipients.length === 1 ? sendToInfo.id : undefined
+          contactId: recipients.length === 1 ? sendToInfo.id : undefined,
+          emailHistoryId: emailHistoryId
         };
 
         const result = await EmailService.sendEmail(emailData);
 
         if (result.statusCode === 200 && result.emailHistoryId) {
-          // Now generate the email content with the emailHistoryId
-          const { text, html } = generateInvitationEmailContent(
-            recipients.length > 0 ? 'there' : (sendToInfo.first_name || 'there'),
-            senderName,
-            "PassInviteID",
-            eventDetails,
-            rsvpUniqueIds,
-            result.emailHistoryId // Now you have the emailHistoryId!
-          );
-
-          // Send the email again with the proper content
-          const finalEmailData = {
-            from: sendFromInfo.email,
-            to: [email],
-            subject: subject,
-            text: text,
-            html: html,
-            userId: sendFromInfo.id,
-            eventId: eventId,
-            contactId: recipients.length === 1 ? sendToInfo.id : undefined
-          };
-
-          const finalResult = await EmailService.sendEmail(finalEmailData);
-
-          if (finalResult.statusCode === 200 && finalResult.emailHistoryId) {
-            emailHistoryIds.push(finalResult.emailHistoryId);
-          } else {
-            throw new Error('Failed to send final email');
-          }
+          emailHistoryIds.push(result.emailHistoryId);
         } else {
-          throw new Error('Failed to get emailHistoryId');
+          throw new Error('Failed to send email');
         }
       }
 

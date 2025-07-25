@@ -37,7 +37,7 @@ export const EmailHistoryService = {
     status?: 'PENDING' | 'SENT' | 'OPENED' | 'UNOPENED' | 'UNSENT';
   }): Promise<EmailHistory[]> {
     try {
-      const response = await axios.get('http://localhost:8000/api/email-history', { params });
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/email-history`, { params });
       return response.data.data;
     } catch (error) {
       console.error('Error fetching email history:', error);
@@ -47,7 +47,7 @@ export const EmailHistoryService = {
 
   async getEmailStats(userId: number, eventId?: number): Promise<EmailStats> {
     try {
-      const response = await axios.get('http://localhost:8000/api/email-history/stats', {
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/email-history/stats`, {
         params: { userId, eventId },
       });
       return response.data.data;
@@ -59,7 +59,7 @@ export const EmailHistoryService = {
 
   async getOpenedEmailCount(userId: number, eventId?: number): Promise<number> {
     try {
-      const response = await axios.get('http://localhost:8000/api/email-history/opened-count', {
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/email-history/opened-count`, {
         params: { userId, eventId },
       });
       return response.data.data.opened;
