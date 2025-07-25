@@ -103,25 +103,15 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
 
       // Send emails one by one to capture individual emailHistoryId
       const emailHistoryIds: number[] = [];
-      console.log("emailHistoryIds", emailHistoryIds);
 
-      // Generate email content
       for (const email of recipientEmails) {
-        const { text, html } = generateInvitationEmailContent(
-          recipients.length > 0 ? 'there' : (sendToInfo.first_name || 'there'),
-          senderName,
-          "PassInviteID",
-          eventDetails,
-          rsvpUniqueIds
-        );
-
-        // Send email
+        // First, send email to get the emailHistoryId
         const emailData = {
           from: sendFromInfo.email,
-          to: recipientEmails,
+          to: [email], // Send to one recipient at a time
           subject: subject,
-          text: text,
-          html: html,
+          text: '', // We'll update this after getting the emailHistoryId
+          html: '', // We'll update this after getting the emailHistoryId
           userId: sendFromInfo.id,
           eventId: eventId,
           contactId: recipients.length === 1 ? sendToInfo.id : undefined
@@ -130,9 +120,37 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
         const result = await EmailService.sendEmail(emailData);
 
         if (result.statusCode === 200 && result.emailHistoryId) {
-          emailHistoryIds.push(result.emailHistoryId);
+          // Now generate the email content with the emailHistoryId
+          const { text, html } = generateInvitationEmailContent(
+            recipients.length > 0 ? 'there' : (sendToInfo.first_name || 'there'),
+            senderName,
+            "PassInviteID",
+            eventDetails,
+            rsvpUniqueIds,
+            result.emailHistoryId // Now you have the emailHistoryId!
+          );
+
+          // Send the email again with the proper content
+          const finalEmailData = {
+            from: sendFromInfo.email,
+            to: [email],
+            subject: subject,
+            text: text,
+            html: html,
+            userId: sendFromInfo.id,
+            eventId: eventId,
+            contactId: recipients.length === 1 ? sendToInfo.id : undefined
+          };
+
+          const finalResult = await EmailService.sendEmail(finalEmailData);
+
+          if (finalResult.statusCode === 200 && finalResult.emailHistoryId) {
+            emailHistoryIds.push(finalResult.emailHistoryId);
+          } else {
+            throw new Error('Failed to send final email');
+          }
         } else {
-          throw new Error('Failed to send email');
+          throw new Error('Failed to get emailHistoryId');
         }
       }
 
@@ -142,7 +160,6 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
       setTimeout(() => {
         onConfirmSend();
       }, 1500);
-
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred while sending the email';
