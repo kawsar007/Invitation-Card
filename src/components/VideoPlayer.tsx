@@ -1,5 +1,12 @@
-import { Maximize, Minimize, Pause, Play, Volume2, VolumeX } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import {
+  Maximize,
+  Minimize,
+  Pause,
+  Play,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 type VideoPlayerProps = {
   src: string;
@@ -7,7 +14,11 @@ type VideoPlayerProps = {
   className?: string;
 };
 
-export default function VideoPlayer({ src, poster, className = '' }: VideoPlayerProps) {
+export default function VideoPlayer({
+  src,
+  poster,
+  className = "",
+}: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -74,7 +85,7 @@ export default function VideoPlayer({ src, poster, className = '' }: VideoPlayer
   // Handle fullscreen toggle
   const toggleFullscreen = () => {
     if (!document.fullscreenElement && containerRef.current) {
-      containerRef.current.requestFullscreen().catch(err => {
+      containerRef.current.requestFullscreen().catch((err) => {
         console.error(`Error attempting to enable fullscreen: ${err.message}`);
       });
       setIsFullscreen(true);
@@ -96,18 +107,18 @@ export default function VideoPlayer({ src, poster, className = '' }: VideoPlayer
       }
     };
 
-    video.addEventListener('timeupdate', updateProgress);
-    video.addEventListener('loadedmetadata', () => {
+    video.addEventListener("timeupdate", updateProgress);
+    video.addEventListener("loadedmetadata", () => {
       setDuration(video.duration);
     });
-    video.addEventListener('ended', () => {
+    video.addEventListener("ended", () => {
       setIsPlaying(false);
     });
 
     return () => {
-      video.removeEventListener('timeupdate', updateProgress);
-      video.removeEventListener('loadedmetadata', () => { });
-      video.removeEventListener('ended', () => { });
+      video.removeEventListener("timeupdate", updateProgress);
+      video.removeEventListener("loadedmetadata", () => {});
+      video.removeEventListener("ended", () => {});
     };
   }, []);
 
@@ -116,38 +127,52 @@ export default function VideoPlayer({ src, poster, className = '' }: VideoPlayer
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!videoRef.current) return;
 
+      // Don't handle keyboard shortcuts if user is typing in an input/textarea
+      const activeElement = document.activeElement;
+      const isInputFocused =
+        activeElement &&
+        (activeElement.tagName === "INPUT" ||
+          activeElement.tagName === "TEXTAREA" ||
+          (activeElement as HTMLElement).isContentEditable ||
+          activeElement.closest("[contenteditable]"));
+
+      if (isInputFocused) return;
+
       switch (e.key) {
-        case ' ':
+        case " ":
           e.preventDefault();
           togglePlay();
           break;
-        case 'm':
+        case "m":
           toggleMute();
           break;
-        case 'f':
+        case "f":
           toggleFullscreen();
           break;
-        case 'ArrowLeft':
-          videoRef.current.currentTime = Math.max(0, videoRef.current.currentTime - 5);
+        case "ArrowLeft":
+          videoRef.current.currentTime = Math.max(
+            0,
+            videoRef.current.currentTime - 5
+          );
           break;
-        case 'ArrowRight':
+        case "ArrowRight":
           videoRef.current.currentTime = Math.min(
             videoRef.current.duration,
             videoRef.current.currentTime + 5
           );
           break;
-        case 'ArrowUp':
-          setVolume(prev => Math.min(1, prev + 0.1));
+        case "ArrowUp":
+          setVolume((prev) => Math.min(1, prev + 0.1));
           break;
-        case 'ArrowDown':
-          setVolume(prev => Math.max(0, prev - 0.1));
+        case "ArrowDown":
+          setVolume((prev) => Math.max(0, prev - 0.1));
           break;
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
 
@@ -166,7 +191,7 @@ export default function VideoPlayer({ src, poster, className = '' }: VideoPlayer
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
   return (
@@ -189,8 +214,9 @@ export default function VideoPlayer({ src, poster, className = '' }: VideoPlayer
 
       {/* Controls overlay */}
       <div
-        className={`absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 to-transparent transition-opacity ${showControls ? 'opacity-100' : 'opacity-0'
-          }`}
+        className={`absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 to-transparent transition-opacity ${
+          showControls ? "opacity-100" : "opacity-0"
+        }`}
       >
         {/* Progress bar */}
         <div className="px-4 pb-2">
@@ -218,7 +244,7 @@ export default function VideoPlayer({ src, poster, className = '' }: VideoPlayer
             <button
               onClick={togglePlay}
               className="text-white hover:text-green-400 transition-colors"
-              aria-label={isPlaying ? 'Pause' : 'Play'}
+              aria-label={isPlaying ? "Pause" : "Play"}
             >
               {isPlaying ? <Pause size={20} /> : <Play size={20} />}
             </button>
@@ -228,7 +254,7 @@ export default function VideoPlayer({ src, poster, className = '' }: VideoPlayer
               <button
                 onClick={toggleMute}
                 className="text-white hover:text-green-400 transition-colors"
-                aria-label={isMuted ? 'Unmute' : 'Mute'}
+                aria-label={isMuted ? "Unmute" : "Mute"}
               >
                 {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
               </button>
@@ -241,8 +267,9 @@ export default function VideoPlayer({ src, poster, className = '' }: VideoPlayer
                 onChange={handleVolumeChange}
                 className="w-20 h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer"
                 style={{
-                  background: `linear-gradient(to right, #10b981 0%, #10b981 ${volume * 100
-                    }%, #4b5563 ${volume * 100}%, #4b5563 100%)`,
+                  background: `linear-gradient(to right, #10b981 0%, #10b981 ${
+                    volume * 100
+                  }%, #4b5563 ${volume * 100}%, #4b5563 100%)`,
                 }}
               />
             </div>
@@ -252,7 +279,7 @@ export default function VideoPlayer({ src, poster, className = '' }: VideoPlayer
           <button
             onClick={toggleFullscreen}
             className="text-white hover:text-green-400 transition-colors"
-            aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+            aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
           >
             {isFullscreen ? <Minimize size={20} /> : <Maximize size={20} />}
           </button>
