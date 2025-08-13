@@ -1,10 +1,10 @@
-import { Contact } from '@/types/sendContact';
-import { ChevronDown } from 'lucide-react';
-import React from 'react';
-import { ActionDropdown } from './ActionDropdown';
+import { Contact } from "@/types/sendContact";
+import { ChevronDown } from "lucide-react";
+import React from "react";
+import { ActionDropdown } from "./ActionDropdown";
 
 interface ContactTableRowProps {
-  contact: Contact;
+  contact: any;
   isSelected: boolean;
   onSelect: (id: number, checked: boolean) => void;
   onMenuAction: (action: string, contactId: number) => void;
@@ -20,10 +20,11 @@ export const ContactTableRow: React.FC<ContactTableRowProps> = ({
   onMenuAction,
   openDropdown,
   onDropdownToggle,
-  dropdownRef
+  dropdownRef,
 }) => {
+
   const handleSendClick = () => {
-    onMenuAction('send', contact.id);
+    onMenuAction("send", contact?.contact.id);
   };
 
   return (
@@ -32,7 +33,7 @@ export const ContactTableRow: React.FC<ContactTableRowProps> = ({
         <input
           type="checkbox"
           checked={isSelected}
-          onChange={(e) => onSelect(contact.id, e.target.checked)}
+          onChange={(e) => onSelect(contact?.contact.id, e.target.checked)}
           className="rounded border-gray-300"
         />
       </td>
@@ -40,23 +41,27 @@ export const ContactTableRow: React.FC<ContactTableRowProps> = ({
         <div className="flex items-center space-x-2">
           <div className="w-2 h-2 bg-green-500 rounded-full"></div>
           <span className="text-sm font-medium text-gray-900">
-            {contact.first_name} {contact?.last_name}
+            {contact?.contact.first_name} {contact?.contact?.last_name}
           </span>
         </div>
       </td>
       <td className="p-4">
         <div className="flex items-center space-x-2">
           <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-          <span className="text-sm text-gray-900">{contact.email}</span>
+          <span className="text-sm text-gray-900">
+            {contact?.contact.email}
+          </span>
         </div>
       </td>
       <td className="p-4">
         <div className="flex items-center space-x-2">
           <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-          <span className="text-sm text-gray-900">{contact.phone}</span>
+          <span className="text-sm text-gray-900">
+            {contact?.contact.phone}
+          </span>
         </div>
       </td>
-      <td className="p-4 text-sm text-gray-900">+ 3</td>
+      {/* <td className="p-4 text-sm text-gray-900">+ 3</td>
       <td className="p-4">
         <span className="inline-flex items-center space-x-1 text-sm">
           <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
@@ -75,7 +80,7 @@ export const ContactTableRow: React.FC<ContactTableRowProps> = ({
           ))}
           <button className="text-blue-600 text-sm hover:underline">+ Tag</button>
         </div>
-      </td>
+      </td> */}
       <td className="p-4">
         <div className="flex items-center space-x-2 relative">
           <button
@@ -86,16 +91,16 @@ export const ContactTableRow: React.FC<ContactTableRowProps> = ({
           </button>
           <div className="relative">
             <button
-              onClick={() => onDropdownToggle(contact.id)}
+              onClick={() => onDropdownToggle(contact?.contact.id)}
               className="text-gray-600 hover:text-gray-900 p-1 rounded hover:bg-gray-100"
             >
               <ChevronDown size={16} />
             </button>
 
-            {openDropdown === contact.id && (
+            {openDropdown === contact?.contact.id && (
               <ActionDropdown
                 ref={dropdownRef}
-                onAction={(action) => onMenuAction(action, contact.id)}
+                onAction={(action) => onMenuAction(action, contact?.contact.id)}
               />
             )}
           </div>

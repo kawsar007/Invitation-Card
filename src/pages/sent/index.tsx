@@ -1,32 +1,45 @@
-import { ContactHeader } from '@/components/send-ui/contact/ContactHeader';
-import { ContactTable } from '@/components/send-ui/contact/ContactTable';
-import { ContactTabs } from '@/components/send-ui/contact/ContactTabs';
-import { ContactFormModal } from '@/components/send-ui/modals/create-contact';
-import DeleteContactModal from '@/components/send-ui/modals/DeleteContactModal';
-import SelectContactModal from '@/components/send-ui/modals/SelectContactModal';
-import { useCraftApi } from '@/context/CraftApiContext';
-import { useUser } from '@/context/UserContext';
-import { useContactFilters } from '@/hooks/send-contact/useContactFilters';
-import { useContactForm } from '@/hooks/send-contact/useContactForm';
-import { useContacts } from '@/hooks/send-contact/useContacts';
-import { useContactSelection } from '@/hooks/send-contact/useContactSelection';
-import { useDropdown } from '@/hooks/send-contact/useDropdown';
-import { useErrorHandler } from '@/hooks/send-contact/useErrorHandler';
-import { Contact, RSVPPayload, RSVPResponse } from '@/types/sendContact';
-import { getAuthToken } from '@/utils/auth';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { toast } from 'sonner';
+import { ContactHeader } from "@/components/send-ui/contact/ContactHeader";
+import { ContactTable } from "@/components/send-ui/contact/ContactTable";
+import { ContactTabs } from "@/components/send-ui/contact/ContactTabs";
+import { ContactFormModal } from "@/components/send-ui/modals/create-contact";
+import DeleteContactModal from "@/components/send-ui/modals/DeleteContactModal";
+import SelectContactModal from "@/components/send-ui/modals/SelectContactModal";
+import { useCraftApi } from "@/context/CraftApiContext";
+import { useUser } from "@/context/UserContext";
+import { useContactFilters } from "@/hooks/send-contact/useContactFilters";
+import { useContactForm } from "@/hooks/send-contact/useContactForm";
+import { useContacts } from "@/hooks/send-contact/useContacts";
+import { useContactSelection } from "@/hooks/send-contact/useContactSelection";
+import { useDropdown } from "@/hooks/send-contact/useDropdown";
+import { useErrorHandler } from "@/hooks/send-contact/useErrorHandler";
+import {
+  Contact,
+  RSVPData,
+  RSVPPayload,
+  RSVPResponse,
+} from "@/types/sendContact";
+import { getAuthToken } from "@/utils/auth";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
+
+interface APIResponse {
+  data: RSVPData[];
+}
 
 const SendContactTable: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const eventId = searchParams.get("eventId");
+
   const { user } = useUser();
   const token = getAuthToken();
   // Craft API and User context
-  const {
-    invitations
-  } = useCraftApi();
-  const latest = invitations.reduce((max, item) =>
-    new Date(item.created_at) > new Date(max.created_at) ? item : max
-    , invitations[0]);
+  const { invitations } = useCraftApi();
+  const latest = invitations.reduce(
+    (max, item) =>
+      new Date(item.created_at) > new Date(max.created_at) ? item : max,
+    invitations[0]
+  );
 
   // Core contact data and operations
   const {
@@ -41,19 +54,23 @@ const SendContactTable: React.FC = () => {
     deleteMultipleContacts,
     validateContactData,
     buildContactPayload,
-    clearError
+    clearError,
   } = useContacts();
 
   // UI state for create/add modals
   const [showAddContactModal, setShowAddContactModal] = useState(false);
   const [showNewContactModal, setShowNewContactModal] = useState(false);
-  const [contactType, setContactType] = useState<'individual' | 'couple'>('individual');
+  const [contactType, setContactType] = useState<"individual" | "couple">(
+    "individual"
+  );
   const [groupSize, setGroupSize] = useState(2);
 
   // UI state for update modal
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
-  const [updateContactType, setUpdateContactType] = useState<'individual' | 'couple'>('individual');
+  const [updateContactType, setUpdateContactType] = useState<
+    "individual" | "couple"
+  >("individual");
   const [updateGroupSize, setUpdateGroupSize] = useState(2);
 
   // Delete confirmation modal state
@@ -65,80 +82,107 @@ const SendContactTable: React.FC = () => {
   const [isCreatingRSVP, setIsCreatingRSVP] = useState(false);
   const [rsvpUniqueIds, setRSVPUniqueIds] = useState<string>();
 
-
   // Custom hooks for specific functionality
-  const { activeTab, setActiveTab, searchTerm, setSearchTerm, filteredContacts, tabs } =
-    useContactFilters(contacts);
+  const {
+    activeTab,
+    setActiveTab,
+    searchTerm,
+    setSearchTerm,
+    filteredContacts,
+    tabs,
+  } = useContactFilters(contacts);
 
-  const { selectedContacts, handleSelectAll, handleSelectContact, clearSelection, isAllSelected, isIndeterminate, selectedCount } =
-    useContactSelection(contacts);
+  const {
+    selectedContacts,
+    handleSelectAll,
+    handleSelectContact,
+    clearSelection,
+    isAllSelected,
+    isIndeterminate,
+    selectedCount,
+  } = useContactSelection(contacts);
 
   const { openDropdown, setOpenDropdown, dropdownRef } = useDropdown();
 
   // Rsvp creation function
-  const createRSVP = useCallback(async (contactId: number, allowCount: number, tags: string[]): Promise<string | null> => {
-    try {
-      setIsCreatingRSVP(true);
+  const createRSVP = useCallback(
+    async (
+      contactId: number,
+      allowCount: number,
+      tags: string[]
+    ): Promise<string | null> => {
+      try {
+        setIsCreatingRSVP(true);
 
-      //  Using dynamic values from the form
-      const rsvpPayload: RSVPPayload = {
-        contact_id: contactId,
-        event_id: latest?.event_id,
-        invitation_card_id: latest?.id,
-        version: latest?.version,
-        user_id: user?.id,
-        allow_count: allowCount,
-        allow: [],
-        tags: tags
+        //  Using dynamic values from the form
+        const rsvpPayload: RSVPPayload = {
+          contact_id: contactId,
+          event_id: latest?.event_id,
+          invitation_card_id: latest?.id,
+          version: latest?.version,
+          user_id: user?.id,
+          allow_count: allowCount,
+          allow: [],
+          tags: tags,
+        };
+
+        const response = await fetch(
+          `${import.meta.env.VITE_BASE_URL}/api/rsvp`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(rsvpPayload),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data: RSVPResponse = await response.json();
+        setRSVPUniqueIds(data.unique_id);
+        toast.success(data?.message || "RSVP created successfully");
+        return data.unique_id;
+      } catch (error) {
+        console.error("Failed to create RSVP:", error);
+        // You might want to show a toast notification or handle this error differently
+        return null;
+      } finally {
+        setIsCreatingRSVP(false);
       }
-
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/rsvp`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(rsvpPayload)
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      };
-
-      const data: RSVPResponse = await response.json();
-      setRSVPUniqueIds(data.unique_id);
-      toast.success(data?.message || 'RSVP created successfully');
-      return data.unique_id;
-
-    } catch (error) {
-      console.error('Failed to create RSVP:', error);
-      // You might want to show a toast notification or handle this error differently
-      return null;
-    } finally {
-      setIsCreatingRSVP(false);
-    }
-  }, [latest?.event_id, latest?.id, latest?.version, token, user?.id]);
+    },
+    [latest?.event_id, latest?.id, latest?.version, token, user?.id]
+  );
 
   // Memoize the update complete callback to prevent unnecessary re-renders
   const handleUpdateComplete = useCallback(() => {
     setShowUpdateModal(false);
     setEditingContact(null);
-    setUpdateContactType('individual');
+    setUpdateContactType("individual");
     setUpdateGroupSize(2);
   }, []);
 
   // Memoize form hook parameters to prevent unnecessary re-renders
-  const createFormParams = useMemo(() => ({
-    contactType,
-    groupSize
-  }), [contactType, groupSize]);
+  const createFormParams = useMemo(
+    () => ({
+      contactType,
+      groupSize,
+    }),
+    [contactType, groupSize]
+  );
 
-  const updateFormParams = useMemo(() => ({
-    contactType: updateContactType,
-    groupSize: updateGroupSize,
-    editingContact,
-    onUpdateComplete: handleUpdateComplete
-  }), [updateContactType, updateGroupSize, editingContact, handleUpdateComplete]);
+  const updateFormParams = useMemo(
+    () => ({
+      contactType: updateContactType,
+      groupSize: updateGroupSize,
+      editingContact,
+      onUpdateComplete: handleUpdateComplete,
+    }),
+    [updateContactType, updateGroupSize, editingContact, handleUpdateComplete]
+  );
 
   // Create form hook
   const createFormHook = useContactForm(createFormParams);
@@ -157,31 +201,34 @@ const SendContactTable: React.FC = () => {
   // Initialize update form when editing contact changes
   useEffect(() => {
     if (editingContact) {
-      setUpdateContactType(editingContact.contact_type || 'individual');
+      setUpdateContactType(editingContact.contact_type || "individual");
       setUpdateGroupSize(editingContact.group_size || 2);
     }
   }, [editingContact]);
 
   // Memoize handlers to prevent unnecessary re-renders
-  const handleMenuAction = useCallback(async (action: string, contactId: number) => {
-    setOpenDropdown(null);
+  const handleMenuAction = useCallback(
+    async (action: string, contactId: number) => {
+      setOpenDropdown(null);
 
-    if (action === 'delete') {
-      // Find the contact to delete
-      const contact = contacts.find(c => c.id === contactId);
-      setContactToDelete(contact);
-      setShowDeleteModal(true);
-    } else if (action === 'update') {
-      // Find the contact to update
-      const contact = contacts.find(c => c.id === contactId);
-      if (contact) {
-        setEditingContact(contact);
-        setShowUpdateModal(true);
+      if (action === "delete") {
+        // Find the contact to delete
+        const contact = contacts.find((c) => c.id === contactId);
+        setContactToDelete(contact);
+        setShowDeleteModal(true);
+      } else if (action === "update") {
+        // Find the contact to update
+        const contact = contacts.find((c) => c.id === contactId);
+        if (contact) {
+          setEditingContact(contact);
+          setShowUpdateModal(true);
+        }
+      } else {
+        console.log(`${action} for contact ${contactId}`);
       }
-    } else {
-      console.log(`${action} for contact ${contactId}`);
-    }
-  }, [contacts]);
+    },
+    [contacts]
+  );
 
   // Handle delete confirmation
   const handleDeleteConfirm = useCallback(async () => {
@@ -198,96 +245,127 @@ const SendContactTable: React.FC = () => {
   }, [contactToDelete, deleteContact]);
 
   // Handle Bulk Actions
-  const handleBulkAction = useCallback((action: string, contactIds: number[]) => {
-    switch (action) {
-      case 'edit':
-        if (contactIds.length === 1) {
-          // Edit single contact
-          const contact = contacts.find(c => c.id === contactIds[0]);
-          if (contact) {
-            setEditingContact(contact);
-            setShowUpdateModal(true);
+  const handleBulkAction = useCallback(
+    (action: string, contactIds: number[]) => {
+      switch (action) {
+        case "edit":
+          if (contactIds.length === 1) {
+            // Edit single contact
+            const contact = contacts.find((c) => c.id === contactIds[0]);
+            if (contact) {
+              setEditingContact(contact);
+              setShowUpdateModal(true);
+            }
+          } else {
+            // Handle bulk edit (you can implement this later)
+            alert(
+              "Bulk edit is not implemented yet. Please select only one contact to edit."
+            );
           }
-        } else {
-          // Handle bulk edit (you can implement this later)
-          alert('Bulk edit is not implemented yet. Please select only one contact to edit.');
-        }
-        break;
-      case 'message':
-        // Handle bulk message
-        console.log('Message contacts:', contactIds);
-        break;
-      case 'delete':
-        // Handle bulk delete
-        if (contactIds.length > 0) {
-          const message = contactIds.length === 1
-            ? 'Are you sure you want to delete this contact?'
-            : `Are you sure you want to delete ${contactIds.length} contacts?`;
+          break;
+        case "message":
+          // Handle bulk message
+          console.log("Message contacts:", contactIds);
+          break;
+        case "delete":
+          // Handle bulk delete
+          if (contactIds.length > 0) {
+            const message =
+              contactIds.length === 1
+                ? "Are you sure you want to delete this contact?"
+                : `Are you sure you want to delete ${contactIds.length} contacts?`;
 
-          if (window.confirm(message)) {
-            handleBulkDelete(contactIds);
+            if (window.confirm(message)) {
+              handleBulkDelete(contactIds);
+            }
           }
-        }
-        break;
-    }
-  }, [contacts]);
+          break;
+      }
+    },
+    [contacts]
+  );
 
   // Handle bulk delete
-  const handleBulkDelete = useCallback(async (contactIds: number[]) => {
-    const success = await deleteMultipleContacts(contactIds);
-    if (success) {
-      clearSelection();
-    }
-  }, [deleteMultipleContacts, clearSelection]);
+  const handleBulkDelete = useCallback(
+    async (contactIds: number[]) => {
+      const success = await deleteMultipleContacts(contactIds);
+      if (success) {
+        clearSelection();
+      }
+    },
+    [deleteMultipleContacts, clearSelection]
+  );
 
   // Submit contact handler (for creating)
-  const handleSubmitContact = useCallback(async (saveAndAddAnother: boolean = false) => {
-    const validation = validateContactData(contactType, createFormHook.formData, createFormHook.tiedContacts);
-    if (!validation.isValid) {
-      alert(validation.error);
-      return;
-    }
+  const handleSubmitContact = useCallback(
+    async (saveAndAddAnother: boolean = false) => {
+      const validation = validateContactData(
+        contactType,
+        createFormHook.formData,
+        createFormHook.tiedContacts
+      );
+      if (!validation.isValid) {
+        alert(validation.error);
+        return;
+      }
 
-    const payload = buildContactPayload(contactType, createFormHook.formData, createFormHook.tiedContacts, createFormHook.tags);
-    const contactResult = await createContact(payload);
+      const payload = buildContactPayload(
+        contactType,
+        createFormHook.formData,
+        createFormHook.tiedContacts,
+        createFormHook.tags
+      );
+      const contactResult = await createContact(payload);
 
-    if (contactResult && contactResult.success) {
-      const newContactId = contactResult.contact?.id;
+      if (contactResult && contactResult.success) {
+        const newContactId = contactResult.contact?.id;
 
-      if (newContactId) {
-        const allowCount = createFormHook?.plusOneCount;
-        const tags = createFormHook?.tags || [];
+        if (newContactId) {
+          const allowCount = createFormHook?.plusOneCount;
+          const tags = createFormHook?.tags || [];
 
-        const rsvpUniqueId = await createRSVP(newContactId, allowCount, tags)
-        if (rsvpUniqueId) {
-          toast.success("RSVP created successfully")
-          console.log('RSVP created with unique ID:', rsvpUniqueId);
-          // You can show a success notification here if needed
+          const rsvpUniqueId = await createRSVP(newContactId, allowCount, tags);
+          if (rsvpUniqueId) {
+            toast.success("RSVP created successfully");
+            console.log("RSVP created with unique ID:", rsvpUniqueId);
+            // You can show a success notification here if needed
+          } else {
+            console.warn("Contact created but RSVP creation failed");
+            toast.warning("Contact created but RSVP creation failed");
+            // You might want to show a warning notification
+          }
+        }
+        if (saveAndAddAnother) {
+          createFormHook.resetForm();
         } else {
-          console.warn('Contact created but RSVP creation failed');
-          toast.warning("Contact created but RSVP creation failed");
-          // You might want to show a warning notification
+          setShowNewContactModal(false);
+          createFormHook.resetForm();
         }
       }
-      if (saveAndAddAnother) {
-        createFormHook.resetForm();
-      } else {
-        setShowNewContactModal(false);
-        createFormHook.resetForm();
-      }
-    }
-  }, [validateContactData, contactType, createFormHook, buildContactPayload, createContact, createRSVP]);
+    },
+    [
+      validateContactData,
+      contactType,
+      createFormHook,
+      buildContactPayload,
+      createContact,
+      createRSVP,
+    ]
+  );
 
   // Submit contact handler (for updating)
   const handleUpdateContact = useCallback(async () => {
-    const validation = validateContactData(updateContactType, updateFormHook.formData, updateFormHook.tiedContacts);
+    const validation = validateContactData(
+      updateContactType,
+      updateFormHook.formData,
+      updateFormHook.tiedContacts
+    );
     if (!validation.isValid) {
       alert(validation.error);
       return;
     }
 
     const contactData = updateFormHook.getContactData();
-
 
     const success = await updateContact(contactData.id, contactData);
 
@@ -300,9 +378,10 @@ const SendContactTable: React.FC = () => {
   const handleDeleteSelected = useCallback(async () => {
     if (selectedContacts.length === 0) return;
 
-    const message = selectedContacts.length === 1
-      ? 'Are you sure you want to delete this contact?'
-      : `Are you sure you want to delete ${selectedContacts.length} contacts?`;
+    const message =
+      selectedContacts.length === 1
+        ? "Are you sure you want to delete this contact?"
+        : `Are you sure you want to delete ${selectedContacts.length} contacts?`;
 
     if (window.confirm(message)) {
       const success = await deleteMultipleContacts(selectedContacts);
@@ -315,7 +394,11 @@ const SendContactTable: React.FC = () => {
   // Handle unsaved changes warning
   const handleCloseUpdateModal = useCallback(() => {
     if (updateFormHook.isFormModified()) {
-      if (window.confirm('You have unsaved changes. Are you sure you want to close?')) {
+      if (
+        window.confirm(
+          "You have unsaved changes. Are you sure you want to close?"
+        )
+      ) {
         updateFormHook.exitEditMode();
       }
     } else {

@@ -58,6 +58,18 @@ export interface CreateContactResponse {
   contact: Contact;
 }
 
+export interface RSVPData {
+  id: number;
+  unique_id: string;
+  allow_count: number;
+  allow: any[];
+  version: number;
+  tags: string[];
+  created_at: string;
+  updated_at: string;
+  contact: Contact;
+  event: Event;
+}
 
 // RSVP types
 export interface RSVPPayload {
