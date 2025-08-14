@@ -26,9 +26,6 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
 }) => {
   const { user, isAuthenticated } = useUser();
 
-  console.log("Mu User:", user);
-
-
   // Add this to get query parameters
   const [searchParams] = useSearchParams();
   const eventId = searchParams.get('eventId');

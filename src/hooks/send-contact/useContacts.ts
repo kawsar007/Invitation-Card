@@ -1,7 +1,13 @@
-import { Contact, ContactFormData, ContactsResponseObject, CreateContactResponse, TiedContact } from '@/types/sendContact';
-import { getAuthToken } from '@/utils/auth';
-import { useCallback, useState } from 'react';
-import { toast } from 'sonner';
+import {
+  Contact,
+  ContactFormData,
+  ContactsResponseObject,
+  CreateContactResponse,
+  TiedContact,
+} from "@/types/sendContact";
+import { getAuthToken } from "@/utils/auth";
+import { useCallback, useState } from "react";
+import { toast } from "sonner";
 
 interface ContactPayload {
   first_name: string;
@@ -22,14 +28,28 @@ interface UseContactsReturn {
 
   // Actions
   fetchContacts: () => Promise<void>;
-  createContact: (payload: ContactPayload) => Promise<CreateContactResponse | null>;
+  createContact: (
+    payload: ContactPayload
+  ) => Promise<CreateContactResponse | null>;
   deleteContact: (contactId: number) => Promise<boolean>;
   deleteMultipleContacts: (contactIds: number[]) => Promise<boolean>;
-  updateContact: (contactId: number, payload: Partial<ContactPayload>) => Promise<boolean>;
+  updateContact: (
+    contactId: number,
+    payload: Partial<ContactPayload>
+  ) => Promise<boolean>;
 
   // Utility functions
-  validateContactData: (contactType: 'individual' | 'couple', formData: ContactFormData, tiedContacts: TiedContact[]) => { isValid: boolean; error?: string };
-  buildContactPayload: (contactType: 'individual' | 'couple', formData: ContactFormData, tiedContacts: TiedContact[], tags: string[]) => ContactPayload;
+  validateContactData: (
+    contactType: "individual" | "couple",
+    formData: ContactFormData,
+    tiedContacts: TiedContact[]
+  ) => { isValid: boolean; error?: string };
+  buildContactPayload: (
+    contactType: "individual" | "couple",
+    formData: ContactFormData,
+    tiedContacts: TiedContact[],
+    tags: string[]
+  ) => ContactPayload;
 
   // Reset functions
   clearError: () => void;
@@ -39,7 +59,7 @@ interface UseContactsReturn {
 export const useContacts = (): UseContactsReturn => {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const token = getAuthToken();
@@ -49,13 +69,16 @@ export const useContacts = (): UseContactsReturn => {
     setError(null);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/contacts/list`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+      const response = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/api/contacts/list`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
-      });
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -64,219 +87,285 @@ export const useContacts = (): UseContactsReturn => {
       const result: ContactsResponseObject = await response.json();
       setContacts(result.contacts);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch contacts';
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch contacts";
       setError(errorMessage);
-      console.error('Error fetching contacts:', err);
+      console.error("Error fetching contacts:", err);
     } finally {
       setLoading(false);
     }
   }, [token]);
 
-  const createContact = useCallback(async (payload: ContactPayload): Promise<CreateContactResponse | null> => {
-    setIsSubmitting(true);
-    setError(null);
+  const createContact = useCallback(
+    async (payload: ContactPayload): Promise<CreateContactResponse | null> => {
+      setIsSubmitting(true);
+      setError(null);
 
-    try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/contacts/create`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_BASE_URL}/api/contacts/create`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(payload),
+          }
+        );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        toast.error(errorData.message)
-        throw new Error(errorData.message || 'Failed to create contact');
-      }
-      const result = await response.json() as CreateContactResponse;
-      toast.success(result.message)
-      // Refresh contacts list after successful creation
-      await fetchContacts();
-      return result;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to create contact';
-      setError(errorMessage);
-      console.error('Error creating contact:', err);
-      return null;
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [token, fetchContacts]);
-
-  const deleteContact = useCallback(async (contactId: number): Promise<boolean> => {
-    setError(null);
-
-    try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/contacts/${contactId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.log("errorData--->", errorData);
+          
+          // toast.error(errorData.message)
+          if (
+            errorData.message === "Existing contact found" &&
+            errorData.data
+          ) {
+            setError({ message: errorData.message, contact: errorData.data });
+            return {
+              success: false,
+              message: errorData.message,
+              contact: errorData.data,
+            };
+          }
+          throw new Error(errorData.message || "Failed to create contact");
         }
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        toast.error(errorData.message)
-        throw new Error(errorData.message || 'Failed to delete contact');
+        const result = (await response.json()) as CreateContactResponse;
+        toast.success(result.message);
+        // Refresh contacts list after successful creation
+        await fetchContacts();
+        return result;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to create contact";
+        setError(errorMessage);
+        console.error("Error creating contact:", err);
+        return null;
+      } finally {
+        setIsSubmitting(false);
       }
-      const result = await response.json();
-      toast.success(result.message)
+    },
+    [token, fetchContacts]
+  );
 
-      // Remove contact from local state
-      setContacts(prev => prev.filter(contact => contact.id !== contactId));
-      return true;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to delete contact';
-      setError(errorMessage);
-      console.error('Error deleting contact:', err);
-      return false;
-    }
-  }, [token]);
+  const deleteContact = useCallback(
+    async (contactId: number): Promise<boolean> => {
+      setError(null);
 
-  const deleteMultipleContacts = useCallback(async (contactIds: number[]): Promise<boolean> => {
-    setError(null);
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_BASE_URL}/api/contacts/${contactId}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-    try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/contacts/batch-delete`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ contact_ids: contactIds })
-      });
+        if (!response.ok) {
+          const errorData = await response.json();
+          toast.error(errorData.message);
+          throw new Error(errorData.message || "Failed to delete contact");
+        }
+        const result = await response.json();
+        toast.success(result.message);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to delete contacts');
+        // Remove contact from local state
+        setContacts((prev) =>
+          prev.filter((contact) => contact.id !== contactId)
+        );
+        return true;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to delete contact";
+        setError(errorMessage);
+        console.error("Error deleting contact:", err);
+        return false;
       }
+    },
+    [token]
+  );
 
-      // Remove contacts from local state
-      setContacts(prev => prev.filter(contact => !contactIds.includes(contact.id)));
-      return true;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to delete contacts';
-      setError(errorMessage);
-      console.error('Error deleting multiple contacts:', err);
-      return false;
-    }
-  }, [token]);
+  const deleteMultipleContacts = useCallback(
+    async (contactIds: number[]): Promise<boolean> => {
+      setError(null);
 
-  const updateContact = useCallback(async (contactId: number, payload: Partial<ContactPayload>): Promise<boolean> => {
-    setError(null);
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_BASE_URL}/api/contacts/batch-delete`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ contact_ids: contactIds }),
+          }
+        );
 
-    try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/contacts/update/${contactId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to delete contacts");
+        }
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        toast.error(errorData.message);
-        throw new Error(errorData.message || 'Failed to update contact');
-
+        // Remove contacts from local state
+        setContacts((prev) =>
+          prev.filter((contact) => !contactIds.includes(contact.id))
+        );
+        return true;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to delete contacts";
+        setError(errorMessage);
+        console.error("Error deleting multiple contacts:", err);
+        return false;
       }
+    },
+    [token]
+  );
 
-      const data = await response.json()
-      toast.success(data?.message)
+  const updateContact = useCallback(
+    async (
+      contactId: number,
+      payload: Partial<ContactPayload>
+    ): Promise<boolean> => {
+      setError(null);
 
-      // Refresh contacts list after successful update
-      await fetchContacts();
-      return true;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to update contact';
-      setError(errorMessage);
-      console.error('Error updating contact:', err);
-      return false;
-    }
-  }, [token, fetchContacts]);
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_BASE_URL}/api/contacts/update/${contactId}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(payload),
+          }
+        );
 
-  const validateContactData = useCallback((
-    contactType: 'individual' | 'couple',
-    formData: ContactFormData,
-    tiedContacts: TiedContact[]
-  ): { isValid: boolean; error?: string } => {
-    if (contactType === 'individual') {
-      if (!formData.first_name.trim()) {
-        return { isValid: false, error: 'First name is required' };
+        if (!response.ok) {
+          const errorData = await response.json();
+          toast.error(errorData.message);
+          throw new Error(errorData.message || "Failed to update contact");
+        }
+
+        const data = await response.json();
+        toast.success(data?.message);
+
+        // Refresh contacts list after successful update
+        await fetchContacts();
+        return true;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to update contact";
+        setError(errorMessage);
+        console.error("Error updating contact:", err);
+        return false;
       }
-      if (!formData.email.trim()) {
-        return { isValid: false, error: 'Email is required' };
-      }
-      // Basic email validation
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(formData.email.trim())) {
-        return { isValid: false, error: 'Please enter a valid email address' };
-      }
-    } else {
-      const validTiedContacts = tiedContacts.filter(contact =>
-        contact.first_name.trim() && contact.email.trim()
-      );
+    },
+    [token, fetchContacts]
+  );
 
-      if (validTiedContacts.length === 0) {
-        return { isValid: false, error: 'At least one contact with first name and email is required' };
-      }
+  const validateContactData = useCallback(
+    (
+      contactType: "individual" | "couple",
+      formData: ContactFormData,
+      tiedContacts: TiedContact[]
+    ): { isValid: boolean; error?: string } => {
+      if (contactType === "individual") {
+        if (!formData.first_name.trim()) {
+          return { isValid: false, error: "First name is required" };
+        }
+        if (!formData.email.trim()) {
+          return { isValid: false, error: "Email is required" };
+        }
+        // Basic email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email.trim())) {
+          return {
+            isValid: false,
+            error: "Please enter a valid email address",
+          };
+        }
+      } else {
+        const validTiedContacts = tiedContacts.filter(
+          (contact) => contact.first_name.trim() && contact.email.trim()
+        );
 
-      // Validate emails for tied contacts
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      for (const contact of validTiedContacts) {
-        if (!emailRegex.test(contact.email.trim())) {
-          return { isValid: false, error: `Please enter a valid email address for ${contact.first_name}` };
+        if (validTiedContacts.length === 0) {
+          return {
+            isValid: false,
+            error: "At least one contact with first name and email is required",
+          };
+        }
+
+        // Validate emails for tied contacts
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        for (const contact of validTiedContacts) {
+          if (!emailRegex.test(contact.email.trim())) {
+            return {
+              isValid: false,
+              error: `Please enter a valid email address for ${contact.first_name}`,
+            };
+          }
         }
       }
-    }
 
-    return { isValid: true };
-  }, []);
+      return { isValid: true };
+    },
+    []
+  );
 
-  const buildContactPayload = useCallback((
-    contactType: 'individual' | 'couple',
-    formData: ContactFormData,
-    tiedContacts: TiedContact[],
-    tags: string[]
-  ): ContactPayload => {
-    if (contactType === 'individual') {
-      return {
-        first_name: formData.first_name.trim(),
-        last_name: formData.last_name.trim(),
-        email: formData.email.trim(),
-        phone: formData.phone.trim(),
-        has_tied_contact: false,
-        tags: tags.length > 0 ? tags : undefined
-      };
-    } else {
-      const validTiedContacts = tiedContacts.filter(contact =>
-        contact.first_name.trim() && contact.email.trim()
-      );
+  const buildContactPayload = useCallback(
+    (
+      contactType: "individual" | "couple",
+      formData: ContactFormData,
+      tiedContacts: TiedContact[],
+      tags: string[]
+    ): ContactPayload => {
+      if (contactType === "individual") {
+        return {
+          first_name: formData.first_name.trim(),
+          last_name: formData.last_name.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim(),
+          has_tied_contact: false,
+          tags: tags.length > 0 ? tags : undefined,
+        };
+      } else {
+        const validTiedContacts = tiedContacts.filter(
+          (contact) => contact.first_name.trim() && contact.email.trim()
+        );
 
-      const mainContact = validTiedContacts[0];
-      const otherContacts = validTiedContacts.slice(1);
+        const mainContact = validTiedContacts[0];
+        const otherContacts = validTiedContacts.slice(1);
 
-      return {
-        first_name: mainContact.first_name.trim(),
-        last_name: mainContact.last_name.trim(),
-        email: mainContact.email.trim(),
-        phone: mainContact.phone.trim(),
-        has_tied_contact: otherContacts.length > 0,
-        tied_contacts: otherContacts.length > 0 ? otherContacts.map(contact => ({
-          first_name: contact.first_name.trim(),
-          last_name: contact.last_name.trim(),
-          email: contact.email.trim(),
-          phone: contact.phone.trim()
-        })) : undefined,
-        tags: tags.length > 0 ? tags : undefined
-      };
-    }
-  }, []);
+        return {
+          first_name: mainContact.first_name.trim(),
+          last_name: mainContact.last_name.trim(),
+          email: mainContact.email.trim(),
+          phone: mainContact.phone.trim(),
+          has_tied_contact: otherContacts.length > 0,
+          tied_contacts:
+            otherContacts.length > 0
+              ? otherContacts.map((contact) => ({
+                  first_name: contact.first_name.trim(),
+                  last_name: contact.last_name.trim(),
+                  email: contact.email.trim(),
+                  phone: contact.phone.trim(),
+                }))
+              : undefined,
+          tags: tags.length > 0 ? tags : undefined,
+        };
+      }
+    },
+    []
+  );
 
   const clearError = useCallback(() => {
     setError(null);
@@ -306,6 +395,6 @@ export const useContacts = (): UseContactsReturn => {
 
     // Reset functions
     clearError,
-    refreshContacts
+    refreshContacts,
   };
 };

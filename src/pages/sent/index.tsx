@@ -2,6 +2,7 @@ import { ContactHeader } from "@/components/send-ui/contact/ContactHeader";
 import { ContactTable } from "@/components/send-ui/contact/ContactTable";
 import { ContactTabs } from "@/components/send-ui/contact/ContactTabs";
 import { ContactFormModal } from "@/components/send-ui/modals/create-contact";
+import ExistingContactModal from "@/components/send-ui/modals/create-contact/ExistingContactModal";
 import DeleteContactModal from "@/components/send-ui/modals/DeleteContactModal";
 import SelectContactModal from "@/components/send-ui/modals/SelectContactModal";
 import { useCraftApi } from "@/context/CraftApiContext";
@@ -82,6 +83,11 @@ const SendContactTable: React.FC = () => {
   const [isCreatingRSVP, setIsCreatingRSVP] = useState(false);
   const [rsvpUniqueIds, setRSVPUniqueIds] = useState<string>();
 
+  // Add these states below the existing modal states
+  const [showExistingContactModal, setShowExistingContactModal] =
+    useState(false);
+  const [existingContact, setExistingContact] = useState<Contact | null>(null);
+
   // Custom hooks for specific functionality
   const {
     activeTab,
@@ -143,6 +149,8 @@ const SendContactTable: React.FC = () => {
         }
 
         const data: RSVPResponse = await response.json();
+        console.log("Create RSVP:--->", data);
+
         setRSVPUniqueIds(data.unique_id);
         toast.success(data?.message || "RSVP created successfully");
         return data.unique_id;
@@ -156,6 +164,39 @@ const SendContactTable: React.FC = () => {
     },
     [latest?.event_id, latest?.id, latest?.version, token, user?.id]
   );
+
+  // Handle Existing Contact
+  const handleAddExistingContact = useCallback(async () => {
+    if (!existingContact) return;
+
+    try {
+      const allowCount = existingContact.group_size || 1; // Use existing contact's group size or default to 1
+      const tags = existingContact.tags || [];
+
+      const rsvpUniqueId = await createRSVP(
+        existingContact.id,
+        allowCount,
+        tags
+      );
+      console.log("Existing Contact: --->", rsvpUniqueId);
+
+      setRSVPUniqueIds(rsvpUniqueId);
+      if (rsvpUniqueId) {
+        toast.success("Contact added to table successfully");
+        setShowNewContactModal(false);
+        createFormHook.resetForm();
+        setShowExistingContactModal(false);
+        setExistingContact(null);
+        // Refresh contacts to update the table
+        await fetchContacts(); // Call fetchContacts to update contacts state
+        setRSVPUniqueIds(rsvpUniqueId); // Update rsvpUniqueIds if needed
+      } else {
+        toast.error("Failed to add contact to table");
+      }
+    } catch (error) {
+      toast.error("An error occurred while adding the contact");
+    }
+  }, [existingContact, createRSVP]);
 
   // Memoize the update complete callback to prevent unnecessary re-renders
   const handleUpdateComplete = useCallback(() => {
@@ -191,7 +232,12 @@ const SendContactTable: React.FC = () => {
   const updateFormHook = useContactForm(updateFormParams);
 
   // Error handling
-  useErrorHandler(error, clearError);
+  useErrorHandler({
+    error,
+    clearError,
+    setShowExistingContactModal,
+    setExistingContact,
+  });
 
   // Initialize contacts
   useEffect(() => {
@@ -319,7 +365,7 @@ const SendContactTable: React.FC = () => {
 
       if (contactResult && contactResult.success) {
         const newContactId = contactResult.contact?.id;
-
+        await fetchContacts();
         if (newContactId) {
           const allowCount = createFormHook?.plusOneCount;
           const tags = createFormHook?.tags || [];
@@ -504,6 +550,15 @@ const SendContactTable: React.FC = () => {
         // Additional props for update mode
         isEditMode={true}
         editingContact={editingContact}
+      />
+
+      <ExistingContactModal
+        isOpen={showExistingContactModal}
+        onClose={() => {
+          setShowExistingContactModal(false);
+          setExistingContact(null);
+        }}
+        onConfirm={handleAddExistingContact}
       />
 
       {/* Delete Confirmation Modal */}

@@ -31,6 +31,7 @@ interface ContactTableProps {
   rsvpUniqueIds: string;
 }
 
+
 interface APIResponse {
   data: RSVPData[];
 }
@@ -69,6 +70,7 @@ export const ContactTable: React.FC<ContactTableProps> = ({
 
   console.log("RSVP Contact: --->", rsvpContact);
   console.log("RSVP Error: --->", rsvpContactError);
+  console.log("rsvpUniqueIds", rsvpUniqueIds);
 
   // Craft API and User context
   const {
