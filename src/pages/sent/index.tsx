@@ -32,6 +32,8 @@ const SendContactTable: React.FC = () => {
   const [searchParams] = useSearchParams();
   const eventId = searchParams.get("eventId");
 
+  console.log("Event Id:--->", eventId);
+
   const { user } = useUser();
   const token = getAuthToken();
   // Craft API and User context
@@ -87,6 +89,10 @@ const SendContactTable: React.FC = () => {
   const [showExistingContactModal, setShowExistingContactModal] =
     useState(false);
   const [existingContact, setExistingContact] = useState<Contact | null>(null);
+
+  const [rsvpContact, setRsvpContact] = useState<RSVPData[]>([]);
+  const [rsvpContactLoading, setRsvpContactLoading] = useState<boolean>(true);
+  const [rsvpContactError, setRsvpContactError] = useState<string | null>(null);
 
   // Custom hooks for specific functionality
   const {
@@ -165,6 +171,41 @@ const SendContactTable: React.FC = () => {
     [latest?.event_id, latest?.id, latest?.version, token, user?.id]
   );
 
+  useEffect(() => {
+    fetchRsvpContacts();
+  }, []);
+
+  const fetchRsvpContacts = async () => {
+    try {
+      setRsvpContactLoading(true);
+      const response = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/api/rsvp?event_id=${eventId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result: APIResponse = await response.json();
+
+      setRsvpContact(result.data);
+      setRsvpContactError(null);
+    } catch (error) {
+      setRsvpContactError(
+        error instanceof Error ? error.message : "An error occurred"
+      );
+      console.error("Error fetching contacts", error);
+    } finally {
+      setRsvpContactLoading(false);
+    }
+  };
+
   // Handle Existing Contact
   const handleAddExistingContact = useCallback(async () => {
     if (!existingContact) return;
@@ -187,8 +228,7 @@ const SendContactTable: React.FC = () => {
         createFormHook.resetForm();
         setShowExistingContactModal(false);
         setExistingContact(null);
-        // Refresh contacts to update the table
-        await fetchContacts(); // Call fetchContacts to update contacts state
+        fetchRsvpContacts(); // Fetch updated rsvp contacts list
         setRSVPUniqueIds(rsvpUniqueId); // Update rsvpUniqueIds if needed
       } else {
         toast.error("Failed to add contact to table");
@@ -238,11 +278,6 @@ const SendContactTable: React.FC = () => {
     setShowExistingContactModal,
     setExistingContact,
   });
-
-  // Initialize contacts
-  useEffect(() => {
-    fetchContacts();
-  }, [fetchContacts]);
 
   // Initialize update form when editing contact changes
   useEffect(() => {
@@ -365,7 +400,6 @@ const SendContactTable: React.FC = () => {
 
       if (contactResult && contactResult.success) {
         const newContactId = contactResult.contact?.id;
-        await fetchContacts();
         if (newContactId) {
           const allowCount = createFormHook?.plusOneCount;
           const tags = createFormHook?.tags || [];
@@ -374,6 +408,8 @@ const SendContactTable: React.FC = () => {
           if (rsvpUniqueId) {
             toast.success("RSVP created successfully");
             console.log("RSVP created with unique ID:", rsvpUniqueId);
+            // Re-fetch RSVP contacts to update the table
+            await fetchRsvpContacts();
             // You can show a success notification here if needed
           } else {
             console.warn("Contact created but RSVP creation failed");
@@ -396,6 +432,7 @@ const SendContactTable: React.FC = () => {
       buildContactPayload,
       createContact,
       createRSVP,
+      fetchRsvpContacts
     ]
   );
 
@@ -486,6 +523,7 @@ const SendContactTable: React.FC = () => {
           isIndeterminate={isIndeterminate}
           onBulkAction={handleBulkAction}
           rsvpUniqueIds={rsvpUniqueIds}
+          rsvpContact={rsvpContact}
         />
       )}
 

@@ -29,6 +29,7 @@ interface ContactTableProps {
   isIndeterminate: boolean;
   onBulkAction?: (action: string, contactIds: number[]) => void;
   rsvpUniqueIds: string;
+  rsvpContact: RSVPData[];
 }
 
 
@@ -48,6 +49,7 @@ export const ContactTable: React.FC<ContactTableProps> = ({
   isIndeterminate,
   onBulkAction,
   rsvpUniqueIds,
+  rsvpContact
 }) => {
   const token = getAuthToken();
   const [searchParams] = useSearchParams();
@@ -64,66 +66,53 @@ export const ContactTable: React.FC<ContactTableProps> = ({
   const [modalContacts, setModalContacts] = useState<Contact[]>([]);
 
   // Single Event RSVP and Contact List State;
-  const [rsvpContact, setRsvpContact] = useState<RSVPData[]>([]);
-  const [rsvpContactLoading, setRsvpContactLoading] = useState<boolean>(true);
-  const [rsvpContactError, setRsvpContactError] = useState<string | null>(null);
+  // const [rsvpContact, setRsvpContact] = useState<RSVPData[]>([]);
+  // const [rsvpContactLoading, setRsvpContactLoading] = useState<boolean>(true);
+  // const [rsvpContactError, setRsvpContactError] = useState<string | null>(null);
 
-  console.log("RSVP Contact: --->", rsvpContact);
-  console.log("RSVP Error: --->", rsvpContactError);
+  console.log("RSVP Contact: -------====>", rsvpContact);
+  // console.log("RSVP Error: --->", rsvpContactError);
   console.log("rsvpUniqueIds", rsvpUniqueIds);
 
   // Craft API and User context
   const {
-    craftInvitation,
-    previewInvitation,
-    loading,
-    invitations,
-    previewLoading,
-    error,
-    versionNo,
     previewData,
-    imageGeneratingWithDelay,
-    generateImage,
-    imageGenerating,
-    craftPreviewAndGenerate,
   } = useCraftApi();
 
-  useEffect(() => {
-    fetchRsvpContacts();
-  }, []);
+  // useEffect(() => {
+  //   fetchRsvpContacts();
+  // }, []);
 
-  const fetchRsvpContacts = async () => {
-    try {
-      setRsvpContactLoading(true);
-      const response = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/api/rsvp?event_id=${eventId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+  // const fetchRsvpContacts = async () => {
+  //   try {
+  //     setRsvpContactLoading(true);
+  //     const response = await fetch(
+  //       `${import.meta.env.VITE_BASE_URL}/api/rsvp?event_id=${eventId}`,
+  //       {
+  //         method: "GET",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result: APIResponse = await response.json();
+  //     if (!response.ok) {
+  //       throw new Error(`HTTP error! status: ${response.status}`);
+  //     }
+  //     const result: APIResponse = await response.json();
 
-      console.log("Result Rsvp:--->", result?.data);
-
-      setRsvpContact(result.data);
-      setRsvpContactError(null);
-    } catch (error) {
-      setRsvpContactError(
-        error instanceof Error ? error.message : "An error occurred"
-      );
-      console.error("Error fetching contacts", error);
-    } finally {
-      setRsvpContactLoading(false);
-    }
-  };
+  //     setRsvpContact(result.data);
+  //     setRsvpContactError(null);
+  //   } catch (error) {
+  //     setRsvpContactError(
+  //       error instanceof Error ? error.message : "An error occurred"
+  //     );
+  //     console.error("Error fetching contacts", error);
+  //   } finally {
+  //     setRsvpContactLoading(false);
+  //   }
+  // };
 
   const { user } = useUser();
   const filteredContacts = contacts.filter((contact) => {
@@ -345,7 +334,7 @@ export const ContactTable: React.FC<ContactTableProps> = ({
       {/* Footer */}
       <div className="flex items-center justify-between p-4 border-t border-gray-200 text-sm text-gray-600">
         <div>
-          {contacts.length} People ({selectedCount} selected) → 7 Plus 1s = 9
+          {rsvpContact.length} People ({selectedCount} selected) → 7 Plus 1s = 9
           Total
         </div>
         <div className="flex items-center space-x-4">
