@@ -32,8 +32,6 @@ const SendContactTable: React.FC = () => {
   const [searchParams] = useSearchParams();
   const eventId = searchParams.get("eventId");
 
-  console.log("Event Id:--->", eventId);
-
   const { user } = useUser();
   const token = getAuthToken();
   // Craft API and User context
@@ -58,7 +56,7 @@ const SendContactTable: React.FC = () => {
     validateContactData,
     buildContactPayload,
     clearError,
-  } = useContacts();
+  } = useContacts();  
 
   // UI state for create/add modals
   const [showAddContactModal, setShowAddContactModal] = useState(false);
@@ -155,7 +153,6 @@ const SendContactTable: React.FC = () => {
         }
 
         const data: RSVPResponse = await response.json();
-        console.log("Create RSVP:--->", data);
 
         setRSVPUniqueIds(data.unique_id);
         toast.success(data?.message || "RSVP created successfully");
@@ -219,7 +216,6 @@ const SendContactTable: React.FC = () => {
         allowCount,
         tags
       );
-      console.log("Existing Contact: --->", rsvpUniqueId);
 
       setRSVPUniqueIds(rsvpUniqueId);
       if (rsvpUniqueId) {

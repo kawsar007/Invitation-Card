@@ -53,7 +53,7 @@ export const ContactTable: React.FC<ContactTableProps> = ({
 }) => {
   const token = getAuthToken();
   const [searchParams] = useSearchParams();
-  const eventId = searchParams.get("eventId");
+  const eventId = searchParams.get("eventId");  
 
   const { event } = useEventDetails(eventId);
 
@@ -63,16 +63,7 @@ export const ContactTable: React.FC<ContactTableProps> = ({
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContactId, setModalContactId] = useState<number | null>(null);
-  const [modalContacts, setModalContacts] = useState<Contact[]>([]);
-
-  // Single Event RSVP and Contact List State;
-  // const [rsvpContact, setRsvpContact] = useState<RSVPData[]>([]);
-  // const [rsvpContactLoading, setRsvpContactLoading] = useState<boolean>(true);
-  // const [rsvpContactError, setRsvpContactError] = useState<string | null>(null);
-
-  console.log("RSVP Contact: -------====>", rsvpContact);
-  // console.log("RSVP Error: --->", rsvpContactError);
-  console.log("rsvpUniqueIds", rsvpUniqueIds);
+  const [modalContacts, setModalContacts] = useState<any>([]);
 
   // Craft API and User context
   const {
@@ -152,7 +143,8 @@ export const ContactTable: React.FC<ContactTableProps> = ({
 
   // Handle send action for individual contact
   const handleSendClick = (contactId: number) => {
-    const contact = contacts.find((c) => c.id === contactId);
+    const contact = rsvpContact.find((c) => c.contact?.id === contactId);
+    
     if (contact) {
       setModalContactId(contactId);
       setModalContacts([contact]);
@@ -198,6 +190,7 @@ export const ContactTable: React.FC<ContactTableProps> = ({
 
   // Enhanced menu action handler to intercept send actions
   const handleMenuAction = (action: string, contactId: number) => {
+    
     if (action === "send") {
       handleSendClick(contactId);
     } else {

@@ -1,6 +1,6 @@
 import { EmailHistoryService } from '@/services/emailHistoryService';
 import { EmailService, generateInvitationEmailContent } from '@/services/emailService';
-import { Contact } from '@/types/sendContact';
+import { Contact, RSVPData } from '@/types/sendContact';
 import { X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 
@@ -31,8 +31,8 @@ interface SendInvitationModalProps {
   subject: string;
   invitationPreview?: string;
   sendFromInfo: User;
-  sendToInfo: Contact
-  recipients?: Contact[];
+  sendToInfo: any;
+  recipients?: RSVPData[];
   eventDetails?: EventDetails;
   rsvpUniqueIds: string;
   eventId?: number;
@@ -89,8 +89,9 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
     setOpenedCount(null);
 
     try {
-      const recipientEmails = recipients.length > 0 ? recipients.map(recipient => recipient.email).filter(Boolean)
-        : [sendToInfo.email].filter(Boolean);
+      const recipientEmails = recipients.length > 0 ? recipients.map(recipient => recipient?.contact?.email).filter(Boolean)
+        : [sendToInfo?.email].filter(Boolean);
+      
 
       if (recipientEmails.length === 0) {
         throw new Error('No valid email addresses found');
@@ -109,7 +110,7 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
           body: JSON.stringify({
             userId: sendFromInfo.id,
             eventId: eventId,
-            contactId: recipients.length === 1 ? sendToInfo.id : undefined,
+            contactId: recipients.length === 1 ? sendToInfo?.contact?.id : undefined,
             to: email,
             subject: subject
           }),

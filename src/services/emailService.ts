@@ -57,8 +57,6 @@ export const generateInvitationEmailContent = (
   rsvpUniqueIds?: string,
   emailHistoryId?: number
 ) => {
-  console.log("RSVP Unique IDs--->:", rsvpUniqueIds);
-
   const text = `
 Hello ${recipientName},
 
