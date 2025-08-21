@@ -1,19 +1,20 @@
-import { useRSVPForm } from '@/hooks/useRSVPForm';
-import { FinalRSVPResponse } from '@/types/sendContact';
-import { OctagonMinus } from 'lucide-react';
-import React from 'react';
-import { CompletionModal } from './CompletionModal';
-import { EventDetails } from './EventDetails';
-import { RSVPModal } from './RSVPModal';
+import { useRSVPForm } from "@/hooks/useRSVPForm";
+import { FinalRSVPResponse } from "@/types/sendContact";
+import { OctagonMinus } from "lucide-react";
+import React from "react";
+import { CompletionModal } from "./CompletionModal";
+import { EventDetails } from "./EventDetails";
+import { RSVPModal } from "./RSVPModal";
+import { useParams, useSearchParams } from "react-router-dom";
 
 interface EnvelopeSidebarPropsType {
-  rsvpData: FinalRSVPResponse
+  rsvpData: FinalRSVPResponse;
 }
 
 const EnvelopeSidebar: React.FC<EnvelopeSidebarPropsType> = ({ rsvpData }) => {
-
+  const { rsvpId } = useParams<{ rsvpId: string }>();
   // const { allow, allow_count, contact, event, invitation_card, tags, version } = rsvpData;
-  console.log("EnvelopeSidebarPropsType:->", rsvpData);
+  console.log("rsvpId:->", rsvpId);
 
   const {
     // State
@@ -42,8 +43,8 @@ const EnvelopeSidebar: React.FC<EnvelopeSidebarPropsType> = ({ rsvpData }) => {
     setIsExpandedSection,
     handleGuestTransportationChange,
     handleOwnTransportationChange,
-    handleSubmit
-  } = useRSVPForm();
+    handleSubmit,
+  } = useRSVPForm({rsvpId: rsvpId || ''});
 
   const handleButtonClick = () => {
     if (isSubmitted) {
@@ -54,34 +55,39 @@ const EnvelopeSidebar: React.FC<EnvelopeSidebarPropsType> = ({ rsvpData }) => {
   };
 
   // Calculate total attending (user + guests)
-  const totalAttending = submittedData?.attendance === 'attend' ? 1 + (submittedData?.guestInfo?.length || 0) : 0;
+  const totalAttending =
+    submittedData?.attendance === "ATTEND"
+      ? 1 + (submittedData?.guestInfo?.length || 0)
+      : 0;
 
   return (
     <div>
       <EventDetails rsvpData={rsvpData} />
 
       <div className="sticky bottom-0 left-0 right-0 bg-white pb-4 border-gray-200">
-        {submittedData?.attendance === 'not-attend' &&
-          <p className='text-xs text-gray-400 p-1 flex justify-start'>
-            <span className='mr-1 mt-[2px]'>
-              <OctagonMinus size={18} color='red' />
+        {submittedData?.attendance === "NOT_ATTEND" && (
+          <p className="text-xs text-gray-400 p-1 flex justify-start">
+            <span className="mr-1 mt-[2px]">
+              <OctagonMinus size={18} color="red" />
             </span>
             RSVP Submitted Successfully - 0 Attending in Your Group
           </p>
-        }
-        {submittedData?.attendance === 'attend' &&
-          <p className='text-xs text-gray-400 p-1 flex justify-start'>
-            RSVP Submitted Successfully - {totalAttending} Attending in Your Group
+        )}
+        {submittedData?.attendance === "ATTEND" && (
+          <p className="text-xs text-gray-400 p-1 flex justify-start">
+            RSVP Submitted Successfully - {totalAttending} Attending in Your
+            Group
           </p>
-        }
+        )}
         <button
           onClick={handleButtonClick}
-          className={`w-full py-3 px-8 rounded text-sm font-medium transition-colors tracking-wide ${isSubmitted
-            ? 'bg-gray-400 text-white hover:bg-gray-500'
-            : 'bg-teal-500 text-white hover:bg-teal-600'
-            }`}
+          className={`w-full py-3 px-8 rounded text-sm font-medium transition-colors tracking-wide ${
+            isSubmitted
+              ? "bg-gray-400 text-white hover:bg-gray-500"
+              : "bg-teal-500 text-white hover:bg-teal-600"
+          }`}
         >
-          {isSubmitted ? 'VIEW RSVP' : 'SUBMIT RSVP'}
+          {isSubmitted ? "VIEW RSVP" : "SUBMIT RSVP"}
         </button>
       </div>
 

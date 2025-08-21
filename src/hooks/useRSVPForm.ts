@@ -1,17 +1,29 @@
-import { AttendanceStatus, GuestInfo, OwnInfo, SubmittedData } from "@/types/types";
+import {
+  AttendanceStatus,
+  GuestInfo,
+  OwnInfo,
+  SubmittedData,
+} from "@/types/types";
+import { getAuthToken } from "@/utils/auth";
+import axios from "axios";
 import { useState } from "react";
+import { toast } from "sonner";
 
-export const useRSVPForm = () => {
+export const useRSVPForm = ({ rsvpId }: { rsvpId: string }) => {
+  const token = getAuthToken();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false);
-  const [attendanceStatus, setAttendanceStatus] = useState<AttendanceStatus>('');
-  const [message, setMessage] = useState('');
-  const [submittedData, setSubmittedData] = useState<SubmittedData | null>(null);
+  const [attendanceStatus, setAttendanceStatus] =
+    useState<AttendanceStatus>("");
+  const [message, setMessage] = useState("");
+  const [submittedData, setSubmittedData] = useState<SubmittedData | null>(
+    null
+  );
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const [ownInfo, setOwnInfo] = useState<OwnInfo>({
-    foodAllergies: '',
-    allergyDetails: '',
+    foodAllergies: "",
+    allergyDetails: "",
     transportation: [],
   });
 
@@ -29,105 +41,147 @@ export const useRSVPForm = () => {
     if (!isSubmitted) {
       resetForm();
     }
-  }
+  };
 
   const closeCompletionModal = () => {
     setIsCompletionModalOpen(false);
   };
 
   const resetForm = () => {
-    setAttendanceStatus('');
-    setMessage('');
+    setAttendanceStatus("");
+    setMessage("");
     setGuests([]);
     setOwnInfo({
-      foodAllergies: '',
-      allergyDetails: '',
+      foodAllergies: "",
+      allergyDetails: "",
       transportation: [],
     });
     setIsExpandedSection(false);
   };
 
   const updateOwnInfo = (field: keyof OwnInfo, value: string | string[]) => {
-    setOwnInfo(prev => {
+    setOwnInfo((prev) => {
       const updated = { ...prev, [field]: value };
-      if (field === 'foodAllergies' && value === 'no') {
-        updated.allergyDetails = '';
+      if (field === "foodAllergies" && value === "no") {
+        updated.allergyDetails = "";
       }
       return updated;
-    })
-  }
+    });
+  };
 
   const addGuest = () => {
     const newGuest: GuestInfo = {
-      firstName: '',
-      lastName: '',
-      foodAllergies: '',
-      allergyDetails: '',
+      firstName: "",
+      lastName: "",
+      foodAllergies: "",
+      allergyDetails: "",
       transportation: [],
     };
-    setGuests(prev => [...prev, newGuest]);
+    setGuests((prev) => [...prev, newGuest]);
   };
 
   const removeGuest = (index: number) => {
-    setGuests(prev => prev.filter((_, i) => i !== index));
+    setGuests((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const updateGuestInfo = (index: number, field: keyof GuestInfo, value: string | string[]) => {
-    setGuests(prev => prev.map((guest, i) => {
-      if (i === index) {
-        const updated = { ...guest, [field]: value };
-        // Clear allergy details if user selects "no" for food allergies
-        if (field === 'foodAllergies' && value === 'no') {
-          updated.allergyDetails = '';
+  const updateGuestInfo = (
+    index: number,
+    field: keyof GuestInfo,
+    value: string | string[]
+  ) => {
+    setGuests((prev) =>
+      prev.map((guest, i) => {
+        if (i === index) {
+          const updated = { ...guest, [field]: value };
+          // Clear allergy details if user selects "no" for food allergies
+          if (field === "foodAllergies" && value === "no") {
+            updated.allergyDetails = "";
+          }
+          return updated;
         }
-        return updated;
-      }
-      return guest;
-    }));
+        return guest;
+      })
+    );
   };
 
-  const handleGuestTransportationChange = (guestIndex: number, option: string) => {
-    setGuests(prev => prev.map((guest, i) => {
-      if (i === guestIndex) {
-        return {
-          ...guest,
-          transportation: guest.transportation.includes(option) ?
-            guest.transportation.filter(item => item !== option) :
-            [...guest.transportation, option]
-        };
-      }
-      return guest;
-    }));
+  const handleGuestTransportationChange = (
+    guestIndex: number,
+    option: string
+  ) => {
+    setGuests((prev) =>
+      prev.map((guest, i) => {
+        if (i === guestIndex) {
+          return {
+            ...guest,
+            transportation: guest.transportation.includes(option)
+              ? guest.transportation.filter((item) => item !== option)
+              : [...guest.transportation, option],
+          };
+        }
+        return guest;
+      })
+    );
   };
 
   const handleOwnTransportationChange = (option: string) => {
-    setOwnInfo(prev => ({
+    setOwnInfo((prev) => ({
       ...prev,
-      transportation: prev.transportation.includes(option) ?
-        prev.transportation.filter(item => item !== option) :
-        [...prev.transportation, option]
-    }))
-  }
+      transportation: prev.transportation.includes(option)
+        ? prev.transportation.filter((item) => item !== option)
+        : [...prev.transportation, option],
+    }));
+  };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!rsvpId) {
+      console.error("RSVP ID is missing");
+      return { success: false, error: "RSVP ID is missing" };
+    }
+    if (!attendanceStatus) {
+      console.error("Attendance status is required");
+      return { success: false, error: "Attendance status is required" };
+    }
+
     const submissionData: SubmittedData = {
+      rsvpId,
       ownInfo: {
         foodAllergies: ownInfo.foodAllergies,
         allergyDetails: ownInfo.allergyDetails,
         transportation: ownInfo.transportation,
       },
-      ...ownInfo,
-      attendance: attendanceStatus as 'attend' | 'not-attend',
+      foodAllergies: ownInfo.foodAllergies,
+      allergyDetails: ownInfo.allergyDetails,
+      transportation: ownInfo.transportation,
+      attendance: attendanceStatus as "ATTEND" | "NOT_ATTEND",
       message,
       bringGuest: guests.length > 0,
       guestInfo: guests.length > 0 ? guests : null,
-      submittedAt: new Date().toISOString()
+      // submittedAt: new Date().toISOString(),
     };
-    setSubmittedData(submissionData);
-    setIsSubmitted(true);
-    closeModal();
-    setIsCompletionModalOpen(true);
-  }
+
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/api/rsvp-response/submit`,
+        submissionData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setSubmittedData(submissionData);
+      setIsSubmitted(true);
+      closeModal();
+      setIsCompletionModalOpen(true);
+      toast.success(response.data?.message)
+
+      return { success: true, data: response?.data };
+    } catch (error) {
+      console.error("Failed to submit RSVP:", error);
+      return { success: false, error: error.message };
+    }
+  };
 
   return {
     // State
@@ -156,6 +210,6 @@ export const useRSVPForm = () => {
     setIsExpandedSection,
     handleGuestTransportationChange,
     handleOwnTransportationChange,
-    handleSubmit
-  }
-}
+    handleSubmit,
+  };
+};

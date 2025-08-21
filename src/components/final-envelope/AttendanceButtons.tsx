@@ -13,8 +13,8 @@ export const AttendanceButtons: React.FC<AttendanceButtonsProps> = ({
   return (
     <div className="flex gap-3 mb-4">
       <button
-        onClick={() => onAttendanceChange('attend')}
-        className={`flex-1 py-2 px-4 rounded text-sm font-medium transition-colors ${attendanceStatus === 'attend'
+        onClick={() => onAttendanceChange('ATTEND')}
+        className={`flex-1 py-2 px-4 rounded text-sm font-medium transition-colors ${attendanceStatus === 'ATTEND'
           ? 'bg-green-500 text-white'
           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
           }`}
@@ -22,8 +22,8 @@ export const AttendanceButtons: React.FC<AttendanceButtonsProps> = ({
         Will Attend
       </button>
       <button
-        onClick={() => onAttendanceChange('not-attend')}
-        className={`flex-1 py-2 px-4 rounded text-sm font-medium transition-colors ${attendanceStatus === 'not-attend'
+        onClick={() => onAttendanceChange('NOT_ATTEND')}
+        className={`flex-1 py-2 px-4 rounded text-sm font-medium transition-colors ${attendanceStatus === 'NOT_ATTEND'
           ? 'bg-gray-500 text-white'
           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
           }`}

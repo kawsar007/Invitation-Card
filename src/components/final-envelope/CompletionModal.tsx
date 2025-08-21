@@ -36,15 +36,15 @@ export const CompletionModal: React.FC<CompletionModalProps> = ({
         {/* Modal Body */}
         <div className="p-6">
           <p className="text-sm text-gray-500 mb-6">
-            {formatDate(submittedData.submittedAt)} - RSVP Submitted (
-            {submittedData.attendance === "not-attend"
+            {formatDate(new Date().toISOString())} - RSVP Submitted (
+            {submittedData.attendance === "NOT_ATTEND"
               ? <span className="text-red-500 font-bold">Not Attending</span>
               : `Attending ${submittedData.bringGuest ? (1 + submittedData.guestInfo.length) : 1}`}
             )
           </p>
 
           {/* Main attendee */}
-          {submittedData.attendance === "attend" &&
+          {submittedData.attendance === "ATTEND" &&
             <>
               <div className="mb-6">
                 <div className="flex items-center mb-4">

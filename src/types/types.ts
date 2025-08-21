@@ -70,15 +70,16 @@ export interface OwnInfo {
 }
 
 export interface SubmittedData {
+  rsvpId?: string
   ownInfo: OwnInfo;
   foodAllergies: string;
   allergyDetails: string;
   transportation: string[];
-  attendance: 'attend' | 'not-attend';
+  attendance: 'ATTEND' | 'NOT_ATTEND';
   message: string;
   bringGuest: boolean;
   guestInfo: GuestInfo[] | null; // Changed from single GuestInfo to array
-  submittedAt: string;
+  submittedAt?: string;
 }
 
-export type AttendanceStatus = 'attend' | 'not-attend' | '';
+export type AttendanceStatus = 'ATTEND' | 'NOT_ATTEND' | '';
