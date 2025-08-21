@@ -135,10 +135,12 @@ export const useRSVPForm = ({ rsvpId }: { rsvpId: string }) => {
   const handleSubmit = async () => {
     if (!rsvpId) {
       console.error("RSVP ID is missing");
+      toast.error("RSVP ID is missing");
       return { success: false, error: "RSVP ID is missing" };
     }
     if (!attendanceStatus) {
       console.error("Attendance status is required");
+      toast.error("Attendance status is required");
       return { success: false, error: "Attendance status is required" };
     }
 
@@ -174,7 +176,12 @@ export const useRSVPForm = ({ rsvpId }: { rsvpId: string }) => {
       setIsSubmitted(true);
       closeModal();
       setIsCompletionModalOpen(true);
-      toast.success(response.data?.message)
+      toast.success(response.data?.message);
+
+      // Check if email was sent successfully
+      if (response.data?.emailSent === false) {
+        toast.warning("RSVP submitted, but email notification to host failed");
+      }
 
       return { success: true, data: response?.data };
     } catch (error) {
