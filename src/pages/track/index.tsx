@@ -1,3 +1,4 @@
+import { EmailTable } from "@/components/track-ui/EmailTable";
 import { RSVPResponseModal } from "@/components/track-ui/RSVPResponseModal";
 import { StatsCard } from "@/components/track-ui/StatsCard";
 import { TrackLoading } from "@/components/track-ui/TrackLoading";
@@ -14,11 +15,8 @@ import {
   Clock,
   Download,
   Eye,
-  Filter,
   Mail,
-  Search,
   Send,
-  Users,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
@@ -38,10 +36,7 @@ export const TrackInvitationPage: React.FC<EmailHistoryDashboardProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-
-  const [selectedRSVP, setSelectedRSVP] = useState<SubmitRSVPResponse | null>(
-    null
-  );
+  const [selectedRSVP, setSelectedRSVP] = useState<SubmitRSVPResponse | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loadingRSVP, setLoadingRSVP] = useState(false);
 
@@ -54,7 +49,15 @@ export const TrackInvitationPage: React.FC<EmailHistoryDashboardProps> = ({
           EmailHistoryService.getEmailHistory({ userId, eventId }),
           EmailHistoryService.getEmailStats(userId, eventId),
         ]);
-        setHistory(historyData);
+        console.log("History Data:", historyData);
+        
+        setHistory(
+          historyData.map((item: any) => ({
+            ...item,
+            rsvp_id: item.rsvp_id ?? null,
+            submit_rsvp: item.submit_rsvp ?? null,
+          }))
+        );
         setStats(statsData);
       } catch (err) {
         setError("Failed to load email history");
@@ -65,40 +68,6 @@ export const TrackInvitationPage: React.FC<EmailHistoryDashboardProps> = ({
     };
     fetchData();
   }, [userId, eventId]);
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "opened":
-        return "bg-green-100 text-green-800 border-green-200";
-      case "sent":
-        return "bg-blue-100 text-blue-800 border-blue-200";
-      case "pending":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "unopened":
-        return "bg-gray-100 text-gray-800 border-gray-200";
-      case "unsent":
-        return "bg-red-100 text-red-800 border-red-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "opened":
-        return <Eye className="w-3 h-3" />;
-      case "sent":
-        return <Send className="w-3 h-3" />;
-      case "pending":
-        return <Clock className="w-3 h-3" />;
-      case "unopened":
-        return <Mail className="w-3 h-3" />;
-      case "unsent":
-        return <AlertCircle className="w-3 h-3" />;
-      default:
-        return <Mail className="w-3 h-3" />;
-    }
-  };
 
   const handleViewRSVP = async (email: EmailHistory) => {
     if (!email.submit_rsvp) return;
@@ -144,15 +113,13 @@ export const TrackInvitationPage: React.FC<EmailHistoryDashboardProps> = ({
     return matchesSearch && matchesStatus;
   });
 
-  // console.log("Filtered History:", filteredHistory);
-
   const openRate = stats
     ? ((stats.opened / (stats.sent || 1)) * 100).toFixed(1)
     : "0";
 
   if (isLoading) {
     return <TrackLoading />;
-  } 
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
@@ -218,184 +185,25 @@ export const TrackInvitationPage: React.FC<EmailHistoryDashboardProps> = ({
               subtitle={`Open Rate:${openRate}%`}
             />
             <StatsCard
-              title="Pending"
-              value={stats.pending}
+              title="Unopened"
+              value={stats.unopened}
               icon={<Clock className="w-6 h-6 text-yellow-600" />}
               color="bg-yellow-100"
-              subtitle={`In Queue:${stats.unsent + stats.pending}`}
+              subtitle={`In Queue:${stats.unopened}`}
+              // subtitle={`In Queue:${stats.unsent + stats.pending}`}
             />
           </div>
         )}
 
-        {/* Filters and Search */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder="Search emails..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm w-full sm:w-80"
-                />
-              </div>
-              <div className="flex items-center space-x-3">
-                <Filter className="w-4 h-4 text-gray-400" />
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="all">All Status</option>
-                  <option value="sent">Sent</option>
-                  <option value="opened">Opened</option>
-                  <option value="pending">Pending</option>
-                  <option value="unopened">Unopened</option>
-                  <option value="unsent">Unsent</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Email List */}
-          <div className="overflow-hidden">
-            {filteredHistory.length === 0 ? (
-              <div className="text-center py-12">
-                <Mail className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500 text-lg mb-2">No emails found</p>
-                <p className="text-gray-400 text-sm">
-                  Try adjusting your search or filter criteria
-                </p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Recipient
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Subject
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Sent
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Opened
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Event
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredHistory.map((email) => (
-                      <tr
-                        key={email.id}
-                        className="hover:bg-gray-50 transition-colors"
-                      >
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="flex-shrink-0 h-8 w-8">
-                              <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                                <Users className="h-4 w-4 text-blue-600" />
-                              </div>
-                            </div>
-                            <div className="ml-3">
-                              <div className="text-sm font-medium text-gray-900">
-                                {email.to}
-                              </div>
-                              {email.contact && (
-                                <div className="text-sm text-gray-500">
-                                  {email.contact?.first_name}
-                                  {email.contact?.last_name}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-sm text-gray-900 max-w-xs truncate">
-                            {email.subject}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(
-                              email.status.toLowerCase()
-                            )}`}
-                          >
-                            {getStatusIcon(email.status.toLowerCase())}
-                            <span className="ml-1 capitalize">
-                              {email.status.toLowerCase()}
-                            </span>
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {email.sent_at
-                            ? new Date(email.sent_at).toLocaleDateString(
-                                "en-US",
-                                {
-                                  month: "short",
-                                  day: "numeric",
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                }
-                              )
-                            : "-"}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {email.opened_at
-                            ? new Date(email.opened_at).toLocaleDateString(
-                                "en-US",
-                                {
-                                  month: "short",
-                                  day: "numeric",
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                }
-                              )
-                            : "-"}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">
-                            {email.event?.name || "-"}
-                          </div>
-                        </td>
-
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">
-                            {email.submit_rsvp ? (
-                              <button
-                                onClick={() => handleViewRSVP(email)}
-                                className="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full"
-                              >
-                                Viewed RSVP
-                              </button>
-                            ) : (
-                              <button className="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-800 text-xs font-medium rounded-full">
-                                No Response
-                              </button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        </div>
+        {/*Email Table & Filters and Search */}
+        <EmailTable
+          filteredHistory={filteredHistory}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
+          onViewRSVP={handleViewRSVP}
+        />
         {/* RSVP Response Modal */}
         <RSVPResponseModal
           isOpen={isModalOpen}
