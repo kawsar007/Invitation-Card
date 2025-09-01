@@ -1,9 +1,10 @@
-import { useUser } from '@/context/UserContext';
-import { AttendanceStatus, GuestInfo, OwnInfo } from '@/types/types';
-import { ChevronDown, ChevronUp, CirclePlus, User, X } from 'lucide-react';
-import React, { useEffect, useRef } from 'react';
-import { AttendanceButtons } from './AttendanceButtons';
-import { GuestForm } from './GuestForm';
+import { useUser } from "@/context/UserContext";
+import { AttendanceStatus, GuestInfo, OwnInfo } from "@/types/types";
+import { ChevronDown, ChevronUp, CirclePlus, User, X } from "lucide-react";
+import React, { useEffect, useRef } from "react";
+import { AttendanceButtons } from "./AttendanceButtons";
+import { GuestForm } from "./GuestForm";
+import { FaSpinner } from "react-icons/fa";
 
 interface RSVPModalProps {
   isOpen: boolean;
@@ -18,20 +19,25 @@ interface RSVPModalProps {
   onMessageChange: (message: string) => void;
   onAddGuest: () => void;
   onRemoveGuest: (index: number) => void;
-  onGuestInfoChange: (index: number, field: keyof GuestInfo, value: string | string[]) => void;
+  onGuestInfoChange: (
+    index: number,
+    field: keyof GuestInfo,
+    value: string | string[]
+  ) => void;
   onOwnInfoChange: (field: keyof OwnInfo, value: string | string[]) => void;
   onGuestTransportationChange: (guestIndex: number, option: string) => void;
   onOwnTransportationChange: (option: string) => void;
   onToggleExpanded: () => void;
+  isSubmitting: boolean;
   onSubmit: () => void;
 }
 
 const TRANSPORTATION_OPTIONS = [
-  'Public transit',
-  'Rideshare/Taxi',
-  'Personal vehicle',
-  'Carpool',
-  'Other'
+  "Public transit",
+  "Rideshare/Taxi",
+  "Personal vehicle",
+  "Carpool",
+  "Other",
 ];
 
 export const RSVPModal: React.FC<RSVPModalProps> = ({
@@ -52,7 +58,8 @@ export const RSVPModal: React.FC<RSVPModalProps> = ({
   onGuestTransportationChange,
   onOwnTransportationChange,
   onToggleExpanded,
-  onSubmit
+  isSubmitting,
+  onSubmit,
 }) => {
   const { user } = useUser();
   const guestRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -67,12 +74,17 @@ export const RSVPModal: React.FC<RSVPModalProps> = ({
         // Small delay to ensure the DOM is updated
         setTimeout(() => {
           // Try to focus on the first input field in the guest form
-          const firstInput = lastGuestRef.querySelector('input, textarea, select') as HTMLElement;
+          const firstInput = lastGuestRef.querySelector(
+            "input, textarea, select"
+          ) as HTMLElement;
           if (firstInput) {
             firstInput.focus();
           } else {
             // Fallback: scroll the guest form into view
-            lastGuestRef.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            lastGuestRef.scrollIntoView({
+              behavior: "smooth",
+              block: "nearest",
+            });
           }
         }, 50);
       }
@@ -92,7 +104,9 @@ export const RSVPModal: React.FC<RSVPModalProps> = ({
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 relative max-h-[90vh] overflow-y-auto">
         {/* Modal Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-800">SUBMIT YOUR RSVP</h2>
+          <h2 className="text-lg font-semibold text-gray-800">
+            SUBMIT YOUR RSVP
+          </h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -108,13 +122,23 @@ export const RSVPModal: React.FC<RSVPModalProps> = ({
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center text-gray-600">
                 <User size={16} className="mr-2" />
-                <span className="text-sm font-medium">{user?.first_name} {user?.last_name}</span>
+                <span className="text-sm font-medium">
+                  {user?.first_name} {user?.last_name}
+                </span>
               </div>
-              {attendanceStatus === 'attend' && (
+              {attendanceStatus === "ATTEND" && (
                 <div className="flex items-center text-green-600 text-sm">
                   <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center mr-2">
-                    <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    <svg
+                      className="w-2.5 h-2.5 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </div>
                   ATTENDING
@@ -134,21 +158,32 @@ export const RSVPModal: React.FC<RSVPModalProps> = ({
                 className="w-full flex items-center justify-between p-3 text-left text-sm text-gray-600 hover:bg-gray-50"
               >
                 <span>Additional Information</span>
-                {isExpandedSection ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                {isExpandedSection ? (
+                  <ChevronUp size={16} />
+                ) : (
+                  <ChevronDown size={16} />
+                )}
               </button>
 
               {isExpandedSection && (
                 <div className="p-4 border-t border-gray-200 bg-white">
                   <div className="mb-6">
-                    <p className="text-sm text-gray-600 mb-3">Do you have any food allergies?</p>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Do you have any food allergies?
+                    </p>
                     <div className="space-y-2">
                       <label className="flex items-center cursor-pointer">
                         <input
                           type="radio"
                           name="ownFoodAllergies"
                           value="yes"
-                          checked={ownInfo.foodAllergies === 'yes'}
-                          onChange={(e) => onOwnInfoChange('foodAllergies', e.target.value as 'yes' | 'no')}
+                          checked={ownInfo.foodAllergies === "yes"}
+                          onChange={(e) =>
+                            onOwnInfoChange(
+                              "foodAllergies",
+                              e.target.value as "yes" | "no"
+                            )
+                          }
                           className="mr-3"
                         />
                         <span className="text-sm text-gray-600">Yes</span>
@@ -158,22 +193,29 @@ export const RSVPModal: React.FC<RSVPModalProps> = ({
                           type="radio"
                           name="ownFoodAllergies"
                           value="no"
-                          checked={ownInfo.foodAllergies === 'no'}
-                          onChange={(e) => onOwnInfoChange('foodAllergies', e.target.value as 'yes' | 'no')}
+                          checked={ownInfo.foodAllergies === "no"}
+                          onChange={(e) =>
+                            onOwnInfoChange(
+                              "foodAllergies",
+                              e.target.value as "yes" | "no"
+                            )
+                          }
                           className="mr-3"
                         />
                         <span className="text-sm text-gray-600">No</span>
                       </label>
                     </div>
 
-                    {ownInfo.foodAllergies === 'yes' && (
+                    {ownInfo.foodAllergies === "yes" && (
                       <div className="mt-4">
                         <label className="block text-sm text-gray-600 mb-2">
                           Please specify your food allergies:
                         </label>
                         <textarea
                           value={ownInfo.allergyDetails}
-                          onChange={(e) => onOwnInfoChange('allergyDetails', e.target.value)}
+                          onChange={(e) =>
+                            onOwnInfoChange("allergyDetails", e.target.value)
+                          }
                           className="w-full p-2 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-300 resize-none"
                           placeholder="e.g., peanuts, shellfish, dairy..."
                           rows={2}
@@ -183,17 +225,24 @@ export const RSVPModal: React.FC<RSVPModalProps> = ({
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-600 mb-3">What transportation options will your group be utilizing?</p>
+                    <p className="text-sm text-gray-600 mb-3">
+                      What transportation options will your group be utilizing?
+                    </p>
                     <div className="space-y-2">
-                      {TRANSPORTATION_OPTIONS.map(option => (
-                        <label key={option} className="flex items-center cursor-pointer">
+                      {TRANSPORTATION_OPTIONS.map((option) => (
+                        <label
+                          key={option}
+                          className="flex items-center cursor-pointer"
+                        >
                           <input
                             type="checkbox"
                             checked={ownInfo.transportation.includes(option)}
                             onChange={() => onOwnTransportationChange(option)}
                             className="mr-3"
                           />
-                          <span className="text-sm text-gray-600">{option}</span>
+                          <span className="text-sm text-gray-600">
+                            {option}
+                          </span>
                         </label>
                       ))}
                     </div>
@@ -212,7 +261,7 @@ export const RSVPModal: React.FC<RSVPModalProps> = ({
               onClick={onAddGuest}
               className="text-teal-700 hover:text-teal-600 text-sm font-normal transition-colors flex justify-center items-center"
             >
-              <CirclePlus size={16} className='mr-1' /> Bring a Guest
+              <CirclePlus size={16} className="mr-1" /> Bring a Guest
             </button>
           </div>
 
@@ -249,12 +298,19 @@ export const RSVPModal: React.FC<RSVPModalProps> = ({
             <button
               onClick={onSubmit}
               disabled={!attendanceStatus}
-              className={`px-6 py-2 rounded text-sm font-medium transition-colors ${attendanceStatus
-                ? 'bg-gray-400 text-white hover:bg-gray-500'
-                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                }`}
+              className={`px-6 py-2 rounded text-sm font-medium transition-colors ${
+                attendanceStatus
+                  ? "bg-gray-400 text-white hover:bg-gray-500"
+                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
             >
-              SEND
+              {isSubmitting ? (
+                <>
+                  Sending...
+                </>
+              ) : (
+                "Send"
+              )}
             </button>
           </div>
         </div>

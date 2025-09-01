@@ -46,7 +46,7 @@ export const TrackInvitationPage: React.FC<EmailHistoryDashboardProps> = ({
       setIsLoading(true);
       try {
         const [historyData, statsData] = await Promise.all([
-          EmailHistoryService.getEmailHistory({ userId, eventId }),
+          EmailHistoryService.getEmailHistory({ userId, eventId, latestOnly: true }),
           EmailHistoryService.getEmailStats(userId, eventId),
         ]);
         console.log("History Data:", historyData);

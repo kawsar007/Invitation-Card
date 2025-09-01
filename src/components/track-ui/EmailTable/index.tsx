@@ -145,11 +145,11 @@ export const EmailTable: React.FC<EmailTableProps> = ({
                     </td>
 
                     {/* Subject */}
-                    <td className="px-6 py-4">
+                    {/* <td className="px-6 py-4">
                       <div className="text-sm text-gray-900 max-w-xs truncate">
                         {email.subject}
                       </div>
-                    </td>
+                    </td> */}
 
                     {/* Status */}
                     <td className="px-6 py-4 whitespace-nowrap">

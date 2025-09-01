@@ -20,6 +20,7 @@ export const useRSVPForm = ({ rsvpId }: { rsvpId: string }) => {
     null
   );
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [ownInfo, setOwnInfo] = useState<OwnInfo>({
     foodAllergies: "",
@@ -57,6 +58,7 @@ export const useRSVPForm = ({ rsvpId }: { rsvpId: string }) => {
       transportation: [],
     });
     setIsExpandedSection(false);
+    setIsSubmitting(false);
   };
 
   const updateOwnInfo = (field: keyof OwnInfo, value: string | string[]) => {
@@ -143,7 +145,7 @@ export const useRSVPForm = ({ rsvpId }: { rsvpId: string }) => {
       toast.error("Attendance status is required");
       return { success: false, error: "Attendance status is required" };
     }
-
+setIsSubmitting(true);
     const submissionData: SubmittedData = {
       rsvpId,
       ownInfo: {
@@ -187,6 +189,8 @@ export const useRSVPForm = ({ rsvpId }: { rsvpId: string }) => {
     } catch (error) {
       console.error("Failed to submit RSVP:", error);
       return { success: false, error: error.message };
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -202,6 +206,7 @@ export const useRSVPForm = ({ rsvpId }: { rsvpId: string }) => {
     guests,
     ownInfo,
     isExpandedSection,
+    isSubmitting,
 
     // Actions
     openModal,

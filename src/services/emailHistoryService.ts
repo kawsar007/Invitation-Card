@@ -39,6 +39,7 @@ export const EmailHistoryService = {
     eventId?: number;
     contactId?: number;
     status?: "PENDING" | "SENT" | "OPENED" | "UNOPENED" | "UNSENT";
+    latestOnly: true
   }): Promise<EmailHistory[]> {
     try {
       const response = await axios.get(

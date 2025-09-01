@@ -28,6 +28,7 @@ const EnvelopeSidebar: React.FC<EnvelopeSidebarPropsType> = ({ rsvpData }) => {
     isExpandedSection,
     submittedData,
     isSubmitted,
+    isSubmitting,
 
     // Actions
     openModal,
@@ -109,6 +110,7 @@ const EnvelopeSidebar: React.FC<EnvelopeSidebarPropsType> = ({ rsvpData }) => {
         onGuestTransportationChange={handleGuestTransportationChange}
         onOwnTransportationChange={handleOwnTransportationChange}
         onToggleExpanded={() => setIsExpandedSection(!isExpandedSection)}
+        isSubmitting={isSubmitting}
         onSubmit={handleSubmit}
       />
 
