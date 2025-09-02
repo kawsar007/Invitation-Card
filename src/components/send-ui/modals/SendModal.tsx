@@ -1,8 +1,11 @@
-import { EmailHistoryService } from '@/services/emailHistoryService';
-import { EmailService, generateInvitationEmailContent } from '@/services/emailService';
-import { Contact, RSVPData } from '@/types/sendContact';
-import { X } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { EmailHistoryService } from "@/services/emailHistoryService";
+import {
+  EmailService,
+  generateInvitationEmailContent,
+} from "@/services/emailService";
+import { Contact, RSVPData } from "@/types/sendContact";
+import { X } from "lucide-react";
+import React, { useEffect, useState } from "react";
 
 // types/User.ts
 export interface EventDetails {
@@ -16,12 +19,11 @@ export interface User {
   first_name: string;
   last_name: string;
   email: string;
-  role: 'host' | 'guest' | string; // adjust based on your system roles
+  role: "host" | "guest" | string; // adjust based on your system roles
   profile_photo: string | null;
   created_at: string; // ISO date string
   updated_at: string; // ISO date string
 }
-
 
 interface SendInvitationModalProps {
   isOpen: boolean;
@@ -50,13 +52,12 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
   recipients = [],
   eventDetails,
   rsvpUniqueIds,
-  eventId
+  eventId,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [openedCount, setOpenedCount] = useState<number | null>(null);
-
 
   const firstName = sendFromInfo?.first_name;
   const lastName = sendFromInfo?.last_name;
@@ -67,10 +68,13 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
     if (success && eventId && sendFromInfo.id) {
       const fetchOpenedCount = async () => {
         try {
-          const count = await EmailHistoryService.getOpenedEmailCount(sendFromInfo.id, eventId);
+          const count = await EmailHistoryService.getOpenedEmailCount(
+            sendFromInfo.id,
+            eventId
+          );
           setOpenedCount(count);
         } catch (err) {
-          console.error('Error fetching opened email count:', err);
+          console.error("Error fetching opened email count:", err);
         }
       };
       // Fetch immediately and then every 30 seconds
@@ -83,40 +87,49 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
   if (!isOpen) return null;
 
   const handleSendEmail = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     setError(null);
     setSuccess(null);
     setOpenedCount(null);
 
     try {
-      const recipientEmails = recipients.length > 0 ? recipients.map(recipient => recipient?.contact?.email).filter(Boolean)
-        : [sendToInfo?.email].filter(Boolean);
-      
+      const recipientEmails =
+        recipients.length > 0
+          ? recipients
+              .map((recipient) => recipient?.contact?.email)
+              .filter(Boolean)
+          : [sendToInfo?.email].filter(Boolean);
 
       if (recipientEmails.length === 0) {
-        throw new Error('No valid email addresses found');
+        throw new Error("No valid email addresses found");
       }
 
       // Send emails one by one to capture individual emailHistoryId
       const emailHistoryIds: number[] = [];
 
       for (const email of recipientEmails) {
-        const historyResponse = await fetch(`${import.meta.env.VITE_BASE_URL}/api/email/create-history`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({
-            userId: sendFromInfo.id,
-            eventId: eventId,
-            contactId: recipients.length === 1 ? sendToInfo?.contact?.id : undefined,
-            to: email,
-            subject: subject
-          }),
-        });
+        const historyResponse = await fetch(
+          `${import.meta.env.VITE_BASE_URL}/api/email/create-history`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({
+              userId: sendFromInfo.id,
+              eventId: eventId,
+              contactId:
+                recipients.length === 1 ? sendToInfo?.contact?.id : undefined,
+              to: email,
+              subject: subject,
+            }),
+          }
+        );
         if (!historyResponse.ok) {
-          throw new Error(`Failed to create email history: ${historyResponse.status}`);
+          throw new Error(
+            `Failed to create email history: ${historyResponse.status}`
+          );
         }
 
         const historyResult = await historyResponse.json();
@@ -124,13 +137,13 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
 
         // Generate email content with the emailHistoryId
         const { text, html } = generateInvitationEmailContent(
-          recipients.length > 0 ? 'there' : (sendToInfo.first_name || 'there'),
+          recipients.length > 0 ? "there" : sendToInfo.first_name || "there",
           senderName,
           "PassInviteID",
           eventDetails,
-          rsvpUniqueIds,
+          rsvpUniqueIds ? rsvpUniqueIds : recipients[0].unique_id,
           emailHistoryId
-        )
+        );
 
         // First, send email to get the emailHistoryId
         const emailData = {
@@ -142,7 +155,7 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
           userId: sendFromInfo.id,
           eventId: eventId,
           contactId: recipients.length === 1 ? sendToInfo.id : undefined,
-          emailHistoryId: emailHistoryId
+          emailHistoryId: emailHistoryId,
         };
 
         const result = await EmailService.sendEmail(emailData);
@@ -150,26 +163,31 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
         if (result.statusCode === 200 && result.emailHistoryId) {
           emailHistoryIds.push(result.emailHistoryId);
         } else {
-          throw new Error('Failed to send email');
+          throw new Error("Failed to send email");
         }
       }
 
-      setSuccess(`Email sent successfully to ${recipientEmails.length} recipient${recipientEmails.length > 1 ? 's' : ''}!`);
+      setSuccess(
+        `Email sent successfully to ${recipientEmails.length} recipient${
+          recipientEmails.length > 1 ? "s" : ""
+        }!`
+      );
 
       // Call the original onConfirmSend after successful email send
       setTimeout(() => {
         onConfirmSend();
       }, 1500);
-
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An error occurred while sending the email';
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "An error occurred while sending the email";
       setError(errorMessage);
-      console.error('Error sending email:', err);
+      console.error("Error sending email:", err);
     } finally {
       setIsLoading(false);
     }
-  }
-
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
@@ -191,8 +209,12 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
         {/* Scrollable Content */}
         <div className="overflow-y-auto flex-1 p-4 md:p-6">
           <p className="text-sm text-gray-600 mb-4">
-            A friendly reminder that when you hit send, your invitation will be sent to{' '}
-            <span className="font-medium text-gray-800">{recipientCount} people</span> and cannot be undone.{' '}
+            A friendly reminder that when you hit send, your invitation will be
+            sent to{" "}
+            <span className="font-medium text-gray-800">
+              {recipientCount} people
+            </span>{" "}
+            and cannot be undone.{" "}
             <span className="font-medium text-gray-800">
               Be sure you've proofed and are ready to send!
             </span>
@@ -200,10 +222,12 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
 
           <div className="mb-4">
             <div className="text-sm text-gray-700 mb-1">
-              <span className="font-medium text-gray-800">From:</span> {senderName}
+              <span className="font-medium text-gray-800">From:</span>{" "}
+              {senderName}
             </div>
             <div className="text-sm text-gray-700 mb-3">
-              <span className="font-medium text-gray-800">Subject:</span> {eventDetails?.eventName}
+              <span className="font-medium text-gray-800">Subject:</span>{" "}
+              {eventDetails?.eventName}
             </div>
           </div>
 
@@ -230,8 +254,8 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
                     alt="Invitation Preview"
                     className="object-contain max-h-[50vh] w-full max-w-[320px]"
                     style={{
-                      transform: 'rotate(90deg)',
-                      transformOrigin: 'center'
+                      transform: "rotate(90deg)",
+                      transformOrigin: "center",
                     }}
                   />
                 </div>
@@ -256,21 +280,40 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
           <button
             onClick={handleSendEmail}
             disabled={isLoading}
-            className={`w-full sm:w-auto px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${isLoading
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-green-600 hover:bg-green-700'
-              }`}
+            className={`w-full sm:w-auto px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${
+              isLoading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-green-600 hover:bg-green-700"
+            }`}
           >
             {isLoading ? (
               <div className="flex items-center">
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
                 Sending...
               </div>
             ) : (
-              `Send to ${recipientCount} ${recipientCount === 1 ? 'person' : 'people'}`
+              `Send to ${recipientCount} ${
+                recipientCount === 1 ? "person" : "people"
+              }`
             )}
           </button>
         </div>
