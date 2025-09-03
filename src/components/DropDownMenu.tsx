@@ -1,8 +1,4 @@
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,29 +26,44 @@ export function DropdownMenuDemo({ logout }) {
         {/* <Button variant="outline">Profile</Button> */}
         <Avatar className="cursor-pointer">
           {user?.profile_photo ? (
-            <AvatarImage src={user.profile_photo} alt={user?.first_name || '@user'} />
+            <AvatarImage
+              src={user.profile_photo}
+              alt={user?.first_name || "@user"}
+            />
           ) : (
-            <AvatarImage src="" alt={user?.first_name || '@user'} />
+            <AvatarImage src="" alt={user?.first_name || "@user"} />
           )}
           <AvatarFallback>
             {user?.first_name && user?.last_name
               ? `${user.first_name[0]}${user.last_name[0]}`.toUpperCase()
-              : 'U'}
+              : "U"}
           </AvatarFallback>
         </Avatar>
-
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem className="cursor-pointer" onClick={() => navigate('/profile')}>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => navigate("/profile")}
+          >
             Profile
             <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer" onClick={() => navigate('/events')}>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => navigate("/events")}
+          >
             Events
             <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => navigate("/contacts")}
+          >
+            Contacts
+            <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem>
             Billing
@@ -81,10 +92,6 @@ export function DropdownMenuDemo({ logout }) {
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>
-          <DropdownMenuItem>
-            New Team
-            <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
-          </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem>GitHub</DropdownMenuItem>
@@ -97,5 +104,5 @@ export function DropdownMenuDemo({ logout }) {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

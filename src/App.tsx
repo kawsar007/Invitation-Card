@@ -22,6 +22,7 @@ import SignUp from "./pages/auth/SignUp";
 import EventsPage from "./pages/events";
 import TemplatesPage from "./pages/templates";
 import { ProfilePage } from "./pages/profile/profile";
+import ContactPage from "./pages/contacts";
 
 const queryClient = new QueryClient();
 
@@ -87,18 +88,15 @@ const AppContent = () => {
           path="/profile"
           element={
             <ProtectedRoute>
-              <ProfilePage
-                user={{
-                  id: 2,
-                  first_name: "Kawsar",
-                  last_name: "Ahamed",
-                  email: "imkawsar007@gmail.com",
-                  role: "host",
-                  profile_photo: null,
-                  created_at: "2025-08-21T07:59:27.000Z",
-                  updated_at: "2025-08-21T07:59:27.000Z",
-                }}
-              />
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/contacts"
+          element={
+            <ProtectedRoute>
+              <ContactPage />
             </ProtectedRoute>
           }
         />

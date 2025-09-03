@@ -21,11 +21,8 @@ type User = {
   updated_at: string;
 };
 
-type ProfilePageProps = {
-  user: User;
-};
 
-export const ProfilePage: React.FC<ProfilePageProps> = () => {
+export const ProfilePage: React.FC = () => {
   const { user, isAuthenticated } = useUser();
   const [isEditing, setIsEditing] = useState(false);
 
