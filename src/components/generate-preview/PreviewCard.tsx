@@ -21,7 +21,7 @@ const PreviewCard: React.FC<PreviewCardProps> = ({ versionNo, previewData, previ
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editType, setEditType] = useState<'from' | 'subject'>('from');
   const [fromName, setFromName] = useState(`${user?.first_name || ''} ${user?.last_name || ''}`);
-  const [subject, setSubject] = useState(event.name);
+  const [subject, setSubject] = useState(event?.name);
   const [tempValue, setTempValue] = useState('');
 
   const handleEditClick = (type: 'from' | 'subject') => {

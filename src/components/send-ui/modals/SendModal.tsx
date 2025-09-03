@@ -154,6 +154,7 @@ export const SendInvitationModal: React.FC<SendInvitationModalProps> = ({
           html: html, // We'll update this after getting the emailHistoryId
           userId: sendFromInfo.id,
           eventId: eventId,
+          rsvp_uniqueId: !rsvpUniqueIds ? recipients[0].unique_id : rsvpUniqueIds,
           contactId: recipients.length === 1 ? sendToInfo.id : undefined,
           emailHistoryId: emailHistoryId,
         };

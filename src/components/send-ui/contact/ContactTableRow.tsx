@@ -22,7 +22,7 @@ export const ContactTableRow: React.FC<ContactTableRowProps> = ({
   onDropdownToggle,
   dropdownRef,
 }) => {
-
+  
   const handleSendClick = () => {
     onMenuAction("send", contact?.contact.id);
   };
@@ -87,7 +87,7 @@ export const ContactTableRow: React.FC<ContactTableRowProps> = ({
             onClick={handleSendClick}
             className="bg-green-500 text-white px-3 py-1 text-sm rounded hover:bg-green-600"
           >
-            SEND
+            {contact.send_email ? "Re-send" : "SEND"}
           </button>
           <div className="relative">
             <button
