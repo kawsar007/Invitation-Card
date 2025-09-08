@@ -23,6 +23,7 @@ import EventsPage from "./pages/events";
 import TemplatesPage from "./pages/templates";
 import { ProfilePage } from "./pages/profile/profile";
 import ContactPage from "./pages/contacts";
+import SubscriptionRoutes from "./routes/SubscriptionRoutes";
 
 const queryClient = new QueryClient();
 
@@ -104,6 +105,7 @@ const AppContent = () => {
           path="/"
           element={<LandingPage theme={theme} toggleTheme={toggleTheme} />}
         />
+        <Route path="/subscription/*" element={<SubscriptionRoutes />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
