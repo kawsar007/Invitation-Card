@@ -15,6 +15,8 @@ const SubscriptionPlans: React.FC = () => {
   const [processingPlan, setProcessingPlan] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  console.log("Current Subscription --->", currentSubscription);
+
   useEffect(() => {
     fetchData();
   }, []);

@@ -23,27 +23,6 @@ export interface PaymentResponse {
     paymentId: number;
     transactionId: string;
   };
-  message?: string;
-  error?: any;
-}
-
-export interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  message?: string;
-  error?: any;
-}
-
-export interface PaymentHistoryResponse {
-  success: boolean;
-  data: Payment[];
-  message?: string;
-}
-
-export interface PaymentDetailsResponse {
-  success: boolean;
-  data: Payment;
-  message?: string;
 }
 
 class PatmentService {
@@ -55,52 +34,26 @@ class PatmentService {
     };
   }
 
-  private async handleResponse<T>(response: Response): Promise<T> {
-    const data = await response.json();
-    
-    if (!response.ok) {
-      // Handle HTTP errors
-      throw new Error(
-        data.message || `HTTP error! status: ${response.status}`
-      );
-    }
-
-    // Handle application-level errors
-    if (!data.success) {
-      throw new Error(data.message || "Request failed");
-    }
-
-    return data;
-  }
-
   async initiatePayment(plan: string): Promise<PaymentResponse> {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/api/payment/initiate`,
-        {
-          method: "POST",
-          headers: this.getAuthHeaders(),
-          body: JSON.stringify({ plan }),
-        }
-      );
-
-      const data = await response.json();
-
-      // Handle both successful and error responses from your backend
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+    const response = await fetch(
+      `${import.meta.env.VITE_BASE_URL}/api/payment/initiate`,
+      {
+        method: "POST",
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify({ plan }),
       }
+    );
 
-      return data;
-    } catch (error) {
-      console.error("Payment initiation error:", error);
-      throw error;
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+
+    return response.json();
   }
 
   async getPaymentHistory(): Promise<{ success: boolean; data: Payment[] }> {
     const response = await fetch(
-      `${import.meta.env.VITE_BASE_URL}/api/payment/history`,
+      `${import.meta.env.VITE_BASE_URL}/payment/history`,
       {
         method: "GET",
         headers: this.getAuthHeaders(),
@@ -118,7 +71,7 @@ class PatmentService {
     transactionId: string
   ): Promise<{ success: boolean; data: Payment }> {
     const response = await fetch(
-      `${import.meta.env.VITE_BASE_URL}/payments/transaction/${transactionId}`,
+      `${import.meta.env.VITE_BASE_URL}/payment/transaction/${transactionId}`,
       {
         method: "GET",
         headers: this.getAuthHeaders(),
